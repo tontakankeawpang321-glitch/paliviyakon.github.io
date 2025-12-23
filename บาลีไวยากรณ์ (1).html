@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>บาลีไวยากรณ์ (AI Chatbot)</title>
+<link href="https://fonts.googleapis.com/css2?family=Kodchasan:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+  :root{
+    --bg:#f9fafb; --ink:#1e1e1e;
+    --line:#d1d5db; --edge:#9ca3af;
+    --primary:#111827; --accent:#4b5563;
+    --y-200:#fff7d6; --y-300:#ffd966;
+    --radius:14px; --shadow:0 10px 22px rgba(0,0,0,.15);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--ink);font-family:"Kodchasan",system-ui,sans-serif}
+
+  .wrap{max-width:1100px;margin:26px auto;padding:16px; padding-bottom: 80px;} /* เพิ่ม padding ล่างเผื่อปุ่ม Chat */
+  .title{font-size:clamp(22px,3.6vw,34px);font-weight:700;margin-bottom:8px;
+    background:linear-gradient(110deg,var(--primary),#374151);
+    -webkit-background-clip:text;background-clip:text;color:transparent;}
+  .sub{margin:0 0 16px;color:var(--accent);font-size:14px}
+
+  /* --- Search Bar --- */
+  .search-wrap { position: relative; margin: 16px 4px 24px; }
+  .search-input {
+    width: 100%; height: 52px; padding: 0 60px 0 20px;
+    border-radius: var(--radius); border: 1px solid var(--line);
+    background-color: #fff; font-size: 16px; font-family: inherit;
+    color: var(--ink); box-shadow: var(--shadow); -webkit-appearance: none;
+  }
+  .search-input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(17, 24, 39, 0.1); }
+  .search-btn {
+    position: absolute; top: 6px; right: 6px; bottom: 6px; width: 42px;
+    border: none; background: var(--primary); border-radius: 10px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; color: white; transition: .2s ease;
+  }
+  .search-btn:hover { background: var(--accent); }
+  .search-btn svg { width: 20px; height: 20px; }
+
+  h2{
+    display:flex;align-items:center;gap:10px;margin:18px 4px 10px;font-size:20px;
+    color:#4b3a00;font-weight:800;
+    background:linear-gradient(90deg,var(--y-300),var(--y-200));
+    padding:8px 14px;border-radius:var(--radius);
+  }
+  h2 .dot{width:10px;height:10px;border-radius:50%; background:linear-gradient(180deg,#ffd04d,#d6a31a);}
+
+  .grid{display:grid;gap:12px;margin:0 4px 18px;grid-template-columns:repeat(2,1fr)}
+
+  .dbtn{display:flex;align-items:center;gap:10px;
+    padding:14px;border-radius:var(--radius);
+    background:linear-gradient(180deg,#fff,#f3f4f6);
+    border:1px solid var(--edge);
+    box-shadow:0 1px 0 #fff inset, var(--shadow);
+    text-decoration:none;color:var(--ink);font-weight:700;min-height:52px;
+    transition:.25s ease;}
+  .dbtn:hover{transform:translateY(-2px);box-shadow:0 2px 0 #fff inset, 0 12px 22px rgba(0,0,0,.25)}
+  .dbtn:active{transform:translateY(1px)}
+  .dbtn .dot{width:8px;height:8px;border-radius:50%;background:linear-gradient(180deg,#9ca3af,#4b5563);box-shadow:0 0 0 3px #e5e7eb}
+  .dbtn .name{line-height:1.25;word-break:break-word}
+
+  /* ===== CSS ของ Chatbot UI (Copy มาจาก Law AI) ===== */
+  .chat-bubble::before { content: ''; position: absolute; width: 0; height: 0; border-style: solid; }
+  .chat-bubble-user::before {
+    border-width: 0 12px 12px 12px; border-color: transparent transparent #d97706 transparent; /* สีส้มทอง */
+    top: -10px; right: 12px;
+  }
+  .chat-bubble-model::before {
+    border-width: 0 12px 12px 12px; border-color: transparent transparent #e5e7eb transparent;
+    top: -10px; left: 12px;
+  }
+  .gemini-thinking-bar {
+    position: relative; width: 100%; height: 4px; background-color: #e0e0e0;
+    border-radius: 2px; overflow: hidden;
+  }
+  .gemini-thinking-bar::before {
+    content: ''; position: absolute; top: 0; left: 0; height: 100%; width: 100%;
+    background: linear-gradient(90deg, #d97706, #fbbf24, #f59e0b, #d97706);
+    background-size: 200% 100%; animation: thinking-gradient 2s linear infinite;
+  }
+  @keyframes thinking-gradient { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+  
+  #fab-chat-toggle {
+    position: fixed; bottom: 25px; right: 25px;
+    width: 60px; height: 60px;
+    background-color: #000000; color: white;
+    border: none; border-radius: 50%;
+    font-size: 28px; line-height: 60px; text-align: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    cursor: pointer; z-index: 998;
+    transition: transform 0.2s, opacity 0.3s;
+  }
+  #fab-chat-toggle:hover { transform: scale(1.05); background-color: #333; }
+  
+  #chatbot-modal {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    z-index: 1000; transition: opacity 0.3s, transform 0.3s;
+    opacity: 1; transform: translateY(0); pointer-events: auto;
+  }
+  #chatbot-modal.chatbot-hidden {
+    opacity: 0; transform: translateY(100%); pointer-events: none;
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="title">สารบัญหน้า</div>
+    <p class="sub">แยกตามหมวด</p>
+
+    <div class="search-wrap">
+      <input type="text" id="searchInput" class="search-input" placeholder="ค้นหาหัวข้อที่ต้องการ...">
+      <button class="search-btn" aria-label="ค้นหา">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M10 18a7.952 7.952 0 0 0 4.897-1.688l4.396 4.396 1.414-1.414-4.396-4.396A7.952 7.952 0 0 0 18 10c0-4.411-3.589-8-8-8s-8 3.589-8 8 3.589 8 8 8zm0-14c3.309 0 6 2.691 6 6s-2.691 6-6 6-6-2.691-6-6 2.691-6 6-6z"></path>
+        </svg>
+      </button>
+    </div>
+
+    <h2><span class="dot"></span><span>นาม / สัพพนาม</span></h2>
+    <div class="grid">
+      <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/01-บทนำ"><span class="dot"></span><span class="name">บทนำ</span></a>
+      <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/02-นาม"><span class="dot"></span><span class="name">นาม</span></a>
+      <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/03-ลิงค"><span class="dot"></span><span class="name">ลิงค์</span></a>
+      <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/04-วจนะ"><span class="dot"></span><span class="name">วจนะ</span></a>
+      <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/05-วภตต"><span class="dot"></span><span class="name">วิภัตติ</span></a>
+      <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/097-หลกการแปลมคธเปนไทย"><span class="dot"></span><span class="name">หลักการแปลมคธเป็นไทย</span></a>
+    </div>
+
+  </div>
+
+  <footer>
+    <p class="footer-links" style="text-align:center; color:#666; margin-top:20px;">
+      © 2025 Crow Studio |
+      <a href="https://sites.google.com/view/privacy-policy-pdpa-crow-studi/%E0%B8%AB%E0%B8%99%E0%B8%B2%E0%B9%81%E0%B8%A3%E0%B8%81" style="color:#4b5563;">นโยบายความเป็นส่วนตัว</a> |
+      <a href="ลิงก์ข้อตกลง" style="color:#4b5563;">ข้อตกลงการใช้งาน</a>
+    </p>
+  </footer>
+
+  <button id="fab-chat-toggle" title="ถาม AI บาลี">Ai</button>
+
+  <div id="chatbot-modal" class="chatbot-hidden">
+    <div class="flex flex-col h-screen bg-gray-100">
+      <header class="bg-yellow-600 text-white p-4 flex justify-between items-center shadow-md">
+        <div class="flex items-center gap-2">
+            <span class="text-2xl">☸️</span>
+            <h1 class="text-lg font-bold font-sans">AI บาลีไวยากรณ์</h1>
+        </div>
+        <div>
+          <button id="new-chat-btn" class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-1 px-3 rounded mr-2 text-sm">
+            เริ่มใหม่
+          </button>
+          <button id="chatbot-close-btn" class="bg-gray-700 hover:bg-gray-900 text-white font-bold py-1 px-3 rounded text-sm">
+            ปิด
+          </button>
+        </div>
+      </header>
+
+      <main id="chat-history" class="flex-1 overflow-y-auto p-4 space-y-4 bg-amber-50">
+        <div class="flex items-start space-x-2">
+          <span class="text-2xl">🤖</span>
+          <div class="chat-bubble chat-bubble-model bg-white text-gray-800 p-3 rounded-lg max-w-lg relative border border-gray-200 shadow-sm">
+            <p>เจริญพร... อาตมาคือ AI ผู้ช่วยด้านบาลีไวยากรณ์ หากโยมสงสัยเรื่องศัพท์ การแจกวิภัตติ หรือหลักการแปล สอบถามได้เลย</p>
+          </div>
+        </div>
+      </main>
+
+      <div id="thinking-indicator" class="p-4 hidden bg-amber-50">
+        <div class="flex items-center space-x-2">
+          <span class="text-2xl">🤖</span>
+          <div class="chat-bubble chat-bubble-model bg-white text-gray-800 p-3 rounded-lg max-w-lg relative border border-gray-200">
+            <div class="gemini-thinking-bar"></div>
+          </div>
+        </div>
+      </div>
+
+      <footer class="bg-white p-3 shadow-inner border-t border-gray-200">
+        <div class="flex space-x-2">
+          <input id="user-input" type="text" placeholder="ถามเรื่องบาลี..." class="flex-1 p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-500 font-sans">
+          <button id="send-btn" class="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded-xl shadow-sm">
+            ส่ง
+          </button>
+        </div>
+      </footer>
+    </div>
+  </div>
+
+<script>
+    // --- Script ค้นหา (เดิม) ---
+    document.getElementById('searchInput').addEventListener('keyup', function() {
+      let filter = this.value.toLowerCase();
+      let links = document.querySelectorAll('.dbtn');
+      links.forEach(function(link) {
+        let name = link.querySelector('.name').textContent.toLowerCase();
+        if (name.includes(filter)) {
+          link.style.display = "flex";
+        } else {
+          link.style.display = "none";
+        }
+      });
+    });
+
+    // ==========================================
+    // --- Script Chatbot (Backend เดียวกับ Law AI) ---
+    // ==========================================
+    
+    // URL Backend เดิมที่คุณให้มา
+    const BACKEND_URL = 'https://us-central1-law-ai-14740.cloudfunctions.net/api/chat';
+
+    // กำหนด System Prompt ให้บอทรู้ว่าเป็นผู้เชี่ยวชาญบาลี (ส่งไปหลอก Backend ว่านี่คือบริบทการคุย)
+    const SYSTEM_PROMPT = {
+        role: "user",
+        parts: [{ text: "System Instruction: คุณคือ AI ผู้เชี่ยวชาญด้าน 'บาลีไวยากรณ์' และ 'พุทธศาสนสุภาษิต' มีหน้าที่อธิบายหลักไวยากรณ์ การแจกวิภัตติ วาจก สมาส ตัทธิต และแปลความหมายธรรมะ ให้ตอบด้วยภาษาที่สุภาพ นุ่มนวล (อาจใช้สรรพนามแทนตัวว่า 'อาตมา' หรือ 'ผู้ช่วย' ก็ได้ตามความเหมาะสม) ห้ามตอบเรื่องกฎหมาย ถ้าผู้ใช้ถามเรื่องอื่นให้วกกลับมาเรื่องบาลี" }]
+    };
+    const SYSTEM_ACK = {
+        role: "model",
+        parts: [{ text: "รับทราบ เจริญพร อาตมาพร้อมให้ความรู้ด้านบาลีไวยากรณ์แล้ว" }]
+    };
+
+    let chatHistory = [SYSTEM_PROMPT, SYSTEM_ACK];
+
+    const chatHistoryEl = document.getElementById('chat-history');
+    const userInput = document.getElementById('user-input');
+    const sendBtn = document.getElementById('send-btn');
+    const newChatBtn = document.getElementById('new-chat-btn');
+    const thinkingIndicator = document.getElementById('thinking-indicator');
+
+    function addChatBubble(message, isUser = true) {
+        const bubbleType = isUser ? 'user' : 'model';
+        const icon = isUser ? '👤' : '🤖';
+        const bgClass = isUser ? 'bg-yellow-600 text-white' : 'bg-white text-gray-800 border border-gray-200';
+        
+        const wrap = document.createElement('div');
+        wrap.className = `flex items-start space-x-2 ${isUser ? 'flex-row-reverse space-x-reverse' : ''}`;
+        
+        const bubble = document.createElement('div');
+        bubble.className = `chat-bubble chat-bubble-${bubbleType} ${bgClass} p-3 rounded-lg max-w-lg relative shadow-sm`;
+        bubble.innerHTML = `<p>${message.replace(/\n/g, '<br>')}</p>`;
+        
+        wrap.innerHTML = `<span class="text-2xl">${icon}</span>`;
+        wrap.appendChild(bubble);
+        
+        chatHistoryEl.appendChild(wrap);
+        chatHistoryEl.scrollTop = chatHistoryEl.scrollHeight;
+    }
+
+    function addChatError(message) {
+        const w = document.createElement('div');
+        w.className = 'flex justify-center my-2';
+        w.innerHTML = `<span class="bg-red-100 text-red-700 text-xs font-semibold px-3 py-1 rounded-full">${message}</span>`;
+        chatHistoryEl.appendChild(w);
+        chatHistoryEl.scrollTop = chatHistoryEl.scrollHeight;
+    }
+
+    function setThinking(on) {
+        thinkingIndicator.classList.toggle('hidden', !on);
+        if (on) chatHistoryEl.scrollTop = chatHistoryEl.scrollHeight;
+    }
+
+    async function handleSend() {
+        const message = (userInput.value || '').trim();
+        if (!message) return;
+
+        addChatBubble(message, true);
+        userInput.value = '';
+        setThinking(true);
+        sendBtn.disabled = true;
+
+        // เพิ่มข้อความลงในประวัติ
+        chatHistory.push({ role: "user", parts: [{ text: message }] });
+
+        try {
+            const response = await fetch(BACKEND_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ history: chatHistory }) 
+            });
+
+            if (!response.ok) {
+                const errData = await response.json();
+                throw new Error(errData.error || `Server error: ${response.status}`);
+            }
+
+            const data = await response.json(); 
+            const aiReply = data.reply;
+
+            chatHistory.push({ role: "model", parts: [{ text: aiReply }] });
+            setThinking(false);
+            addChatBubble(aiReply, false);
+
+        } catch (err) {
+            console.error("Fetch Error:", err);
+            setThinking(false);
+            addChatError(`เกิดข้อผิดพลาด: ${err.message}`);
+            // ลบข้อความล่าสุดออกเพื่อให้ลองใหม่ได้
+            chatHistory.pop();
+        } finally {
+            sendBtn.disabled = false;
+        }
+    }
+
+    sendBtn.addEventListener('click', handleSend);
+    userInput.addEventListener('keydown', e => {
+        if (e.key === 'Enter') handleSend();
+    });
+
+    // เริ่มแชทใหม่ (Reset History)
+    newChatBtn.addEventListener('click', () => {
+        chatHistory = [SYSTEM_PROMPT, SYSTEM_ACK]; // Reset กลับไปค่าเริ่มต้น
+        chatHistoryEl.innerHTML = `
+            <div class="flex items-start space-x-2">
+            <span class="text-2xl">🤖</span>
+            <div class="chat-bubble chat-bubble-model bg-white text-gray-800 p-3 rounded-lg max-w-lg relative border border-gray-200 shadow-sm">
+                <p>เจริญพร เริ่มบทสนทนาธรรมใหม่ได้เลย</p>
+            </div>
+            </div>`;
+        userInput.value = '';
+        setThinking(false);
+    });
+
+    // ควบคุมการเปิด/ปิด Modal
+    const fabToggle = document.getElementById('fab-chat-toggle');
+    const chatModal = document.getElementById('chatbot-modal');
+    const chatbotCloseBtn = document.getElementById('chatbot-close-btn');
+
+    fabToggle.addEventListener('click', () => {
+        chatModal.classList.remove('chatbot-hidden');
+        fabToggle.style.opacity = '0';
+    });
+    chatbotCloseBtn.addEventListener('click', () => {
+        chatModal.classList.add('chatbot-hidden');
+        fabToggle.style.opacity = '1';
+    });
+
+</script>
+</body>
+</html>
