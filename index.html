@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>บาลีไวยากรณ์ (AI Chatbot)</title>
 <link href="https://fonts.googleapis.com/css2?family=Kodchasan:wght@400;600;700&display=swap" rel="stylesheet">
+<!-- Tailwind CSS for Chatbot UI -->
 <script src="https://cdn.tailwindcss.com"></script>
 
 <style>
@@ -31,6 +32,7 @@
     border-radius: var(--radius); border: 1px solid var(--line);
     background-color: #fff; font-size: 16px; font-family: inherit;
     color: var(--ink); box-shadow: var(--shadow); -webkit-appearance: none;
+    transition: all 0.2s ease;
   }
   .search-input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(17, 24, 39, 0.1); }
   .search-btn {
@@ -41,6 +43,7 @@
   .search-btn:hover { background: var(--accent); }
   .search-btn svg { width: 20px; height: 20px; }
 
+  /* หัวข้อหมวดโทนเหลืองอ่อน */
   h2{
     display:flex;align-items:center;gap:10px;margin:18px 4px 10px;font-size:20px;
     color:#4b3a00;font-weight:800;
@@ -49,8 +52,10 @@
   }
   h2 .dot{width:10px;height:10px;border-radius:50%; background:linear-gradient(180deg,#ffd04d,#d6a31a);}
 
+  /* กริดปุ่ม 2 คอลัมน์ */
   .grid{display:grid;gap:12px;margin:0 4px 18px;grid-template-columns:repeat(2,1fr)}
 
+  /* ปุ่มโทนดำอ่อน */
   .dbtn{display:flex;align-items:center;gap:10px;
     padding:14px;border-radius:var(--radius);
     background:linear-gradient(180deg,#fff,#f3f4f6);
@@ -63,7 +68,12 @@
   .dbtn .dot{width:8px;height:8px;border-radius:50%;background:linear-gradient(180deg,#9ca3af,#4b5563);box-shadow:0 0 0 3px #e5e7eb}
   .dbtn .name{line-height:1.25;word-break:break-word}
 
-  /* ===== CSS ของ Chatbot UI (Copy มาจาก Law AI) ===== */
+  /* Mobile Responsive */
+  @media (max-width: 600px) {
+    .grid { grid-template-columns: 1fr; }
+  }
+
+  /* ===== CSS ของ Chatbot UI ===== */
   .chat-bubble::before { content: ''; position: absolute; width: 0; height: 0; border-style: solid; }
   .chat-bubble-user::before {
     border-width: 0 12px 12px 12px; border-color: transparent transparent #d97706 transparent; /* สีส้มทอง */
@@ -104,6 +114,9 @@
   #chatbot-modal.chatbot-hidden {
     opacity: 0; transform: translateY(100%); pointer-events: none;
   }
+  
+  /* Class for filtering hidden items */
+  .hidden { display: none !important; }
 </style>
 </head>
 <body>
@@ -111,8 +124,9 @@
     <div class="title">สารบัญหน้า</div>
     <p class="sub">แยกตามหมวด</p>
 
+    <!-- Search Box -->
     <div class="search-wrap">
-      <input type="text" id="searchInput" class="search-input" placeholder="ค้นหาหัวข้อที่ต้องการ...">
+      <input type="text" id="searchInput" class="search-input" placeholder="ค้นหาหัวข้อที่ต้องการ..." onkeyup="filterContent()">
       <button class="search-btn" aria-label="ค้นหา">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
           <path d="M10 18a7.952 7.952 0 0 0 4.897-1.688l4.396 4.396 1.414-1.414-4.396-4.396A7.952 7.952 0 0 0 18 10c0-4.411-3.589-8-8-8s-8 3.589-8 8 3.589 8 8 8zm0-14c3.309 0 6 2.691 6 6s-2.691 6-6 6-6-2.691-6-6 2.691-6 6-6z"></path>
@@ -120,18 +134,162 @@
       </button>
     </div>
 
-    <h2><span class="dot"></span><span>นาม / สัพพนาม</span></h2>
-    <div class="grid">
-      <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/01-บทนำ"><span class="dot"></span><span class="name">บทนำ</span></a>
-      <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/02-นาม"><span class="dot"></span><span class="name">นาม</span></a>
-      <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/03-ลิงค"><span class="dot"></span><span class="name">ลิงค์</span></a>
-      <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/04-วจนะ"><span class="dot"></span><span class="name">วจนะ</span></a>
-      <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/05-วภตต"><span class="dot"></span><span class="name">วิภัตติ</span></a>
-      <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/097-หลกการแปลมคธเปนไทย"><span class="dot"></span><span class="name">หลักการแปลมคธเป็นไทย</span></a>
+    <div id="content-area">
+      <!-- นาม / สัพพนาม -->
+      <h2 class="category-title"><span class="dot"></span><span>นาม / สัพพนาม</span></h2>
+      <div class="grid category-grid">
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/01-บทนำ"><span class="dot"></span><span class="name">บทนำ</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/02-นาม"><span class="dot"></span><span class="name">นาม</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/03-ลิงค"><span class="dot"></span><span class="name">ลิงค์</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/04-วจนะ"><span class="dot"></span><span class="name">วจนะ</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/05-วภตต"><span class="dot"></span><span class="name">วิภัตติ</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/06-อายตนบาต"><span class="dot"></span><span class="name">อายตนิบาต</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/07-การนต"><span class="dot"></span><span class="name">การันต์</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/08-แจกปลงค"><span class="dot"></span><span class="name">แจกปุลิงค์</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/09-แจกอตถลงค"><span class="dot"></span><span class="name">แจกอิตถีลิงค์</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/010-แจกนปสกลงค"><span class="dot"></span><span class="name">แจกนปุสกลิงค์</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/011-กตปยศพธ"><span class="dot"></span><span class="name">กติปยศัพท์</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/012-มนคณศพธ"><span class="dot"></span><span class="name">มโนคณศัพท์</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/013-สงขยา"><span class="dot"></span><span class="name">· สังขยา</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/014-วธนบสงขยา"><span class="dot"></span><span class="name">วิธีนับสังขยา</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/015-ปกตสงขยาเปนนาม---ลงค"><span class="dot"></span><span class="name">ปกติสังขยาเป็นนาม - ลิงค์</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/016-แจกปกตสงขยา"><span class="dot"></span><span class="name">แจกปกติสังขยา</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/017-แจกปรณสงขยา"><span class="dot"></span><span class="name">แจกปูรณสังขยา</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/018-สพพนาม"><span class="dot"></span><span class="name">สัพพนาม</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/019-แจกปรสสพพนาม"><span class="dot"></span><span class="name">แจกปุริสสัพพนาม</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/020-แจกอนยมวเสสนสพพนาม"><span class="dot"></span><span class="name">แจกอนิยมวิเสสนสัพพนาม</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/021-แจกนยมวเสสนสพพนาม"><span class="dot"></span><span class="name">021 · แจกนิยมวิเสสนสัพพนาม</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/022-อพยยศพธ"><span class="dot"></span><span class="name">อัพยยศัพท์</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/023-นบาต"><span class="dot"></span><span class="name">นิบาต</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/024-ปจจยน-อพยยศพธ"><span class="dot"></span><span class="name">ปัจจัยในอัพยยศัพท์</span></a>
+      </div>
+
+      <!-- อาขยาต (กริยา) -->
+      <h2 class="category-title"><span class="dot"></span><span>อาขยาต (กริยา)</span></h2>
+      <div class="grid category-grid">
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/025-อาขยาต-วภตต"><span class="dot"></span><span class="name">อาขยาต วิภัตติ</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/026-อาขยาต-กาล"><span class="dot"></span><span class="name">อาขยาต กาล</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/027-อาขยาต-บท"><span class="dot"></span><span class="name">อาขยาต บท</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/028-อาขยาต-วจนะ-บรษ"><span class="dot"></span><span class="name">อาขยาต วจนะ บุรุษ</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/048-กรยากตก-วภตตและวาจก"><span class="dot"></span><span class="name">กิริยากิตก์ วิภัตติและวาจก</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/049-กรยากตก-กาล"><span class="dot"></span><span class="name">กิริยากิตก์ กาล</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/050-กรยากตก-วาจก"><span class="dot"></span><span class="name">กิริยากิตก์ วาจก</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/051-ปจจยแหงกรยากตก"><span class="dot"></span><span class="name">ปัจจัยแห่งกิริยากิตก์</span></a>
+      </div>
+
+      <!-- สังขยา -->
+      <h2 class="category-title"><span class="dot"></span><span>สังขยา</span></h2>
+      <div class="grid category-grid">
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/013-สงขยา"><span class="dot"></span><span class="name">สังขยา</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/014-วธนบสงขยา"><span class="dot"></span><span class="name">วิธีนับสังขยา</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/015-ปกตสงขยาเปนนาม---ลงค"><span class="dot"></span><span class="name">ปกติสังขยาเป็นนาม - ลิงค์</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/016-แจกปกตสงขยา"><span class="dot"></span><span class="name">แจกปกติสังขยา</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/017-แจกปรณสงขยา"><span class="dot"></span><span class="name">แจกปูรณสังขยา</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/077-สงขยาตทธต"><span class="dot"></span><span class="name">สังขยาตัทธิต</span></a>
+      </div>
+
+      <!-- ธาตุ -->
+      <h2 class="category-title"><span class="dot"></span><span>ธาตุ</span></h2>
+      <div class="grid category-grid">
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/029-ธาต-หมวด-ภธาต"><span class="dot"></span><span class="name">ธาตุ หมวด ภูธาตุ</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/030-หมวด-รธ-ธาต"><span class="dot"></span><span class="name">หมวด รุธฺ ธาตุ</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/031-หมวด-ทว-ธาต"><span class="dot"></span><span class="name">หมวด ทิวฺ ธาตุ</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/032-หมวด-ส-ธาต"><span class="dot"></span><span class="name">หมวด สุ ธาตุ</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/033-หมวด-ก-ธาต"><span class="dot"></span><span class="name">หมวด กี ธาตุ</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/034-หมวด-คห-และ-ตน-ธาต"><span class="dot"></span><span class="name">หมวด คหฺ และ ตนฺ ธาตุ</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/035-หมวด-จร-ธาต"><span class="dot"></span><span class="name">หมวด จุรฺ ธาตุ</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/036-สกรมมอกกรมมธาต"><span class="dot"></span><span class="name">สกัมม+อกัมมธาตุ</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/037-วาจก"><span class="dot"></span><span class="name">วาจก</span></a>
+      </div>
+
+      <!-- กิตก์ / ปัจจัย -->
+      <h2 class="category-title"><span class="dot"></span><span>กิตก์ / ปัจจัย</span></h2>
+      <div class="grid category-grid">
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/042-กตก-นามกตก"><span class="dot"></span><span class="name">กิตก์ นามกิตก์</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/043-สาธนะ"><span class="dot"></span><span class="name">สาธนะ</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/044-ปจจยแหงนามกตก"><span class="dot"></span><span class="name">ปัจจัยแห่งนามกิตก์</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/040-คำอธบายในในกตตวาจก"><span class="dot"></span><span class="name">คำอธิบายในในกัตตุวาจก</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/041-คำอธบายในกมมวาจก"><span class="dot"></span><span class="name">คำอธิบายในกัมมวาจก</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/045-วเคราะห-ในกตปจจย"><span class="dot"></span><span class="name">วิเคราะห์ ในกิตปัจจัย</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/046-วเคราะห-ในกจจปจจย"><span class="dot"></span><span class="name">วิเคราะห์ ในกิจจปัจจัย</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/047-วเคราะห-ในกตกจจปจจย"><span class="dot"></span><span class="name">วิเคราะห์ ในกิตกิจจปัจจัย</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/038-ปจจย"><span class="dot"></span><span class="name">ปัจจัย</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/039-ปจจยพเศษ-5-ตว"><span class="dot"></span><span class="name">ปัจจัยพิเศษ 5 ตัว</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/052-กตปจจย"><span class="dot"></span><span class="name">กิตปัจจัย</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/053-กจจปจจย"><span class="dot"></span><span class="name">กิจจปัจจัย</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/054-กตกจจปจจย"><span class="dot"></span><span class="name">กิตกิจจปัจจัย</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/055-ตนาท-ปจจย"><span class="dot"></span><span class="name">ตูนาทิ ปัจจัย</span></a>
+      </div>
+
+      <!-- สมาส -->
+      <h2 class="category-title"><span class="dot"></span><span>สมาส</span></h2>
+      <div class="grid category-grid">
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/056-สมาส"><span class="dot"></span><span class="name">· สมาส</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/057-กรรมธารยสมาส"><span class="dot"></span><span class="name">กัมมธารยสมาส</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/058-ทคสมาส"><span class="dot"></span><span class="name">ทิคุสมาส</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/059-ตปปRisสมาส"><span class="dot"></span><span class="name">ตัปปุริสสมาส</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/060-ทวนทวสมาส"><span class="dot"></span><span class="name">ทวันทวสมาส</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/061-อพยยภาวสมาส"><span class="dot"></span><span class="name">อัพยยีภาวสมาส</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/062-พหพพหสมาส-6-ตามวภตต"><span class="dot"></span><span class="name">พหุพพิหิสมาส 6 ตามวิภัตติ</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/063-พหพพหสมาส-5-ตามลกษณะ"><span class="dot"></span><span class="name">· พหุพพิหิสมาส 5 ตามลักษณะ</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/064-สมาสทอง"><span class="dot"></span><span class="name">สมาสท้อง</span></a>
+      </div>
+
+      <!-- ตัทธิต -->
+      <h2 class="category-title"><span class="dot"></span><span>ตัทธิต</span></h2>
+      <div class="grid category-grid">
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/065-ตทธต"><span class="dot"></span><span class="name">ตัทธิต</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/066-โคตตตทธต"><span class="dot"></span><span class="name">โคตตตัทธิต</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/067-ตรตยาทตทธต"><span class="dot"></span><span class="name">ตรัตยาทิตัทธิต</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/068-ราคาทตทธต"><span class="dot"></span><span class="name">ราคาทิตัทธิต</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/069-ชาตาทตทธต"><span class="dot"></span><span class="name">ชาตาทิตัทธิต</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/070-สมหตทธต"><span class="dot"></span><span class="name">0สมุหตัทธิต</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/071-ฐานตทธต"><span class="dot"></span><span class="name">ฐานตัทธิต</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/072-พหนตทธต"><span class="dot"></span><span class="name">พหุลตัทธิต</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/073-เสฐฐตทธต"><span class="dot"></span><span class="name">เสฏฐตัทธิต</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/074-ตดสสตถตทธต"><span class="dot"></span><span class="name">ตทัสสัตถิตัทธิต</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/075-ปกตตทธต"><span class="dot"></span><span class="name">ปกติตัทธิต</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/076-ปรณตทธต"><span class="dot"></span><span class="name">ปูรณตัทธิต</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/077-สงขยาตทธต"><span class="dot"></span><span class="name">สังขยาตัทธิต</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/078-วภาคตทธต"><span class="dot"></span><span class="name">วิภาคตัทธิต</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/079-ภาวตทธต"><span class="dot"></span><span class="name">ภาวตัทธิต</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/080-อพยยตทธต"><span class="dot"></span><span class="name"> อัพยยตัทธิต</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/081-ตทธตนอกแบบ"><span class="dot"></span><span class="name">ตัทธิตนอกแบบ</span></a>
+      </div>
+
+      <!-- อักขระ / สัทศาสตร์ -->
+      <h2 class="category-title"><span class="dot"></span><span>อักขระ / สมัญญาภิฐาน</span></h2>
+      <div class="grid category-grid">
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/082-สมญญาภธาน"><span class="dot"></span><span class="name">สมัญญาภิธาน</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/083-สระ"><span class="dot"></span><span class="name">สระ</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/084-พยญชนะ"><span class="dot"></span><span class="name">พยัญชนะ</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/085-ฐานกรณของอกขระ"><span class="dot"></span><span class="name">ฐานกรณ์ของอักขระ</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/086-เสยงของอกขระ"><span class="dot"></span><span class="name">เสียงของอักขระ</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/087-พยญชนะสงโยค"><span class="dot"></span><span class="name">พยัญชนะสังโยค</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/088-อดฒสระ"><span class="dot"></span><span class="name">อัฑฒสระ</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/089-ลำดบสระ"><span class="dot"></span><span class="name">ลำดับสระ</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/090-ลำดบการเรยงอกขระ"><span class="dot"></span><span class="name">ลำดับการเรียงอักขระ</span></a>
+      </div>
+
+      <!-- สนธิ -->
+      <h2 class="category-title"><span class="dot"></span><span>สนธิ</span></h2>
+      <div class="grid category-grid">
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/091-สนธ"><span class="dot"></span><span class="name">สนธิ</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/092-สระสนธ"><span class="dot"></span><span class="name">สระสนธิ</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/093-พยญชนะสนธ"><span class="dot"></span><span class="name">พยัญชนะสนธิ</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/094-นคคหตสนธ"><span class="dot"></span><span class="name"> นิคคหิตสนธิ</span></a>
+      </div>
+
+      <!-- กลอน / หลักการแปล -->
+      <h2 class="category-title"><span class="dot"></span><span>กลอน / หลักการแปล</span></h2>
+      <div class="grid category-grid">
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/095-กลอนสงขยา"><span class="dot"></span><span class="name">กลอนสังขยา</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/096-กลอนวภตตอาขยาต"><span class="dot"></span><span class="name"> กลอนวิภัตติอาขยาต</span></a>
+        <a class="dbtn" target="_blank" rel="noopener" href="https://sites.google.com/view/palivaiyakon/097-หลกการแปลมคธเปนไทย"><span class="dot"></span><span class="name">หลักการแปลมคธเป็นไทย</span></a>
+      </div>
     </div>
-
   </div>
-
+  
   <footer>
     <p class="footer-links" style="text-align:center; color:#666; margin-top:20px;">
       © 2025 Crow Studio |
@@ -140,8 +298,10 @@
     </p>
   </footer>
 
+  <!-- Chatbot Floating Action Button -->
   <button id="fab-chat-toggle" title="ถาม AI บาลี">Ai</button>
 
+  <!-- Chatbot Modal -->
   <div id="chatbot-modal" class="chatbot-hidden">
     <div class="flex flex-col h-screen bg-gray-100">
       <header class="bg-yellow-600 text-white p-4 flex justify-between items-center shadow-md">
@@ -189,19 +349,50 @@
   </div>
 
 <script>
-    // --- Script ค้นหา (เดิม) ---
-    document.getElementById('searchInput').addEventListener('keyup', function() {
-      let filter = this.value.toLowerCase();
-      let links = document.querySelectorAll('.dbtn');
-      links.forEach(function(link) {
-        let name = link.querySelector('.name').textContent.toLowerCase();
-        if (name.includes(filter)) {
-          link.style.display = "flex";
+    // --- Script ค้นหา (แบบละเอียด) ---
+    function filterContent() {
+      // ดึงค่าคำค้นหา
+      let input = document.getElementById('searchInput');
+      let filter = input.value.toUpperCase();
+      
+      // ดึงปุ่มทั้งหมด
+      let buttons = document.getElementsByClassName('dbtn');
+      
+      // วนลูปเช็คปุ่ม
+      for (let i = 0; i < buttons.length; i++) {
+        let txtValue = buttons[i].textContent || buttons[i].innerText;
+        if (txtValue.toUpperCase().indexOf(filter) > -1) {
+          buttons[i].classList.remove('hidden');
         } else {
-          link.style.display = "none";
+          buttons[i].classList.add('hidden');
         }
-      });
-    });
+      }
+
+      // ซ่อนหัวข้อถ้าไม่มีปุ่มในหมวดนั้นแสดงอยู่
+      let categories = document.getElementsByClassName('category-grid');
+      let titles = document.getElementsByClassName('category-title');
+
+      for (let i = 0; i < categories.length; i++) {
+        // นับจำนวนปุ่มที่มองเห็นได้ใน Grid นี้
+        let visibleButtons = 0;
+        let btnsInGrid = categories[i].getElementsByClassName('dbtn');
+        
+        for(let j = 0; j < btnsInGrid.length; j++) {
+          if (!btnsInGrid[j].classList.contains('hidden')) {
+            visibleButtons++;
+          }
+        }
+
+        // ถ้าไม่มีปุ่มแสดงเลย ให้ซ่อนหัวข้อด้วย
+        if (visibleButtons > 0) {
+          categories[i].classList.remove('hidden');
+          if(titles[i]) titles[i].classList.remove('hidden');
+        } else {
+          categories[i].classList.add('hidden');
+          if(titles[i]) titles[i].classList.add('hidden');
+        }
+      }
+    }
 
     // ==========================================
     // --- Script Chatbot (Backend เดียวกับ Law AI) ---
@@ -210,7 +401,7 @@
     // URL Backend เดิมที่คุณให้มา
     const BACKEND_URL = 'https://us-central1-law-ai-14740.cloudfunctions.net/api/chat';
 
-    // กำหนด System Prompt ให้บอทรู้ว่าเป็นผู้เชี่ยวชาญบาลี (ส่งไปหลอก Backend ว่านี่คือบริบทการคุย)
+    // กำหนด System Prompt ให้บอทรู้ว่าเป็นผู้เชี่ยวชาญบาลี
     const SYSTEM_PROMPT = {
         role: "user",
         parts: [{ text: "System Instruction: คุณคือ AI ผู้เชี่ยวชาญด้าน 'บาลีไวยากรณ์' และ 'พุทธศาสนสุภาษิต' มีหน้าที่อธิบายหลักไวยากรณ์ การแจกวิภัตติ วาจก สมาส ตัทธิต และแปลความหมายธรรมะ ให้ตอบด้วยภาษาที่สุภาพ นุ่มนวล (อาจใช้สรรพนามแทนตัวว่า 'อาตมา' หรือ 'ผู้ช่วย' ก็ได้ตามความเหมาะสม) ห้ามตอบเรื่องกฎหมาย ถ้าผู้ใช้ถามเรื่องอื่นให้วกกลับมาเรื่องบาลี" }]
