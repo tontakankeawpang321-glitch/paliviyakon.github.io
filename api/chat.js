@@ -14,7 +14,15 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { message, history } = req.body;
+    // 🔥 จุดสำคัญ: ต้อง parse เอง
+    const body = await new Promise((resolve, reject) => {
+      let data = "";
+      req.on("data", chunk => data += chunk);
+      req.on("end", () => resolve(JSON.parse(data)));
+      req.on("error", reject);
+    });
+
+    const { message, history } = body;
 
     const contents = history ?? [
       {
@@ -27,21 +35,24 @@ export default async function handler(req, res) {
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${API_KEY}`;
 
     const response = await fetch(GEMINI_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ contents })
     });
 
     const data = await response.json();
+
     if (!response.ok) {
-      throw new Error(data.error?.message || 'Gemini API Error');
+      return res.status(500).json(data);
     }
 
-    const aiReply = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
+    const aiReply =
+      data.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
+
     res.status(200).json({ reply: aiReply });
 
-  } catch (error) {
-    console.error("Backend Error:", error);
-    res.status(500).json({ error: error.message });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
   }
 }
