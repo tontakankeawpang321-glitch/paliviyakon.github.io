@@ -127,6 +127,21 @@
   }
   #fab-checkin:active { transform: scale(0.9); }
   
+  /* ตัวเลขแจ้งเตือนบนปุ่ม */
+  #checkin-badge {
+    position: absolute;
+    top: -5px; right: -5px;
+    background-color: #ef4444; /* สีแดง */
+    color: white;
+    font-size: 11px; font-weight: bold;
+    padding: 2px 6px;
+    border-radius: 12px;
+    border: 2px solid white;
+    min-width: 22px;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  }
+  
   /* Toast Notification */
   #toast {
     visibility: hidden; min-width: 250px; margin-left: -125px;
@@ -290,9 +305,10 @@
     </div>
   </div>
 
-  <!-- ปุ่มเช็คชื่อสีทอง -->
+  <!-- ปุ่มเช็คชื่อสีทอง + Badge ตัวเลข -->
   <button id="fab-checkin" title="เช็คชื่อรายวัน" onclick="handleDailyCheckIn()">
     📅
+    <span id="checkin-badge" class="hidden">0</span>
   </button>
   
   <button id="fab-chat-toggle" title="ถาม AI">AI</button>
@@ -307,7 +323,7 @@
         <h2 class="text-2xl font-bold text-amber-600 mb-2">ยินดีด้วย!</h2>
         <p class="text-gray-600 mb-4">คุณเช็คชื่อครบ 100 วันแล้ว!</p>
         <p class="text-sm text-gray-500">นี่คือโค้ดลับสำหรับคุณ:</p>
-        <div class="code-box">PALI-MASTER-100</div>
+        <div class="code-box">no-ads-2025</div>
         <p class="text-xs text-gray-400 mb-6">แคปหน้าจอนี้เก็บไว้เป็นที่ระลึก</p>
         <button onclick="closeRewardModal()" class="bg-amber-600 hover:bg-amber-700 text-white font-bold py-2 px-6 rounded-full transition w-full">ปิดหน้าต่าง</button>
     </div>
@@ -325,18 +341,35 @@
 
         if (lastCheckIn === today) {
             // Already checked in today
-            showToast(`⚠️ พรุงนี้มาใหม่ สะสม 100 วัน รับโคดลับ ลบโฆษณาถาวร (สะสม ${count} วัน)`, 'warning');
+            showToast(`⚠️ วันนี้เช็คชื่อไปแล้ว สะสม 100 รับโคดลับ ลบ โฆษณาฟรีถาวร (สะสม ${count} วัน)`, 'warning');
         } else {
             // New check-in
             count++;
             localStorage.setItem(STORAGE_KEY_DATE, today);
             localStorage.setItem(STORAGE_KEY_COUNT, count);
             
+            updateCheckinBadge(); // อัปเดตตัวเลขทันที
+
             if (count === 100) {
                 document.getElementById('reward-modal').classList.add('open');
-                // Confetti or sound effects could go here
             } else {
                 showToast(`✅ เช็คชื่อสำเร็จ! (วันที่ ${count})`, 'success');
+            }
+        }
+    }
+
+    function updateCheckinBadge() {
+        const STORAGE_KEY_COUNT = 'pali_checkin_count';
+        let count = parseInt(localStorage.getItem(STORAGE_KEY_COUNT) || '0');
+        const badge = document.getElementById('checkin-badge');
+        
+        if (badge) {
+            badge.innerText = count;
+            // ซ่อนถ้าเป็น 0 หรือ แสดงถ้ามากกว่า 0
+            if (count > 0) {
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
             }
         }
     }
@@ -354,6 +387,11 @@
     function closeRewardModal() {
         document.getElementById('reward-modal').classList.remove('open');
     }
+
+    // Call onload to set initial state
+    window.addEventListener('load', () => {
+        updateCheckinBadge();
+    });
 
     // --- 1. Search Logic ---
     function filterContent() {
