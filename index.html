@@ -81,6 +81,7 @@
     font-size: 26px; font-weight: bold;
     box-shadow: 0 6px 16px rgba(0,0,0,0.3);
     cursor: pointer; z-index: 998; transition: 0.3s;
+    display: flex; align-items: center; justify-content: center;
   }
   
   #chatbot-modal {
@@ -109,6 +110,59 @@
     background-size: 200% 100%; animation: thinking-gradient 2s linear infinite;
   }
   @keyframes thinking-gradient { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+  
+  /* --- Daily Check-in UI --- */
+  #fab-checkin {
+    position: fixed; bottom: 100px; /* อยู่เหนือปุ่ม AI (25 + 65 + 10 gap) */
+    right: 32px; /* Center with the AI button (25px + diff) - adjusted manually for visual balance */
+    width: 50px; height: 50px;
+    background: linear-gradient(135deg, #FFD700, #F59E0B);
+    color: #92400e;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    font-size: 20px;
+    box-shadow: 0 4px 12px rgba(251, 191, 36, 0.5);
+    cursor: pointer; z-index: 998; transition: 0.3s;
+    display: flex; align-items: center; justify-content: center;
+  }
+  #fab-checkin:active { transform: scale(0.9); }
+  
+  /* Toast Notification */
+  #toast {
+    visibility: hidden; min-width: 250px; margin-left: -125px;
+    background-color: #333; color: #fff; text-align: center;
+    border-radius: 8px; padding: 16px;
+    position: fixed; z-index: 2000; left: 50%; bottom: 30px;
+    font-size: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    opacity: 0; transition: opacity 0.3s, bottom 0.3s;
+  }
+  #toast.show { visibility: visible; opacity: 1; bottom: 50px; }
+  #toast.success { background-color: #065f46; } /* Green */
+  #toast.warning { background-color: #9a3412; } /* Orange/Red */
+
+  /* Reward Modal */
+  #reward-modal {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.8); z-index: 3000;
+    display: flex; justify-content: center; align-items: center;
+    opacity: 0; pointer-events: none; transition: 0.3s;
+  }
+  #reward-modal.open { opacity: 1; pointer-events: auto; }
+  .reward-box {
+    background: linear-gradient(to bottom, #fff, #fff7ed);
+    width: 90%; max-width: 400px; padding: 30px;
+    border-radius: 20px; text-align: center;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    transform: scale(0.7); transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: 4px solid #F59E0B;
+  }
+  #reward-modal.open .reward-box { transform: scale(1); }
+  .reward-icon { font-size: 60px; margin-bottom: 10px; display: block; }
+  .code-box { 
+    background: #111827; color: #10B981; font-family: monospace; 
+    padding: 15px; border-radius: 10px; margin: 20px 0; font-size: 24px; letter-spacing: 2px;
+  }
+
   .hidden { display: none !important; }
 </style>
 </head>
@@ -236,9 +290,71 @@
     </div>
   </div>
 
+  <!-- ปุ่มเช็คชื่อสีทอง -->
+  <button id="fab-checkin" title="เช็คชื่อรายวัน" onclick="handleDailyCheckIn()">
+    📅
+  </button>
+  
   <button id="fab-chat-toggle" title="ถาม AI">AI</button>
 
+  <!-- Toast Notification -->
+  <div id="toast"></div>
+
+  <!-- Reward Modal (100 days) -->
+  <div id="reward-modal">
+    <div class="reward-box">
+        <span class="reward-icon">🎉👑</span>
+        <h2 class="text-2xl font-bold text-amber-600 mb-2">ยินดีด้วย!</h2>
+        <p class="text-gray-600 mb-4">คุณเช็คชื่อครบ 100 วันแล้ว!</p>
+        <p class="text-sm text-gray-500">นี่คือโค้ดลับสำหรับคุณ:</p>
+        <div class="code-box">PALI-MASTER-100</div>
+        <p class="text-xs text-gray-400 mb-6">แคปหน้าจอนี้เก็บไว้เป็นที่ระลึก</p>
+        <button onclick="closeRewardModal()" class="bg-amber-600 hover:bg-amber-700 text-white font-bold py-2 px-6 rounded-full transition w-full">ปิดหน้าต่าง</button>
+    </div>
+  </div>
+
 <script>
+    // --- Daily Check-in Logic ---
+    function handleDailyCheckIn() {
+        const STORAGE_KEY_DATE = 'pali_last_checkin';
+        const STORAGE_KEY_COUNT = 'pali_checkin_count';
+        
+        const today = new Date().toISOString().split('T')[0]; // Format: YYYY-MM-DD
+        const lastCheckIn = localStorage.getItem(STORAGE_KEY_DATE);
+        let count = parseInt(localStorage.getItem(STORAGE_KEY_COUNT) || '0');
+
+        if (lastCheckIn === today) {
+            // Already checked in today
+            showToast(`⚠️ พรุงนี้มาใหม่ สะสม 100 วัน รับโคดลับ ลบโฆษณาถาวร (สะสม ${count} วัน)`, 'warning');
+        } else {
+            // New check-in
+            count++;
+            localStorage.setItem(STORAGE_KEY_DATE, today);
+            localStorage.setItem(STORAGE_KEY_COUNT, count);
+            
+            if (count === 100) {
+                document.getElementById('reward-modal').classList.add('open');
+                // Confetti or sound effects could go here
+            } else {
+                showToast(`✅ เช็คชื่อสำเร็จ! (วันที่ ${count})`, 'success');
+            }
+        }
+    }
+
+    function showToast(message, type) {
+        const toast = document.getElementById("toast");
+        toast.textContent = message;
+        toast.className = type; // add class 'success' or 'warning'
+        toast.classList.add("show");
+        
+        // Hide after 3 seconds
+        setTimeout(function(){ toast.classList.remove("show"); }, 3000);
+    }
+
+    function closeRewardModal() {
+        document.getElementById('reward-modal').classList.remove('open');
+    }
+
     // --- 1. Search Logic ---
     function filterContent() {
       let filter = document.getElementById('searchInput').value.toUpperCase();
@@ -338,15 +454,18 @@
 
     // Modal Control
     const fab = document.getElementById('fab-chat-toggle');
+    const fabCheckin = document.getElementById('fab-checkin'); // Get the checkin button too
     const modal = document.getElementById('chatbot-modal');
     
     fab.onclick = () => {
         modal.classList.remove('chatbot-hidden');
         fab.style.opacity = '0';
+        fabCheckin.style.opacity = '0'; // Hide check-in button too when chat is open
     };
     document.getElementById('chatbot-close-btn').onclick = () => {
         modal.classList.add('chatbot-hidden');
         fab.style.opacity = '1';
+        fabCheckin.style.opacity = '1'; // Show check-in button again
     };
     document.getElementById('new-chat-btn').onclick = () => {
         chatHistory = [SYSTEM_PROMPT, SYSTEM_ACK];
