@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>บาลีไวยากรณ์ (AI Chatbot)</title>
+<link href="https://fonts.googleapis.com/css2?family=Kodchasan:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+  :root{
+    --bg:#f9fafb; --ink:#1e1e1e;
+    --line:#d1d5db; --edge:#9ca3af;
+    --primary:#111827; --accent:#4b5563;
+    --y-200:#fff7d6; --y-300:#ffd966;
+    --radius:14px; --shadow:0 10px 22px rgba(0,0,0,.15);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--ink);font-family:"Kodchasan",system-ui,sans-serif}
+
+  .wrap{max-width:1100px;margin:26px auto;padding:16px; padding-bottom: 100px;}
+  .title{font-size:clamp(22px,3.6vw,34px);font-weight:700;margin-bottom:8px;
+    background:linear-gradient(110deg,var(--primary),#374151);
+    -webkit-background-clip:text;background-clip:text;color:transparent;}
+  .sub{margin:0 0 16px;color:var(--accent);font-size:14px}
+
+  /* --- Search Bar --- */
+  .search-wrap { position: relative; margin: 16px 4px 8px; }
+  .search-input {
+    width: 100%; height: 52px; padding: 0 60px 0 20px;
+    border-radius: var(--radius); border: 1px solid var(--line);
+    background-color: #fff; font-size: 16px; font-family: inherit;
+    color: var(--ink); box-shadow: var(--shadow); -webkit-appearance: none;
+    transition: all 0.2s ease;
+  }
+  .search-input:focus { outline: none; border-color: #b45309; box-shadow: 0 0 0 3px rgba(180, 83, 9, 0.1); }
+  .search-btn {
+    position: absolute; top: 6px; right: 6px; bottom: 6px; width: 42px;
+    border: none; background: var(--primary); border-radius: 10px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; color: white;
+  }
+  
+  .search-desc { font-size: 12px; color: #6b7280; margin: 0 8px 24px; display: flex; align-items: center; gap: 4px; }
+
+  /* หัวข้อหมวด */
+  h2{
+    display:flex;align-items:center;gap:10px;margin:24px 4px 12px;font-size:19px;
+    color:#4b3a00;font-weight:800;
+    background:linear-gradient(90deg,var(--y-300),var(--y-200));
+    padding:10px 14px;border-radius:var(--radius);
+  }
+  h2 .dot{width:10px;height:10px;border-radius:50%; background:linear-gradient(180deg,#ffd04d,#d6a31a);}
+
+  /* Grid Layout */
+  .grid{display:grid;gap:12px;margin:0 4px 24px;grid-template-columns:repeat(2,1fr)}
+
+  /* ปุ่มบทเรียน */
+  .dbtn{display:flex;align-items:center;gap:10px;
+    padding:14px;border-radius:var(--radius);
+    background:linear-gradient(180deg,#fff,#f3f4f6);
+    border:1px solid var(--edge);
+    box-shadow:0 1px 0 #fff inset, var(--shadow);
+    text-decoration:none;color:var(--ink);font-weight:700;min-height:56px;
+    transition:.2s ease;}
+  .dbtn:hover{transform:translateY(-2px); border-color: #b45309; box-shadow: 0 12px 20px rgba(0,0,0,0.15);}
+  .dbtn .dot{width:8px;height:8px;border-radius:50%;background:#9ca3af; flex-shrink: 0;}
+  .dbtn .name{line-height:1.2; font-size: 15px;}
+
+  @media (max-width: 600px) {
+    .grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    .dbtn { padding: 10px; min-height: 52px; }
+    .dbtn .name { font-size: 13.5px; }
+  }
+
+  /* --- Chatbot UI --- */
+  #fab-chat-toggle {
+    position: fixed; bottom: 25px; right: 25px;
+    width: 65px; height: 65px;
+    background-color: #b45309; color: white;
+    border: none; border-radius: 50%;
+    font-size: 26px; font-weight: bold;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+    cursor: pointer; z-index: 998; transition: 0.3s;
+    display: flex; align-items: center; justify-content: center;
+  }
+  
+  #chatbot-modal {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    z-index: 1000; transition: 0.3s;
+  }
+  .chatbot-hidden { opacity: 0; transform: translateY(100%); pointer-events: none; }
+  
+  .chat-bubble-user::before {
+    content: ''; position: absolute; width: 0; height: 0; border-style: solid;
+    border-width: 0 12px 12px 12px; border-color: transparent transparent #b45309 transparent;
+    top: -10px; right: 12px;
+  }
+  .chat-bubble-model::before {
+    content: ''; position: absolute; width: 0; height: 0; border-style: solid;
+    border-width: 0 12px 12px 12px; border-color: transparent transparent #e5e7eb transparent;
+    top: -10px; left: 12px;
+  }
+  .gemini-thinking-bar {
+    position: relative; width: 100%; height: 4px; background-color: #e0e0e0;
+    border-radius: 2px; overflow: hidden;
+  }
+  .gemini-thinking-bar::before {
+    content: ''; position: absolute; top: 0; left: 0; height: 100%; width: 100%;
+    background: linear-gradient(90deg, #b45309, #fbbf24, #b45309);
+    background-size: 200% 100%; animation: thinking-gradient 2s linear infinite;
+  }
+  @keyframes thinking-gradient { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+  
+  /* --- Daily Check-in UI --- */
+  #fab-checkin {
+    position: fixed; bottom: 100px; /* อยู่เหนือปุ่ม AI (25 + 65 + 10 gap) */
+    right: 32px; /* Center with the AI button (25px + diff) - adjusted manually for visual balance */
+    width: 50px; height: 50px;
+    background: linear-gradient(135deg, #FFD700, #F59E0B);
+    color: #92400e;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    font-size: 20px;
+    box-shadow: 0 4px 12px rgba(251, 191, 36, 0.5);
+    cursor: pointer; z-index: 998; transition: 0.3s;
+    display: flex; align-items: center; justify-content: center;
+  }
+  #fab-checkin:active { transform: scale(0.9); }
+  
+  /* ตัวเลขแจ้งเตือนบนปุ่ม */
+  #checkin-badge {
+    position: absolute;
+    top: -5px; right: -5px;
+    background-color: #ef4444; /* สีแดง */
+    color: white;
+    font-size: 11px; font-weight: bold;
+    padding: 2px 6px;
+    border-radius: 12px;
+    border: 2px solid white;
+    min-width: 22px;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  }
+  
+  /* Toast Notification */
+  #toast {
+    visibility: hidden; min-width: 250px; margin-left: -125px;
+    background-color: #333; color: #fff; text-align: center;
+    border-radius: 8px; padding: 16px;
+    position: fixed; z-index: 2000; left: 50%; bottom: 30px;
+    font-size: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    opacity: 0; transition: opacity 0.3s, bottom 0.3s;
+  }
+  #toast.show { visibility: visible; opacity: 1; bottom: 50px; }
+  #toast.success { background-color: #065f46; } /* Green */
+  #toast.warning { background-color: #9a3412; } /* Orange/Red */
+
+  /* Reward Modal */
+  #reward-modal {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.8); z-index: 3000;
+    display: flex; justify-content: center; align-items: center;
+    opacity: 0; pointer-events: none; transition: 0.3s;
+  }
+  #reward-modal.open { opacity: 1; pointer-events: auto; }
+  .reward-box {
+    background: linear-gradient(to bottom, #fff, #fff7ed);
+    width: 90%; max-width: 400px; padding: 30px;
+    border-radius: 20px; text-align: center;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    transform: scale(0.7); transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: 4px solid #F59E0B;
+  }
+  #reward-modal.open .reward-box { transform: scale(1); }
+  .reward-icon { font-size: 60px; margin-bottom: 10px; display: block; }
+  .code-box { 
+    background: #111827; color: #10B981; font-family: monospace; 
+    padding: 15px; border-radius: 10px; margin: 20px 0; font-size: 24px; letter-spacing: 2px;
+  }
+
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+  <div class="wrap">
+    <div class="title">สารบัญหน้า</div>
+    <p class="sub">แยกตามหมวดหมู่บาลีไวยากรณ์</p>
+
+    <div class="search-wrap">
+      <input type="text" id="searchInput" class="search-input" placeholder="ค้นหาบทเรียน (เช่น นาม, สนธิ, สมาส)..." onkeyup="filterContent()">
+      <button class="search-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20"><path d="M10 18a7.952 7.952 0 0 0 4.897-1.688l4.396 4.396 1.414-1.414-4.396-4.396A7.952 7.952 0 0 0 18 10c0-4.411-3.589-8-8-8s-8 3.589-8 8 3.589 8 8 8zm0-14c3.309 0 6 2.691 6 6s-2.691 6-6 6-6-2.691-6-6 2.691-6 6-6z"></path></svg>
+      </button>
+    </div>
+    <div class="search-desc">
+       <span>💡 ค้นหาหัวข้อที่ต้องการ หรือกดปุ่ม AI สีส้มขวามือเพื่อสอบถาม</span>
+    </div>
+
+    <div id="content-area">
+      <h2 class="category-title"><span class="dot"></span><span>นาม / สัพพนาม</span></h2>
+      <div class="grid category-grid">
+        <a class="dbtn" target="_blank" href="https://sites.google.com/view/palivaiyakon/01-บทนำ"><span class="dot"></span><span class="name">บทนำ</span></a>
+        <a class="dbtn" target="_blank" href="https://sites.google.com/view/palivaiyakon/02-นาม"><span class="dot"></span><span class="name">นาม</span></a>
+        <a class="dbtn" target="_blank" href="https://sites.google.com/view/palivaiyakon/03-ลิงค"><span class="dot"></span><span class="name">ลิงค์</span></a>
+        <a class="dbtn" target="_blank" href="https://sites.google.com/view/palivaiyakon/04-วจนะ"><span class="dot"></span><span class="name">วจนะ</span></a>
+        <a class="dbtn" target="_blank" href="https://sites.google.com/view/palivaiyakon/05-วภตต"><span class="dot"></span><span class="name">วิภัตติ</span></a>
+        <a class="dbtn" target="_blank" href="https://sites.google.com/view/palivaiyakon/06-อายตนบาต"><span class="dot"></span><span class="name">อายตนิบาต</span></a>
+        <a class="dbtn" target="_blank" href="https://sites.google.com/view/palivaiyakon/07-การนต"><span class="dot"></span><span class="name">การันต์</span></a>
+        <a class="dbtn" target="_blank" href="https://sites.google.com/view/palivaiyakon/08-แจกปลงค"><span class="dot"></span><span class="name">แจกปุลิงค์</span></a>
+        <a class="dbtn" target="_blank" href="https://sites.google.com/view/palivaiyakon/09-แจกอตถลงค"><span class="dot"></span><span class="name">แจกอิตถีลิงค์</span></a>
+        <a class="dbtn" target="_blank" href="https://sites.google.com/view/palivaiyakon/010-แจกนปสกลงค"><span class="dot"></span><span class="name">แจกนปุสกลิงค์</span></a>
+        <a class="dbtn" target="_blank" href="https://sites.google.com/view/palivaiyakon/011-กตปยศพธ"><span class="dot"></span><span class="name">กติปยศัพท์</span></a>
+        <a class="dbtn" target="_blank" href="https://sites.google.com/view/palivaiyakon/012-มนคณศพธ"><span class="dot"></span><span class="name">มโนคณศัพท์</span></a>
+        <a class="dbtn" target="_blank" href="https://sites.google.com/view/palivaiyakon/018-สพพนาม"><span class="dot"></span><span class="name">สัพพนาม</span></a>
+        <a class="dbtn" target="_blank" href="https://sites.google.com/view/palivaiyakon/019-แจกปรสสพพนาม"><span class="dot"></span><span class="name">แจกปุริสสัพพนาม</span></a>
+        <a class="dbtn" target="_blank" href="https://sites.google.com/view/palivaiyakon/022-อพยยศพธ"><span class="dot"></span><span class="name">อัพยยศัพท์</span></a>
+        <a class="dbtn" target="_blank" href="https://sites.google.com/view/palivaiyakon/023-นบาต"><span class="dot"></span><span class="name">นิบาต</span></a>
+      </div>
+
+      <h2 class="category-title"><span class="dot"></span><span>อาขยาต (กริยา)</span></h2>
+      <div class="grid category-grid">
+        <a class="dbtn" target="_blank" href="https://sites.google.com/view/palivaiyakon/025-อาขยาต-วภตต"><span class="dot"></span><span class="name">อาขยาต วิภัตติ</span></a>
+        <a class="dbtn" target="_blank" href="https://sites.google.com/view/palivaiyakon/026-อาขยาต-กาล"><span class="dot"></span><span class="name">อาขยาต กาล</span></a>
+        <a class="dbtn" target="_blank" href="https://sites.google.com/view/palivaiyakon/027-อาขยาต-บท"><span class="dot"></span><span class="name">อาขยาต บท</span></a>
+        <a class="dbtn" target="_blank" href="https://sites.google.com/view/palivaiyakon/037-วาจก"><span class="dot"></span><span class="name">วาจก</span></a>
+        <a class="dbtn" target="_blank" href="https://sites.google.com/view/palivaiyakon/048-กรยากตก-วภตตและวาจก"><span class="dot"></span><span class="name">กิริยากิตก์ วาจก</span></a>
+        <a class="dbtn" target="_blank" href="https://sites.google.com/view/palivaiyakon/051-ปจจยแหงกรยากตก"><span class="dot"></span><span class="name">ปัจจัยกิริยากิตก์</span></a>
+      </div>
+
+      <h2 class="category-title"><span class="dot"></span><span>สนธิ / สมาส / ตัทธิต</span></h2>
+      <div class="grid category-grid">
+        <a class="dbtn" target="_blank" href="https://sites.google.com/view/palivaiyakon/091-สนธ"><span class="dot"></span><span class="name">สนธิ</span></a>
+        <a class="dbtn" target="_blank" href="https://sites.google.com/view/palivaiyakon/056-สมาส"><span class="dot"></span><span class="name">สมาส</span></a>
+        <a class="dbtn" target="_blank" href="https://sites.google.com/view/palivaiyakon/064-สมาสทอง"><span class="dot"></span><span class="name">สมาสท้อง</span></a>
+        <a class="dbtn" target="_blank" href="https://sites.google.com/view/palivaiyakon/065-ตทธต"><span class="dot"></span><span class="name">ตัทธิต</span></a>
+        <a class="dbtn" target="_blank" href="https://sites.google.com/view/palivaiyakon/079-ภาวตทธต"><span class="dot"></span><span class="name">ภาวตัทธิต</span></a>
+        <a class="dbtn" target="_blank" href="https://sites.google.com/view/palivaiyakon/081-ตทธตนอกแบบ"><span class="dot"></span><span class="name">ตัทธิตนอกแบบ</span></a>
+      </div>
+
+      <h2 class="category-title"><span class="dot"></span><span>สังขยา</span></h2>
+      <div class="grid category-grid">
+        <a class="dbtn" target="_blank" href="https://sites.google.com/view/palivaiyakon/013-สงขยา"><span class="dot"></span><span class="name">สังขยา</span></a>
+        <a class="dbtn" target="_blank" href="https://sites.google.com/view/palivaiyakon/014-วธนบสงขยา"><span class="dot"></span><span class="name">วิธีนับสังขยา</span></a>
+        <a class="dbtn" target="_blank" href="https://sites.google.com/view/palivaiyakon/016-แจกปกตสงขยา"><span class="dot"></span><span class="name">แจกปกติสังขยา</span></a>
+      </div>
+
+      <h2 class="category-title"><span class="dot"></span><span>สมัญญาภิธาน (อักขระ)</span></h2>
+      <div class="grid category-grid">
+        <a class="dbtn" target="_blank" href="https://sites.google.com/view/palivaiyakon/082-สมญญาภธาน"><span class="dot"></span><span class="name">สมัญญาภิธาน</span></a>
+        <a class="dbtn" target="_blank" href="https://sites.google.com/view/palivaiyakon/083-สระ"><span class="dot"></span><span class="name">สระ</span></a>
+        <a class="dbtn" target="_blank" href="https://sites.google.com/view/palivaiyakon/084-พยญชนะ"><span class="dot"></span><span class="name">พยัญชนะ</span></a>
+        <a class="dbtn" target="_blank" href="https://sites.google.com/view/palivaiyakon/085-ฐานกรณของอกขระ"><span class="dot"></span><span class="name">ฐานกรณ์</span></a>
+      </div>
+
+      <h2 class="category-title"><span class="dot"></span><span>กลอน / หลักการแปล</span></h2>
+      <div class="grid category-grid">
+        <a class="dbtn" target="_blank" href="https://sites.google.com/view/palivaiyakon/095-กลอนสงขยา"><span class="dot"></span><span class="name">กลอนสังขยา</span></a>
+        <a class="dbtn" target="_blank" href="https://sites.google.com/view/palivaiyakon/096-กลอนวภตตอาขยาต"><span class="dot"></span><span class="name">กลอนวิภัตติ</span></a>
+        <a class="dbtn" target="_blank" href="https://sites.google.com/view/palivaiyakon/097-หลกการแปลมคธเปนไทย"><span class="dot"></span><span class="name">หลักการแปล</span></a>
+      </div>
+    </div>
+  </div>
+
+  <div id="chatbot-modal" class="chatbot-hidden">
+    <div class="flex flex-col h-screen bg-gray-100">
+      <header class="bg-amber-800 text-white p-4 flex justify-between items-center shadow-lg">
+        <div class="flex items-center gap-2">
+            <span class="text-2xl">☸️</span>
+            <div>
+                <h1 class="text-lg font-bold">AI บาลีไวยากรณ์</h1>
+                <p class="text-[10px] opacity-80">ผู้ช่วยส่วนตัวด้านภาษาบาลี</p>
+            </div>
+        </div>
+        <div class="flex gap-2">
+          <button id="new-chat-btn" class="bg-amber-700 hover:bg-amber-900 text-xs px-3 py-1.5 rounded-lg border border-amber-600 transition">เริ่มใหม่</button>
+          <button id="chatbot-close-btn" class="bg-gray-800 text-xs px-3 py-1.5 rounded-lg">ปิด</button>
+        </div>
+      </header>
+
+      <main id="chat-history" class="flex-1 overflow-y-auto p-4 space-y-4 bg-orange-50/30">
+        <div class="flex items-start space-x-2">
+          <span class="text-2xl">🤖</span>
+          <div class="chat-bubble chat-bubble-model bg-white text-gray-800 p-3 rounded-lg max-w-[80%] relative border border-gray-200 shadow-sm">
+            <p>เจริญพร... มีเรื่องบาลีไวยากรณ์ส่วนไหนที่โยมสงสัย? สอบถามอาตมาได้เลย</p>
+          </div>
+        </div>
+      </main>
+
+      <div id="thinking-indicator" class="p-4 hidden bg-orange-50/30">
+        <div class="flex items-center space-x-2">
+          <span class="text-2xl">🤖</span>
+          <div class="chat-bubble bg-white p-3 rounded-lg w-28 border border-gray-200 shadow-sm">
+            <div class="gemini-thinking-bar"></div>
+          </div>
+        </div>
+      </div>
+
+      <footer class="bg-white p-4 border-t">
+        <div class="flex space-x-2">
+          <input id="user-input" type="text" placeholder="ถามเรื่องศัพท์, วิภัตติ, หรือสมาส..." class="flex-1 p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-amber-600 outline-none font-sans text-sm">
+          <button id="send-btn" class="bg-amber-800 hover:bg-amber-900 text-white px-5 py-2 rounded-xl font-bold transition">ส่ง</button>
+        </div>
+      </footer>
+    </div>
+  </div>
+
+  <!-- ปุ่มเช็คชื่อสีทอง + Badge ตัวเลข -->
+  <button id="fab-checkin" title="เช็คชื่อรายวัน" onclick="handleDailyCheckIn()">
+    📅
+    <span id="checkin-badge" class="hidden">0</span>
+  </button>
+  
+  <button id="fab-chat-toggle" title="ถาม AI">AI</button>
+
+  <!-- Toast Notification -->
+  <div id="toast"></div>
+
+  <!-- Reward Modal (100 days) -->
+  <div id="reward-modal">
+    <div class="reward-box">
+        <span class="reward-icon">🎉👑</span>
+        <h2 class="text-2xl font-bold text-amber-600 mb-2">ยินดีด้วย!</h2>
+        <p class="text-gray-600 mb-4">คุณเช็คชื่อครบ 100 วันแล้ว!</p>
+        <p class="text-sm text-gray-500">นี่คือโค้ดลับสำหรับคุณ:</p>
+        <div class="code-box">no-ads-2025</div>
+        <p class="text-xs text-gray-400 mb-6">แคปหน้าจอนี้เก็บไว้เป็นที่ระลึก</p>
+        <button onclick="closeRewardModal()" class="bg-amber-600 hover:bg-amber-700 text-white font-bold py-2 px-6 rounded-full transition w-full">ปิดหน้าต่าง</button>
+    </div>
+  </div>
+
+<script>
+    // --- Daily Check-in Logic ---
+    function handleDailyCheckIn() {
+        const STORAGE_KEY_DATE = 'pali_last_checkin';
+        const STORAGE_KEY_COUNT = 'pali_checkin_count';
+        
+        const today = new Date().toISOString().split('T')[0]; // Format: YYYY-MM-DD
+        const lastCheckIn = localStorage.getItem(STORAGE_KEY_DATE);
+        let count = parseInt(localStorage.getItem(STORAGE_KEY_COUNT) || '0');
+
+        if (lastCheckIn === today) {
+            // Already checked in today
+            showToast(`⚠️ วันนี้เช็คชื่อไปแล้ว สะสม 100 รับโคดลับ ลบ โฆษณาฟรีถาวร (สะสม ${count} วัน)`, 'warning');
+        } else {
+            // New check-in
+            count++;
+            localStorage.setItem(STORAGE_KEY_DATE, today);
+            localStorage.setItem(STORAGE_KEY_COUNT, count);
+            
+            updateCheckinBadge(); // อัปเดตตัวเลขทันที
+
+            if (count === 100) {
+                document.getElementById('reward-modal').classList.add('open');
+            } else {
+                showToast(`✅ เช็คชื่อสำเร็จ! (วันที่ ${count})`, 'success');
+            }
+        }
+    }
+
+    function updateCheckinBadge() {
+        const STORAGE_KEY_COUNT = 'pali_checkin_count';
+        let count = parseInt(localStorage.getItem(STORAGE_KEY_COUNT) || '0');
+        const badge = document.getElementById('checkin-badge');
+        
+        if (badge) {
+            badge.innerText = count;
+            // ซ่อนถ้าเป็น 0 หรือ แสดงถ้ามากกว่า 0
+            if (count > 0) {
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+        }
+    }
+
+    function showToast(message, type) {
+        const toast = document.getElementById("toast");
+        toast.textContent = message;
+        toast.className = type; // add class 'success' or 'warning'
+        toast.classList.add("show");
+        
+        // Hide after 3 seconds
+        setTimeout(function(){ toast.classList.remove("show"); }, 3000);
+    }
+
+    function closeRewardModal() {
+        document.getElementById('reward-modal').classList.remove('open');
+    }
+
+    // Call onload to set initial state
+    window.addEventListener('load', () => {
+        updateCheckinBadge();
+    });
+
+    // --- 1. Search Logic ---
+    function filterContent() {
+      let filter = document.getElementById('searchInput').value.toUpperCase();
+      let buttons = document.getElementsByClassName('dbtn');
+      let grids = document.getElementsByClassName('category-grid');
+      let titles = document.getElementsByClassName('category-title');
+
+      for (let i = 0; i < buttons.length; i++) {
+        let txt = buttons[i].textContent || buttons[i].innerText;
+        buttons[i].classList.toggle('hidden', txt.toUpperCase().indexOf(filter) === -1);
+      }
+
+      for (let i = 0; i < grids.length; i++) {
+        let hasVisible = Array.from(grids[i].querySelectorAll('.dbtn')).some(b => !b.classList.contains('hidden'));
+        grids[i].classList.toggle('hidden', !hasVisible);
+        if(titles[i]) titles[i].classList.toggle('hidden', !hasVisible);
+      }
+    }
+
+    // --- 2. Chatbot Logic ---
+    const BACKEND_URL = 'https://solitary-leaf-3661.tontakankeawpang321.workers.dev'; 
+
+    const SYSTEM_PROMPT = {
+        role: "user",
+        parts: [{ text: "System Instruction: คุณคือ AI ผู้เชี่ยวชาญด้าน 'บาลีไวยากรณ์' ให้ตอบด้วยภาษาที่สุภาพ ใช้สรรพนาม 'อาตมา' เน้นการแจกวิภัตติและหลักไวยากรณ์ หากผู้ใช้ถามเรื่องอื่นให้แจ้งว่าสามารถช่วยได้เฉพาะเรื่องบาลี" }]
+    };
+    const SYSTEM_ACK = {
+        role: "model",
+        parts: [{ text: "เจริญพร อาตมาพร้อมช่วยเหลือเรื่องบาลีไวยากรณ์แล้ว" }]
+    };
+
+    let chatHistory = [SYSTEM_PROMPT, SYSTEM_ACK];
+
+    const chatHistoryEl = document.getElementById('chat-history');
+    const userInput = document.getElementById('user-input');
+    const sendBtn = document.getElementById('send-btn');
+    const thinkingIndicator = document.getElementById('thinking-indicator');
+
+    function formatMessage(text) {
+        return text
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\n/g, '<br>');
+    }
+
+    function addChatBubble(message, isUser = true) {
+        const wrap = document.createElement('div');
+        wrap.className = `flex items-start space-x-2 ${isUser ? 'flex-row-reverse space-x-reverse' : ''}`;
+        
+        const bubbleClass = isUser ? 'bg-amber-800 text-white chat-bubble-user' : 'bg-white text-gray-800 border chat-bubble-model';
+        const icon = isUser ? '👤' : '🤖';
+
+        wrap.innerHTML = `
+            <span class="text-2xl">${icon}</span>
+            <div class="chat-bubble ${bubbleClass} p-3 rounded-lg max-w-[85%] relative shadow-sm text-sm">
+                <p>${formatMessage(message)}</p>
+            </div>`;
+        
+        chatHistoryEl.appendChild(wrap);
+        chatHistoryEl.scrollTop = chatHistoryEl.scrollHeight;
+    }
+
+    async function handleSend() {
+        const msg = userInput.value.trim();
+        if (!msg || sendBtn.disabled) return;
+
+        addChatBubble(msg, true);
+        userInput.value = '';
+        sendBtn.disabled = true;
+        thinkingIndicator.classList.remove('hidden');
+        chatHistoryEl.scrollTop = chatHistoryEl.scrollHeight;
+
+        chatHistory.push({ role: "user", parts: [{ text: msg }] });
+
+        try {
+            const res = await fetch(BACKEND_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ history: chatHistory })
+            });
+
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || 'Server Error');
+
+            const reply = data.reply;
+            chatHistory.push({ role: "model", parts: [{ text: reply }] });
+            addChatBubble(reply, false);
+        } catch (err) {
+            const errDiv = document.createElement('div');
+            errDiv.className = "text-center text-red-500 text-[10px] my-2 p-2 bg-red-50 rounded";
+            errDiv.innerText = `เกิดข้อผิดพลาด: ${err.message}`;
+            chatHistoryEl.appendChild(errDiv);
+        } finally {
+            sendBtn.disabled = false;
+            thinkingIndicator.classList.add('hidden');
+        }
+    }
+
+    // Modal Control
+    const fab = document.getElementById('fab-chat-toggle');
+    const fabCheckin = document.getElementById('fab-checkin'); // Get the checkin button too
+    const modal = document.getElementById('chatbot-modal');
+    
+    fab.onclick = () => {
+        modal.classList.remove('chatbot-hidden');
+        fab.style.opacity = '0';
+        fabCheckin.style.opacity = '0'; // Hide check-in button too when chat is open
+    };
+    document.getElementById('chatbot-close-btn').onclick = () => {
+        modal.classList.add('chatbot-hidden');
+        fab.style.opacity = '1';
+        fabCheckin.style.opacity = '1'; // Show check-in button again
+    };
+    document.getElementById('new-chat-btn').onclick = () => {
+        chatHistory = [SYSTEM_PROMPT, SYSTEM_ACK];
+        chatHistoryEl.innerHTML = '';
+        addChatBubble("เจริญพร เริ่มบทสนทนาใหม่ได้เลย", false);
+    };
+
+    sendBtn.onclick = handleSend;
+    userInput.onkeydown = (e) => { if(e.key === 'Enter') handleSend(); };
+</script>
+</body>
+</html>
