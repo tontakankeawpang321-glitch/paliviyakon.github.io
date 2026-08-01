@@ -3,29 +3,56 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>บาลีไวยากรณ์ (AI Chatbot)</title>
-<link href="https://fonts.googleapis.com/css2?family=Kodchasan:wght@400;600;700&display=swap" rel="stylesheet">
+<title>บาลีไวยากรณ์ & เสียงบาลีไวยากรณ์ (AI Chatbot)</title>
+<link href="https://fonts.googleapis.com/css2?family=Kodchasan:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com"></script>
 
 <style>
-  :root{
-    --bg:#f9fafb; --ink:#1e1e1e;
-    --line:#d1d5db; --edge:#9ca3af;
-    --primary:#111827; --accent:#4b5563;
-    --y-200:#fff7d6; --y-300:#ffd966;
-    --radius:14px; --shadow:0 10px 22px rgba(0,0,0,.15);
+  :root {
+    --bg: #f9fafb; 
+    --ink: #1e1e1e;
+    --line: #d1d5db; 
+    --edge: #9ca3af;
+    --primary: #111827; 
+    --accent: #4b5563;
+    --y-200: #fff7d6; 
+    --y-300: #ffd966;
+    --amber-main: #b45309;
+    --amber-light: #fef3c7;
+    --radius: 16px; 
+    --shadow: 0 10px 22px rgba(0,0,0,.12);
   }
-  *{box-sizing:border-box}
-  html,body{margin:0;background:var(--bg);color:var(--ink);font-family:"Kodchasan",system-ui,sans-serif}
+  
+  * { box-sizing: border-box; }
+  html, body { 
+    margin: 0; 
+    background: var(--bg); 
+    color: var(--ink); 
+    font-family: "Kodchasan", system-ui, sans-serif;
+    padding-bottom: 110px; /* Space for bottom nav & mini player */
+    -webkit-tap-highlight-color: transparent;
+  }
 
-  .wrap{max-width:1100px;margin:26px auto;padding:16px; padding-bottom: 100px;}
-  .title{font-size:clamp(22px,3.6vw,34px);font-weight:700;margin-bottom:8px;
-    background:linear-gradient(110deg,var(--primary),#374151);
-    -webkit-background-clip:text;background-clip:text;color:transparent;}
-  .sub{margin:0 0 16px;color:var(--accent);font-size:14px}
+  .wrap { 
+    max-width: 1100px; 
+    margin: 0 auto; 
+    padding: 16px; 
+  }
+  
+  .title { 
+    font-size: clamp(22px, 3.6vw, 34px); 
+    font-weight: 700; 
+    margin-bottom: 4px;
+    background: linear-gradient(110deg, var(--primary), #374151);
+    -webkit-background-clip: text; 
+    background-clip: text; 
+    color: transparent; 
+  }
+  
+  .sub { margin: 0 0 16px; color: var(--accent); font-size: 14px; }
 
   /* --- Search Bar --- */
-  .search-wrap { position: relative; margin: 16px 4px 8px; }
+  .search-wrap { position: relative; margin: 16px 0 8px; }
   .search-input {
     width: 100%; height: 52px; padding: 0 60px 0 20px;
     border-radius: var(--radius); border: 1px solid var(--line);
@@ -33,72 +60,75 @@
     color: var(--ink); box-shadow: var(--shadow); -webkit-appearance: none;
     transition: all 0.2s ease;
   }
-  .search-input:focus { outline: none; border-color: #b45309; box-shadow: 0 0 0 3px rgba(180, 83, 9, 0.1); }
+  .search-input:focus { outline: none; border-color: var(--amber-main); box-shadow: 0 0 0 3px rgba(180, 83, 9, 0.15); }
   .search-btn {
     position: absolute; top: 6px; right: 6px; bottom: 6px; width: 42px;
-    border: none; background: var(--primary); border-radius: 10px; cursor: pointer;
+    border: none; background: var(--amber-main); border-radius: 12px; cursor: pointer;
     display: flex; align-items: center; justify-content: center; color: white;
   }
   
-  .search-desc { font-size: 12px; color: #6b7280; margin: 0 8px 24px; display: flex; align-items: center; gap: 4px; }
+  .search-desc { font-size: 12px; color: #6b7280; margin: 0 8px 20px; display: flex; align-items: center; gap: 4px; }
 
-  /* หัวข้อหมวด */
-  h2{
-    display:flex;align-items:center;gap:10px;margin:24px 4px 12px;font-size:19px;
-    color:#4b3a00;font-weight:800;
-    background:linear-gradient(90deg,var(--y-300),var(--y-200));
-    padding:10px 14px;border-radius:var(--radius);
+  /* Section Titles */
+  h2.category-title {
+    display: flex; align-items: center; gap: 10px; margin: 24px 0 12px; font-size: 18px;
+    color: #4b3a00; font-weight: 700;
+    background: linear-gradient(90deg, var(--y-300), var(--y-200));
+    padding: 10px 16px; border-radius: var(--radius);
   }
-  h2 .dot{width:10px;height:10px;border-radius:50%; background:linear-gradient(180deg,#ffd04d,#d6a31a);}
+  h2.category-title .dot { width: 10px; height: 10px; border-radius: 50%; background: linear-gradient(180deg, #ffd04d, #d6a31a); }
 
   /* Grid Layout */
-  .grid{display:grid;gap:12px;margin:0 4px 24px;grid-template-columns:repeat(2,1fr)}
+  .grid { display: grid; gap: 12px; margin: 0 0 24px; grid-template-columns: repeat(2, 1fr); }
 
-  /* ปุ่มบทเรียน */
-  .dbtn{display:flex;align-items:center;gap:10px;
-    padding:14px;border-radius:var(--radius);
-    background:linear-gradient(180deg,#fff,#f3f4f6);
-    border:1px solid var(--edge);
-    box-shadow:0 1px 0 #fff inset, var(--shadow);
-    text-decoration:none;color:var(--ink);font-weight:700;min-height:56px;
-    transition:.2s ease;}
-  .dbtn:hover{transform:translateY(-2px); border-color: #b45309; box-shadow: 0 12px 20px rgba(0,0,0,0.15);}
-  .dbtn .dot{width:8px;height:8px;border-radius:50%;background:#9ca3af; flex-shrink: 0;}
-  .dbtn .name{line-height:1.2; font-size: 15px;}
+  /* Lesson Button */
+  .dbtn {
+    display: flex; align-items: center; gap: 10px;
+    padding: 14px; border-radius: var(--radius);
+    background: linear-gradient(180deg, #fff, #f9fafb);
+    border: 1px solid var(--line);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.04);
+    text-decoration: none; color: var(--ink); font-weight: 600; min-height: 56px;
+    transition: all .2s ease;
+  }
+  .dbtn:hover { transform: translateY(-2px); border-color: var(--amber-main); box-shadow: 0 10px 18px rgba(0,0,0,0.08); }
+  .dbtn .dot { width: 8px; height: 8px; border-radius: 50%; background: #9ca3af; flex-shrink: 0; }
+  .dbtn .name { line-height: 1.2; font-size: 14.5px; }
 
   @media (max-width: 600px) {
     .grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
-    .dbtn { padding: 10px; min-height: 52px; }
+    .dbtn { padding: 10px 12px; min-height: 52px; }
     .dbtn .name { font-size: 13.5px; }
   }
 
   /* --- Chatbot UI --- */
   #fab-chat-toggle {
-    position: fixed; bottom: 25px; right: 25px;
-    width: 65px; height: 65px;
-    background-color: #b45309; color: white;
+    position: fixed; bottom: 90px; right: 20px;
+    width: 58px; height: 58px;
+    background-color: var(--amber-main); color: white;
     border: none; border-radius: 50%;
-    font-size: 26px; font-weight: bold;
-    box-shadow: 0 6px 16px rgba(0,0,0,0.3);
-    cursor: pointer; z-index: 998; transition: 0.3s;
+    font-size: 22px; font-weight: bold;
+    box-shadow: 0 6px 18px rgba(180, 83, 9, 0.4);
+    cursor: pointer; z-index: 990; transition: all 0.3s ease;
     display: flex; align-items: center; justify-content: center;
   }
-  
+  #fab-chat-toggle:hover { transform: scale(1.05); }
+
   #chatbot-modal {
     position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-    z-index: 1000; transition: 0.3s;
+    z-index: 1000; transition: 0.3s ease-in-out;
   }
   .chatbot-hidden { opacity: 0; transform: translateY(100%); pointer-events: none; }
-  
+
   .chat-bubble-user::before {
     content: ''; position: absolute; width: 0; height: 0; border-style: solid;
-    border-width: 0 12px 12px 12px; border-color: transparent transparent #b45309 transparent;
-    top: -10px; right: 12px;
+    border-width: 0 10px 10px 10px; border-color: transparent transparent #b45309 transparent;
+    top: -8px; right: 12px;
   }
   .chat-bubble-model::before {
     content: ''; position: absolute; width: 0; height: 0; border-style: solid;
-    border-width: 0 12px 12px 12px; border-color: transparent transparent #e5e7eb transparent;
-    top: -10px; left: 12px;
+    border-width: 0 10px 10px 10px; border-color: transparent transparent #ffffff transparent;
+    top: -8px; left: 12px;
   }
   .gemini-thinking-bar {
     position: relative; width: 100%; height: 4px; background-color: #e0e0e0;
@@ -110,72 +140,104 @@
     background-size: 200% 100%; animation: thinking-gradient 2s linear infinite;
   }
   @keyframes thinking-gradient { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
-  
-  /* --- Daily Check-in UI --- */
+
+  /* --- Daily Check-in FAB & Badges --- */
   #fab-checkin {
-    position: fixed; bottom: 100px; /* อยู่เหนือปุ่ม AI (25 + 65 + 10 gap) */
-    right: 32px; /* Center with the AI button (25px + diff) - adjusted manually for visual balance */
+    position: fixed; bottom: 158px; right: 24px;
     width: 50px; height: 50px;
     background: linear-gradient(135deg, #FFD700, #F59E0B);
-    color: #92400e;
-    border: 2px solid #fff;
-    border-radius: 50%;
-    font-size: 20px;
-    box-shadow: 0 4px 12px rgba(251, 191, 36, 0.5);
-    cursor: pointer; z-index: 998; transition: 0.3s;
+    color: #92400e; border: 2px solid #fff; border-radius: 50%;
+    font-size: 20px; box-shadow: 0 4px 14px rgba(245, 158, 11, 0.4);
+    cursor: pointer; z-index: 990; transition: all 0.3s ease;
     display: flex; align-items: center; justify-content: center;
   }
-  #fab-checkin:active { transform: scale(0.9); }
-  
-  /* ตัวเลขแจ้งเตือนบนปุ่ม */
+  #fab-checkin:active { transform: scale(0.92); }
+
   #checkin-badge {
-    position: absolute;
-    top: -5px; right: -5px;
-    background-color: #ef4444; /* สีแดง */
-    color: white;
-    font-size: 11px; font-weight: bold;
-    padding: 2px 6px;
-    border-radius: 12px;
-    border: 2px solid white;
-    min-width: 22px;
-    text-align: center;
+    position: absolute; top: -4px; right: -4px;
+    background-color: #ef4444; color: white;
+    font-size: 10px; font-weight: bold; padding: 2px 6px;
+    border-radius: 10px; border: 2px solid white;
+    min-width: 20px; text-align: center;
     box-shadow: 0 2px 4px rgba(0,0,0,0.2);
   }
-  
+
   /* Toast Notification */
   #toast {
-    visibility: hidden; min-width: 250px; margin-left: -125px;
+    visibility: hidden; min-width: 280px; transform: translateX(-50%);
     background-color: #333; color: #fff; text-align: center;
-    border-radius: 8px; padding: 16px;
-    position: fixed; z-index: 2000; left: 50%; bottom: 30px;
-    font-size: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    border-radius: 12px; padding: 14px 20px;
+    position: fixed; z-index: 2500; left: 50%; bottom: 85px;
+    font-size: 14px; box-shadow: 0 10px 25px rgba(0,0,0,0.25);
     opacity: 0; transition: opacity 0.3s, bottom 0.3s;
   }
-  #toast.show { visibility: visible; opacity: 1; bottom: 50px; }
-  #toast.success { background-color: #065f46; } /* Green */
-  #toast.warning { background-color: #9a3412; } /* Orange/Red */
+  #toast.show { visibility: visible; opacity: 1; bottom: 100px; }
+  #toast.success { background-color: #065f46; border: 1px solid #10b981; }
+  #toast.warning { background-color: #9a3412; border: 1px solid #f97316; }
 
   /* Reward Modal */
   #reward-modal {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.8); z-index: 3000;
+    background: rgba(0,0,0,0.75); backdrop-filter: blur(4px); z-index: 3000;
     display: flex; justify-content: center; align-items: center;
-    opacity: 0; pointer-events: none; transition: 0.3s;
+    opacity: 0; pointer-events: none; transition: 0.3s ease;
   }
   #reward-modal.open { opacity: 1; pointer-events: auto; }
   .reward-box {
     background: linear-gradient(to bottom, #fff, #fff7ed);
-    width: 90%; max-width: 400px; padding: 30px;
-    border-radius: 20px; text-align: center;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-    transform: scale(0.7); transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    border: 4px solid #F59E0B;
+    width: 90%; max-width: 380px; padding: 28px;
+    border-radius: 24px; text-align: center;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+    transform: scale(0.85); transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: 3px solid #F59E0B;
   }
   #reward-modal.open .reward-box { transform: scale(1); }
-  .reward-icon { font-size: 60px; margin-bottom: 10px; display: block; }
+
   .code-box { 
     background: #111827; color: #10B981; font-family: monospace; 
-    padding: 15px; border-radius: 10px; margin: 20px 0; font-size: 24px; letter-spacing: 2px;
+    padding: 14px; border-radius: 12px; margin: 16px 0; font-size: 22px; letter-spacing: 2px;
+  }
+
+  /* --- Bottom Navigation & Mini Player Styling --- */
+  .bottom-bar-wrap {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    z-index: 950; background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid rgba(209, 213, 219, 0.8);
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.06);
+  }
+
+  .nav-item {
+    flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 8px 0; color: #6b7280; font-size: 12px; font-weight: 600; cursor: pointer;
+    transition: all 0.2s ease; border: none; background: transparent;
+  }
+  .nav-item.active { color: #b45309; }
+  .nav-item svg { width: 22px; height: 22px; margin-bottom: 2px; fill: currentColor; }
+
+  /* Audio Slider Custom Styling */
+  input[type=range] {
+    -webkit-appearance: none; width: 100%; background: transparent;
+  }
+  input[type=range]:focus { outline: none; }
+  input[type=range]::-webkit-slider-runnable-track {
+    width: 100%; height: 6px; cursor: pointer;
+    background: #e5e7eb; border-radius: 3px;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    height: 16px; width: 16px; border-radius: 50%;
+    background: #b45309; cursor: pointer;
+    -webkit-appearance: none; margin-top: -5px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  }
+
+  .audio-item-card {
+    transition: all 0.2s ease;
+    border: 1px solid #f3f4f6;
+  }
+  .audio-item-card.playing {
+    border-color: #f59e0b;
+    background-color: #fffbe0;
   }
 
   .hidden { display: none !important; }
@@ -183,20 +245,23 @@
 </head>
 <body>
 
-  <div class="wrap">
+  <!-- ===== PAGE 1: หนังสือ / สารบัญหน้า (LESSONS PAGE) ===== -->
+  <div id="page-book" class="wrap">
     <div class="title">สารบัญหน้า</div>
     <p class="sub">แยกตามหมวดหมู่บาลีไวยากรณ์</p>
 
+    <!-- Search input -->
     <div class="search-wrap">
       <input type="text" id="searchInput" class="search-input" placeholder="ค้นหาบทเรียน (เช่น นาม, สนธิ, สมาส)..." onkeyup="filterContent()">
-      <button class="search-btn">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20"><path d="M10 18a7.952 7.952 0 0 0 4.897-1.688l4.396 4.396 1.414-1.414-4.396-4.396A7.952 7.952 0 0 0 18 10c0-4.411-3.589-8-8-8s-8 3.589-8 8 3.589 8 8 8zm0-14c3.309 0 6 2.691 6 6s-2.691 6-6 6-6-2.691-6-6 2.691-6 6-6z"></path></svg>
+      <button class="search-btn" title="ค้นหา">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M10 18a7.952 7.952 0 0 0 4.897-1.688l4.396 4.396 1.414-1.414-4.396-4.396A7.952 7.952 0 0 0 18 10c0-4.411-3.589-8-8-8s-8 3.589-8 8 3.589 8 8 8zm0-14c3.309 0 6 2.691 6 6s-2.691 6-6 6-6-2.691-6-6 2.691-6 6-6z"></path></svg>
       </button>
     </div>
     <div class="search-desc">
        <span>💡 ค้นหาหัวข้อที่ต้องการ หรือกดปุ่ม AI สีส้มขวามือเพื่อสอบถาม</span>
     </div>
 
+    <!-- Content Categories -->
     <div id="content-area">
       <h2 class="category-title"><span class="dot"></span><span>นาม / สัพพนาม</span></h2>
       <div class="grid category-grid">
@@ -262,6 +327,98 @@
     </div>
   </div>
 
+  <!-- ===== PAGE 2: เสียงบาลีไวยากรณ์ (AUDIO PLAYER PAGE) ===== -->
+  <div id="page-audio" class="wrap hidden">
+    <div class="title">เสียงบาลีไวยากรณ์</div>
+    <p class="sub">เสียงอ่านบทเรียนและหลักบาลีไวยากรณ์</p>
+
+    <!-- Main Full Player Display Box -->
+    <div class="bg-gradient-to-b from-amber-900 to-amber-950 text-white rounded-3xl p-6 shadow-xl mb-6 relative overflow-hidden">
+      <!-- Background decoration -->
+      <div class="absolute -right-10 -top-10 w-40 h-40 bg-amber-500/10 rounded-full blur-2xl"></div>
+      
+      <div class="flex flex-col md:flex-row gap-6 items-center">
+        <!-- Album Art / Icon -->
+        <div class="w-32 h-32 md:w-40 md:h-40 bg-amber-800/80 rounded-2xl flex items-center justify-center border-2 border-amber-500/30 shadow-inner shrink-0">
+          <span class="text-6xl select-none">☸️</span>
+        </div>
+
+        <!-- Player Controls & Details -->
+        <div class="flex-1 w-full text-center md:text-left">
+          <span class="inline-block px-3 py-1 bg-amber-500/20 text-amber-300 text-xs font-semibold rounded-full mb-2">
+            กำลังเล่นเสียงบาลีไวยากรณ์
+          </span>
+          <h3 id="player-title" class="text-xl md:text-2xl font-bold text-amber-100 truncate">
+            กรุณาเลือกบทเรียน
+          </h3>
+          <p id="player-subtitle" class="text-xs md:text-sm text-amber-300/80 mt-1 mb-4 truncate">
+            กดเลือกรายการจากด้านล่าง
+          </p>
+
+          <!-- Timeline & Progress Bar -->
+          <div class="space-y-1 mb-4">
+            <input type="range" id="main-progress" min="0" max="100" value="0" step="0.1" oninput="seekAudio(this.value)">
+            <div class="flex justify-between text-xs text-amber-300/70">
+              <span id="current-time">00:00</span>
+              <span id="total-duration">00:00</span>
+            </div>
+          </div>
+
+          <!-- Main Player Control Buttons -->
+          <div class="flex items-center justify-center md:justify-start gap-4">
+            <!-- Speed Button -->
+            <button id="btn-speed" onclick="togglePlaybackSpeed()" class="text-xs font-bold bg-amber-800/80 hover:bg-amber-700 text-amber-200 px-3 py-2 rounded-xl transition border border-amber-600/40">
+              1.0x
+            </button>
+
+            <!-- Prev Button -->
+            <button onclick="playPrevAudio()" class="text-amber-200 hover:text-white p-2 transition">
+              <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
+            </button>
+
+            <!-- Main Play/Pause Button -->
+            <button id="btn-main-play" onclick="togglePlayPause()" class="w-14 h-14 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 rounded-full flex items-center justify-center shadow-lg transition transform active:scale-95">
+              <svg id="main-play-icon" class="w-8 h-8 fill-current ml-1" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            </button>
+
+            <!-- Next Button -->
+            <button onclick="playNextAudio()" class="text-amber-200 hover:text-white p-2 transition">
+              <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+            </button>
+
+            <!-- Loop Button -->
+            <button id="btn-loop" onclick="toggleLoop()" class="text-amber-400/50 hover:text-amber-300 p-2 transition" title="วนซ้ำบทเดิม">
+              <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Settings Option Bar (Background Playback Option) -->
+      <div class="mt-6 pt-4 border-t border-amber-800/60 flex items-center justify-between text-xs text-amber-200/90">
+        <label class="flex items-center gap-2 cursor-pointer select-none">
+          <input type="checkbox" id="bg-play-toggle" class="w-4 h-4 accent-amber-500 rounded cursor-pointer" onchange="toggleBackgroundPlay(this.checked)" checked>
+          <span>อนุญาตให้เล่นเสียงเบื้องหลัง (เมื่อเปลี่ยนหน้า)</span>
+        </label>
+        <span class="text-[11px] opacity-75">เล่นต่อเนื่องอัตโนมัติ</span>
+      </div>
+    </div>
+
+    <!-- Playlist Section Title -->
+    <div class="flex items-center justify-between mb-3 px-1">
+      <h3 class="font-bold text-gray-800 text-lg">รายการเสียงบาลีไวยากรณ์ทั้งหมด</h3>
+      <span class="text-xs text-amber-800 bg-amber-100 font-semibold px-2.5 py-1 rounded-full" id="playlist-count">8 รายการ</span>
+    </div>
+
+    <!-- Chanting Playlist Cards -->
+    <div id="playlist-container" class="space-y-2.5 mb-8">
+      <!-- Generated via JS -->
+    </div>
+  </div>
+
+  <!-- ===== GLOBAL FLOATING ACTION BUTTONS & MODALS ===== -->
+  
+  <!-- AI Chatbot Modal -->
   <div id="chatbot-modal" class="chatbot-hidden">
     <div class="flex flex-col h-screen bg-gray-100">
       <header class="bg-amber-800 text-white p-4 flex justify-between items-center shadow-lg">
@@ -305,214 +462,1146 @@
     </div>
   </div>
 
-  <!-- ปุ่มเช็คชื่อสีทอง + Badge ตัวเลข -->
+  <!-- Check-in FAB -->
   <button id="fab-checkin" title="เช็คชื่อรายวัน" onclick="handleDailyCheckIn()">
     📅
     <span id="checkin-badge" class="hidden">0</span>
   </button>
   
+  <!-- AI FAB -->
   <button id="fab-chat-toggle" title="ถาม AI">AI</button>
 
   <!-- Toast Notification -->
   <div id="toast"></div>
 
-  <!-- Reward Modal (100 days) -->
+  <!-- Reward Modal (100 days streak) -->
   <div id="reward-modal">
     <div class="reward-box">
-        <span class="reward-icon">🎉👑</span>
-        <h2 class="text-2xl font-bold text-amber-600 mb-2">ยินดีด้วย!</h2>
-        <p class="text-gray-600 mb-4">คุณเช็คชื่อครบ 100 วันแล้ว!</p>
-        <p class="text-sm text-gray-500">นี่คือโค้ดลับสำหรับคุณ:</p>
+        <span class="text-5xl block mb-2">🎉👑</span>
+        <h2 class="text-2xl font-bold text-amber-700 mb-1">ยินดีด้วย!</h2>
+        <p class="text-gray-600 text-sm mb-4">คุณเช็คชื่อสะสมครบ 100 วันแล้ว!</p>
+        <p class="text-xs text-gray-500">รหัสส่วนลด/ปลดล็อกพิเศษ:</p>
         <div class="code-box">no-ads-2025</div>
-        <p class="text-xs text-gray-400 mb-6">แคปหน้าจอนี้เก็บไว้เป็นที่ระลึก</p>
-        <button onclick="closeRewardModal()" class="bg-amber-600 hover:bg-amber-700 text-white font-bold py-2 px-6 rounded-full transition w-full">ปิดหน้าต่าง</button>
+        <p class="text-[11px] text-gray-400 mb-6">บันทึกหรือแคปหน้าจอนี้เก็บไว้เป็นหลักฐาน</p>
+        <button onclick="closeRewardModal()" class="bg-amber-600 hover:bg-amber-700 text-white font-bold py-2.5 px-6 rounded-full transition w-full shadow-md text-sm">ปิดหน้าต่าง</button>
+    </div>
+  </div>
+
+  <!-- ===== BOTTOM NAVIGATION & MINI PLAYER ===== -->
+  <div class="bottom-bar-wrap">
+    <!-- Mini Player Bar (Appears when audio played) -->
+    <div id="mini-player" class="hidden border-b border-gray-100 bg-gradient-to-r from-amber-50 to-orange-50 px-4 py-2 flex items-center justify-between cursor-pointer" onclick="switchTab('audio')">
+      <div class="flex items-center gap-3 min-w-0 flex-1">
+        <div class="w-9 h-9 bg-amber-700 text-white rounded-lg flex items-center justify-center text-sm shrink-0 shadow-sm">
+          ☸️
+        </div>
+        <div class="min-w-0 flex-1">
+          <p id="mini-title" class="text-xs font-bold text-gray-800 truncate">ชื่อบทเรียน</p>
+          <p id="mini-subtitle" class="text-[10px] text-gray-500 truncate">คำอธิบายสั้น</p>
+        </div>
+      </div>
+
+      <!-- Mini Play Controls -->
+      <div class="flex items-center gap-2 shrink-0 ml-2" onclick="event.stopPropagation()">
+        <button onclick="togglePlayPause()" class="w-8 h-8 bg-amber-800 text-white rounded-full flex items-center justify-center shadow">
+          <svg id="mini-play-icon" class="w-4 h-4 fill-current ml-0.5" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        </button>
+        <button onclick="playNextAudio()" class="text-gray-600 hover:text-amber-800 p-1">
+          <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Tab Buttons Navigation Bar -->
+    <div class="flex justify-around items-center h-14 max-w-lg mx-auto">
+      <button id="nav-book" class="nav-item active" onclick="switchTab('book')">
+        <svg viewBox="0 0 24 24"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>
+        <span>หนังสือ</span>
+      </button>
+
+      <button id="nav-audio" class="nav-item" onclick="switchTab('audio')">
+        <svg viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+        <span>เสียงบาลีไวยากรณ์</span>
+      </button>
     </div>
   </div>
 
 <script>
-    // --- Daily Check-in Logic ---
-    function handleDailyCheckIn() {
-        const STORAGE_KEY_DATE = 'pali_last_checkin';
-        const STORAGE_KEY_COUNT = 'pali_checkin_count';
-        
-        const today = new Date().toISOString().split('T')[0]; // Format: YYYY-MM-DD
-        const lastCheckIn = localStorage.getItem(STORAGE_KEY_DATE);
-        let count = parseInt(localStorage.getItem(STORAGE_KEY_COUNT) || '0');
 
-        if (lastCheckIn === today) {
-            // Already checked in today
-            showToast(`⚠️ วันนี้เช็คชื่อไปแล้ว สะสม 100 รับโคดลับ ลบ โฆษณาฟรีถาวร (สะสม ${count} วัน)`, 'warning');
-        } else {
-            // New check-in
-            count++;
-            localStorage.setItem(STORAGE_KEY_DATE, today);
-            localStorage.setItem(STORAGE_KEY_COUNT, count);
-            
-            updateCheckinBadge(); // อัปเดตตัวเลขทันที
+// --- 1. Audio Player State & Data ---
+const chantingPlaylist = [
+  
 
-            if (count === 100) {
-                document.getElementById('reward-modal').classList.add('open');
-            } else {
-                showToast(`✅ เช็คชื่อสำเร็จ! (วันที่ ${count})`, 'success');
-            }
-        }
+{
+    id: "001",
+    title: "001 บทนำ",
+    subtitle: "เกริ่นนำเบื้องต้นเกี่ยวกับบาลีไวยากรณ์",
+    duration: "03:06",
+    url: "audio/1.m4a"
+  },
+  {
+    id: "002",
+    title: "002 นาม",
+    subtitle: "ความหมายและการจำแนกคำนามในภาษาบาลี",
+    duration: "07:22",
+    url: "audio/2.m4a"
+  },
+  {
+    id: "003",
+    title: "003 ลิงค์",
+    subtitle: "เพศของคำนาม (ปุลิงค์ อิตถีลิงค์ นปุสกลิงค์)",
+    duration: "16:08",
+    url: "audio/3.m4a"
+  },
+  {
+    id: "004",
+    title: "004 วจนะ",
+    subtitle: "พจน์หรือจำนวน (เอกวจนะ พหุวจนะ)",
+    duration: "01:38",
+    url: "audio/4.m4a"
+  },
+  {
+    id: "005",
+    title: "005 วิภัตติ",
+    subtitle: "การจำแนกคำนามเพื่อแสดงหน้าที่ในประโยค",
+    duration: "03:14",
+    url: "audio/5.m4a"
+  },
+  {
+    id: "006",
+    title: "006 อายตนิบาต",
+    subtitle: "คำแปลอรรถวิภัตติหรือหน้าที่ของนามวิภัตติ",
+    duration: "01:59",
+    url: "audio/6.m4a"
+  },
+  {
+    id: "007",
+    title: "007 การันต์",
+    subtitle: "สระที่สุดแห่งสัญลักษณ์นาม",
+    duration: "01:25",
+    url: "audio/7.m4a"
+  },
+  {
+    id: "008",
+    title: "008 แจกปุลิงค์",
+    subtitle: "การแจกวิภัตตินามสำหรับเพศชาย",
+    duration: "12:10",
+    url: "audio/8.m4a"
+  },
+  {
+    id: "009",
+    title: "009 แจกอิตถีลิงค์",
+    subtitle: "การแจกวิภัตตินามสำหรับเพศหญิง",
+    duration: "12:35",
+    url: "audio/9.m4a"
+  },
+  {
+    id: "010",
+    title: "010 แจกนปุสกลิงค์",
+    subtitle: "การแจกวิภัตตินามสำหรับเพศกลาง",
+    duration: "07:09",
+    url: "audio/10.m4a"
+  },
+  {
+    id: "011",
+    title: "011 กติปยศัพท์",
+    subtitle: "ศัพท์พิเศษที่มีการแจกวิภัตติเฉพาะตัว",
+    duration: "24:24",
+    url: "audio/11.m4a"
+  },
+  {
+    id: "012",
+    title: "012 มโนคณศัพท์",
+    subtitle: "กลุ่มศัพท์ 12 ตัวที่แจกวิภัตติเหมือน มนัส",
+    duration: "17:03",
+    url: "audio/12.m4a"
+  },
+  {
+    id: "013",
+    title: "013 สังขยา",
+    subtitle: "เรื่องของตัวเลขและการนับในภาษาบาลี",
+    duration: "02:46",
+    url: "audio/13.m4a"
+  },
+  {
+    id: "014",
+    title: "014 วิธีนับสังขยา",
+    subtitle: "วิธีการจัดกลุ่มและการนับจำนวนตัวเลข",
+    duration: "09:04",
+    url: "audio/14.m4a"
+  },
+  {
+    id: "015",
+    title: "015 ปกติสังขยาเป็นนาม-ลิงค์",
+    subtitle: "ลิงค์และพจน์ของปกติสังขยา (1-อสงไขย)",
+    duration: "02:18",
+    url: "audio/15.m4a"
+  },
+  {
+    id: "016",
+    title: "016 แจกปกติสังขยา",
+    subtitle: "การแจกวิภัตติของตัวเลขปกติสังขยา",
+    duration: "09:07",
+    url: "audio/16.m4a"
+  },
+  {
+    id: "017",
+    title: "017 แจกปูรณสังขยา",
+    subtitle: "การแจกวิภัตติของเลขลำดับที่",
+    duration: "06:15",
+    url: "audio/17.m4a"
+  },
+  {
+    id: "018",
+    title: "018 สัพพนาม",
+    subtitle: "คำที่ใช้แทนคำนาม (ปุริสสัพพนาม วิเสสนสัพพนาม)",
+    duration: "03:28",
+    url: "audio/18.m4a"
+  },
+  {
+    id: "019",
+    title: "019 แจกปุริสสัพพนาม",
+    subtitle: "การแจกวิภัตติของบุรุษสรรพนาม (ต ย ตุมฺห อมฺห)",
+    duration: "06:20",
+    url: "audio/19.m4a"
+  },
+  {
+    id: "020",
+    title: "020 แจกอนิยมวิเสสนสัพพนาม",
+    subtitle: "สรรพนามเชื่อมโยง/ชี้เฉพาะแบบไม่แน่นอน",
+    duration: "10:33",
+    url: "audio/20.m4a"
+  },
+  {
+    id: "021",
+    title: "021 แจกนิยมวิเสสนสัพพนาม",
+    subtitle: "สรรพนามชี้เฉพาะแบบแน่นอน (ต เอต อิม อมุ)",
+    duration: "12:44",
+    url: "audio/21.m4a"
+  },
+  {
+    id: "022",
+    title: "022 อัพพยยศัพท์",
+    subtitle: "ศัพท์ที่ไม่เปลี่ยนแปลงรูปตามวิภัตติ ลิงค์ วจนะ",
+    duration: "03:39",
+    url: "audio/22.m4a"
+  },
+  {
+    id: "023",
+    title: "023 นิบาต",
+    subtitle: "คำสำหรับลงในระหว่างคำอื่น แสดงกาล สถานที่ ปฏิเสธ",
+    duration: "13:50",
+    url: "audio/23.m4a"
+  },
+  {
+    id: "024",
+    title: "024 ปัจจัยในอัพยยศัพท์",
+    subtitle: "ปัจจัยที่ใช้ประกอบท้ายธาตุ/ศัพท์เพื่อเป็นอัพยยศัพท์",
+    duration: "11:15",
+    url: "audio/24.m4a"
+  },
+  {
+    id: "025",
+    title: "025 อาขยาต วิภัตติ",
+    subtitle: "วิภัตติของคำกริยาแสดงกาล บท วจนะ บุรุษ",
+    duration: "07:37",
+    url: "audio/25.m4a"
+  },
+  {
+    id: "026",
+    title: "026 อาขยาต กาล",
+    subtitle: "กาลเวลาในการกริยา (ปัจจุบัน อดีต อนาคต)",
+    duration: "12:17",
+    url: "audio/26.m4a"
+  },
+  {
+    id: "027",
+    title: "027 อาขยาต บท",
+    subtitle: "บทของกริยา (ปรัสสบท อัตตโนบท)",
+    duration: "03:15",
+    url: "audio/27.m4a"
+  },
+  {
+    id: "028",
+    title: "028 อาขยาต วจนะ บุรุษ",
+    subtitle: "พจน์และบุรุษในตารางกริยาอาขยาต",
+    duration: "03:40",
+    url: "audio/28.m4a"
+  },
+  {
+    id: "029",
+    title: "029 ธาตุ หมวด ภูธาตุ",
+    subtitle: "หมวดธาตุตัวแทนกลุ่มที่ 1 มีเครื่องปรุงเฉพาะตัว",
+    duration: "03:17",
+    url: "audio/29.m4a"
+  },
+  {
+    id: "030",
+    title: "030 หมวด รุธฺ ธาตุ",
+    subtitle: "หมวดธาตุที่มีการลงนิคคหิตอาคมที่พยัญชนะต้นธาตุ",
+    duration: "01:25",
+    url: "audio/30.m4a"
+  },
+  {
+    id: "031",
+    title: "031 หมวด ทิวฺ ธาตุ",
+    subtitle: "หมวดธาตุที่มี ย ปัจจัย เป็นเครื่องปรุง",
+    duration: "02:17",
+    url: "audio/31.m4a"
+  },
+  {
+    id: "032",
+    title: "032 หมวด สุ ธาตุ",
+    subtitle: "หมวดธาตุที่มี นุ ณุ ณ ปัจจัย เป็นเครื่องปรุง",
+    duration: "00:46",
+    url: "audio/32.m4a"
+  },
+  {
+    id: "033",
+    title: "033 หมวด กี ธาตุ",
+    subtitle: "หมวดธาตุที่มี นา ปัจจัย เป็นเครื่องปรุง",
+    duration: "01:49",
+    url: "audio/33.m4a"
+  },
+  {
+    id: "034",
+    title: "034 หมวด คหฺ และ ตนฺ ธาตุ",
+    subtitle: "หมวดธาตุที่มี ปปฺป ณฺหา หรือ โอ ปัจจัย",
+    duration: "01:31",
+    url: "audio/34.m4a"
+  },
+  {
+    id: "035",
+    title: "035 หมวด จุรฺ ธาตุ",
+    subtitle: "หมวดธาตุที่มี เณ ณย ปัจจัย เป็นเครื่องปรุง",
+    duration: "01:39",
+    url: "audio/35.m4a"
+  },
+  {
+    id: "036",
+    title: "036 สกัมม+อกัมมธาตุ",
+    subtitle: "ธาตุที่เรียกหาบทกรรมและไม่เรียกหาบทกรรม",
+    duration: "01:18",
+    url: "audio/36.m4a"
+  },
+  {
+    id: "037",
+    title: "037 วาจก",
+    subtitle: "โครงสร้างประโยค 5 วาจก ในภาษาบาลี",
+    duration: "06:40",
+    url: "audio/37.m4a"
+  },
+  {
+    id: "038",
+    title: "038 ปัจจัย",
+    subtitle: "ตัวปรุงแต่งธาตุเพื่อบอกวาจก",
+    duration: "05:38",
+    url: "audio/38.m4a"
+  },
+  {
+    id: "039",
+    title: "039 ปัจจัยพิเศษ 5  ตัว",
+    subtitle: "ปัจจัยพิเศษสำหรับสร้างกริยาเฉพาะกลุ่ม (ข ส ห ร ณ)",
+    duration: "02:44",
+    url: "audio/39.m4a"
+  },
+  {
+    id: "040",
+    title: "040 คำอธิบายในในกัตตุวาจก",
+    subtitle: "โครงสร้างและหลักการของกัตตุวาจก (ประธานทำเอง)",
+    duration: "09:42",
+    url: "audio/40.m4a"
+  },
+  {
+    id: "041",
+    title: "041 คำอธิบายในกัมมวาจก",
+    subtitle: "โครงสร้างและหลักการของกัมมวาจก (ประธานถูกทำ)",
+    duration: "06:24",
+    url: "audio/41.m4a"
+  },
+  {
+    id: "042",
+    title: "042 กิตก์  นามกิตก์",
+    subtitle: "การแปลงคำกริยา (ธาตุ) ให้เป็นคำนาม",
+    duration: "02:04",
+    url: "audio/42.m4a"
+  },
+  {
+    id: "043",
+    title: "043 สาธนะ",
+    subtitle: "รูปวิเคราะห์เพื่อบอกความหมายนามกิตก์ 7 สาธนะ",
+    duration: "13:15",
+    url: "audio/43.m4a"
+  },
+  {
+    id: "044",
+    title: "044 ปัจจัยแห่งนามกิตก์",
+    subtitle: "ปัจจัย 3 กลุ่ม (กิต กิจจ กิตกิจจ) สำหรับทำนามกิตก์",
+    duration: "01:58",
+    url: "audio/44.m4a"
+  },
+  {
+    id: "045",
+    title: "045 วิเคราะห์ ในกิตปัจจัย",
+    subtitle: "การวิเคราะห์และตัวอย่างคำที่ลงกิตปัจจัย",
+    duration: "19:58",
+    url: "audio/45.m4a"
+  },
+  {
+    id: "046",
+    title: "046 วิเคราะห์ ในกิจจปัจจัย",
+    subtitle: "การวิเคราะห์และตัวอย่างคำที่ลงกิจจปัจจัย",
+    duration: "09:43",
+    url: "audio/46.m4a"
+  },
+  {
+    id: "047",
+    title: "047 วิเคราะห์ ในกิตกิจจปัจจัย",
+    subtitle: "การวิเคราะห์และตัวอย่างคำที่ลงกิตกิจจปัจจัย",
+    duration: "29:32",
+    url: "audio/47.m4a"
+  },
+  {
+    id: "048",
+    title: "048 กิริยากิตก์ วิภัตติและวาจก",
+    subtitle: "คำกริยาระหว่างประโยคที่แจกวิภัตติเหมือนนาม",
+    duration: "03:42",
+    url: "audio/48.m4a"
+  },
+  {
+    id: "049",
+    title: "049 กิริยากิตก์ กาล",
+    subtitle: "กาลเวลาในกิริยากิตก์ (ปัจจุบัน อดีต อนาคต)",
+    duration: "05:43",
+    url: "audio/49.m4a"
+  },
+  {
+    id: "050",
+    title: "050 กิริยากิตก์ วาจก",
+    subtitle: "วาจกที่ใช้ในกิริยากิตก์และปัจจัยเครื่องปรุง",
+    duration: "02:53",
+    url: "audio/50.m4a"
+  },
+  {
+    id: "051",
+    title: "051 ปัจจัยแห่งกิริยากิตก์",
+    subtitle: "ปัจจัยสำหรับสร้างคำกริยากิตก์",
+    duration: "02:58",
+    url: "audio/51.m4a"
+  },
+  {
+    id: "052",
+    title: "052 กิตปัจจัย",
+    subtitle: "ปัจจัยกิริยากิตก์กลุ่มกิต (อนฺต ตวนฺตุ ตาวี)",
+    duration: "04:01",
+    url: "audio/52.m4a"
+  },
+  {
+    id: "053",
+    title: "053 กิจจปัจจัย",
+    subtitle: "ปัจจัยกิริยากิตก์กลุ่มกิจจ (อนีย ตพฺพ)",
+    duration: "02:43",
+    url: "audio/53.m4a"
+  },
+  {
+    id: "054",
+    title: "054 กิตกิจจปัจจัย",
+    subtitle: "ปัจจัยกิริยากิตก์กลุ่มกิตกิจจ (มาน ต)",
+    duration: "13:58",
+    url: "audio/54.m4a"
+  },
+  {
+    id: "055",
+    title: "055 ตูนาทิ ปัจจัย",
+    subtitle: "ปัจจัยพิเศษในกิริยากิตก์ (ตูนาทิ ตฺวา ตฺวาน)",
+    duration: "07:28",
+    url: "audio/55.m4a"
+  },
+  {
+    id: "056",
+    title: "056 สมาส",
+    subtitle: "การย่อคำนามตั้งแต่ 2 ศัพท์ขึ้นไปเข้าเป็นศัพท์เดียวกัน",
+    duration: "04:16",
+    url: "audio/56.m4a"
+  },
+  {
+    id: "057",
+    title: "057 กัมมธารยสมาส",
+    subtitle: "สมาสที่มีบทหนึ่งเป็นคุณนามหรือวิเศษณ์ของอีกบท",
+    duration: "16:20",
+    url: "audio/57.m4a"
+  },
+  {
+    id: "058",
+    title: "058 ทิคุสมาส",
+    subtitle: "กัมมธารยสมาสที่มีตัวเลข (สังขยา) อยู่ข้างหน้า",
+    duration: "03:20",
+    url: "audio/58.m4a"
+  },
+  {
+    id: "059",
+    title: "059 ตัปปุริสสมาส",
+    subtitle: "สมาสที่เชื่อมด้วยวิภัตตินาม (ทุติยา ถึง สัตตมี)",
+    duration: "10:57",
+    url: "audio/59.m4a"
+  },
+  {
+    id: "060",
+    title: "060 ทวันทวสมาส",
+    subtitle: "สมาสที่รวมคำนามที่มีความสำคัญเท่ากันเข้าด้วยกัน",
+    duration: "06:40",
+    url: "audio/60.m4a"
+  },
+  {
+    id: "061",
+    title: "061 อัพยยีภาวสมาส",
+    subtitle: "สมาสที่มีอุปสัคหรือนิบาตอยู่ข้างหน้า",
+    duration: "07:17",
+    url: "audio/61.m4a"
+  },
+  {
+    id: "062",
+    title: "062 พหุพพิหิสมาส 6 ตามวิภัตติ",
+    subtitle: "สมาสที่บทอื่นเป็นประธาน จำแนกตามวิภัตติ 6",
+    duration: "19:20",
+    url: "audio/62.m4a"
+  },
+  {
+    id: "063",
+    title: "063 พหุพพิหิสมาส 5 ตามลักษณะ",
+    subtitle: "พหุพพิหิสมาสจำแนกตามลักษณะโครงสร้างทางบาลี",
+    duration: "14:48",
+    url: "audio/63.m4a"
+  },
+  {
+    id: "064",
+    title: "064 สมาสท้อง",
+    subtitle: "สมาสซ้อนสมาส หรือมีสมาสย่อยอยู่ภายในสมาสใหญ่",
+    duration: "08:11",
+    url: "audio/64.m4a"
+  },
+  {
+    id: "065",
+    title: "065 ตัทธิต",
+    subtitle: "การใช้ปัจจัยแทนศัพท์นามเพื่อย่อคำให้สั้นลง",
+    duration: "03:15",
+    url: "audio/65.m4a"
+  },
+  {
+    id: "066",
+    title: "066 โคตตตัทธิต",
+    subtitle: "ตัทธิตที่ใช้ย่อคำว่า 'ลูกหลาน' หรือ 'ตระกูล'",
+    duration: "11:17",
+    url: "audio/66.m4a"
+  },
+  {
+    id: "067",
+    title: "067 ตรัตยาทิตัทธิต",
+    subtitle: "ตัทธิตที่มีความหมายหลากหลาย เช่น ข้าม ย้อม ยึดถือ",
+    duration: "06:59",
+    url: "audio/67.m4a"
+  },
+  {
+    id: "068",
+    title: "068 ราคาทิตัทธิต",
+    subtitle: "ตัทธิตที่เกี่ยวกับสีหรือความย้อม",
+    duration: "04:19",
+    url: "audio/68.m4a"
+  },
+  {
+    id: "069",
+    title: "069 ชาตาทิตัทธิต",
+    subtitle: "ตัทธิตที่บอกการเกิด ที่อยู่ หรือความเกี่ยวข้อง",
+    duration: "05:47",
+    url: "audio/69.m4a"
+  },
+  {
+    id: "070",
+    title: "070 สมุหตัทธิต",
+    subtitle: "ตัทธิตที่รวมกลุ่มหรือส่วนรวม (เช่น ประชุม, หมู่)",
+    duration: "04:20",
+    url: "audio/70.m4a"
+  },
+  {
+    id: "071",
+    title: "071 ฐานตัทธิต",
+    subtitle: "ตัทธิตที่บอกสถานที่ หรือตำแหน่งที่ตั้ง",
+    duration: "05:00",
+    url: "audio/71.m4a"
+  },
+  {
+    id: "072",
+    title: "072 พหุลตัทธิต",
+    subtitle: "ตัทธิตที่แสดงความมีอยู่มาก หรือความอุดมสมบูรณ์",
+    duration: "03:15",
+    url: "audio/72.m4a"
+  },
+  {
+    id: "073",
+    title: "073 เสฏฐตัทธิต",
+    subtitle: "ตัทธิตที่แสดงการเปรียบเทียบ (ขั้นกว่า ขั้นสุด)",
+    duration: "05:03",
+    url: "audio/73.m4a"
+  },
+  {
+    id: "074",
+    title: "074 ตทัสสัตถิตัทธิต",
+    subtitle: "ตัทธิตที่ย่อคำว่า 'มีความมีอยู่' (เช่น ผู้มีปัญญา)",
+    duration: "11:56",
+    url: "audio/74.m4a"
+  },
+  {
+    id: "075",
+    title: "075 ปกติตัทธิต",
+    subtitle: "ตัทธิตที่บอกถึงวัตถุที่ทำขึ้น (เช่น ทำด้วยทอง)",
+    duration: "03:43",
+    url: "audio/75.m4a"
+  },
+  {
+    id: "076",
+    title: "076 ปูรณตัทธิต",
+    subtitle: "ตัทธิตที่เกี่ยวกับตัวเลขลำดับที่",
+    duration: "05:54",
+    url: "audio/76.m4a"
+  },
+  {
+    id: "077",
+    title: "077 สังขยาตัทธิต",
+    subtitle: "ตัทธิตที่เกี่ยวกับจำนวนนับหรือมาตราวัด",
+    duration: "01:40",
+    url: "audio/77.m4a"
+  },
+  {
+    id: "078",
+    title: "078 วิภาคตัทธิต",
+    subtitle: "ตัทธิตที่แสดงการจำแนก แจกจ่าย หรือส่วนแบ่ง",
+    duration: "02:03",
+    url: "audio/78.m4a"
+  },
+  {
+    id: "079",
+    title: "079 ภาวตัทธิต",
+    subtitle: "ตัทธิตที่บอกความมี ความเป็น หรือคุณลักษณะ (ตา ตฺต ณฺย)",
+    duration: "12:33",
+    url: "audio/79.m4a"
+  },
+  {
+    id: "080",
+    title: "080 อัพยยตัทธิต",
+    subtitle: "ตัทธิตที่ย่อคำแล้วกลายเป็นศัพท์ที่ไม่เปลี่ยนรูป (อัพยยศัพท์)",
+    duration: "02:11",
+    url: "audio/80.m4a"
+  },
+  {
+    id: "081",
+    title: "081 ตัทธิตนอกแบบ",
+    subtitle: "ตัทธิตพิเศษที่ไม่จัดอยู่ในหมวดหมู่ปกติ",
+    duration: "05:10",
+    url: "audio/81.m4a"
+  },
+  {
+    id: "082",
+    title: "082 สมัญญาภิธาน",
+    subtitle: "อักขรวิธีและชื่อเรียกอักขระในภาษาบาลี",
+    duration: "03:36",
+    url: "audio/82.m4a"
+  },
+  {
+    id: "083",
+    title: "083 สระ",
+    subtitle: "สระ 8 ตัวในภาษาบาลีและการแบ่งเสียงสั้น-ยาว",
+    duration: "06:02",
+    url: "audio/83.m4a"
+  },
+  {
+    id: "084",
+    title: "084 พยัญชนะ",
+    subtitle: "พยัญชนะ 33 ตัวและการแบ่งกลุ่มตามวรรค",
+    duration: "05:04",
+    url: "audio/84.m4a"
+  },
+  {
+    id: "085",
+    title: "085 ฐานกรณ์ของอักขระ",
+    subtitle: "ฐานเกิดและอวัยวะที่ใช้ในการออกเสียงอักขระ",
+    duration: "08:08",
+    url: "audio/85.m4a"
+  },
+  {
+    id: "086",
+    title: "086 เสียงของอักขระ",
+    subtitle: "ลักษณะเสียงอักขระ (สิถิล ธนิต โฆสะ อโฆสะ)",
+    duration: "06:47",
+    url: "audio/86.m4a"
+  },
+  {
+    id: "087",
+    title: "087 พยัญชนะสังโยค",
+    subtitle: "หลักการซ้อนพยัญชนะในคำภาษาบาลี",
+    duration: "04:27",
+    url: "audio/87.m4a"
+  },
+  {
+    id: "088",
+    title: "088 อัฑฒสระ",
+    subtitle: "กึ่งสระกึ่งพยัญชนะ (ย ร ล ว)",
+    duration: "02:23",
+    url: "audio/88.m4a"
+  },
+  {
+    id: "089",
+    title: "089 ลำดับสระ",
+    subtitle: "การจัดลำดับตามเสียงสระในอักขรวิธี",
+    duration: "03:26",
+    url: "audio/89.m4a"
+  },
+  {
+    id: "090",
+    title: "090 ลำดับการเรียงอักขระ",
+    subtitle: "การเรียงพยัญชนะตามพจนานุกรมบาลี",
+    duration: "02:08",
+    url: "audio/90.m4a"
+  },
+  {
+    id: "091",
+    title: "091 สนธิ",
+    subtitle: "การเชื่อมต่อคำศัพท์ทางเสียงและตัวอักษร",
+    duration: "04:01",
+    url: "audio/91.m4a"
+  },
+  {
+    id: "092",
+    title: "092 สระสนธิ",
+    subtitle: "วิธีต่อศัพท์ด้วยการเปลี่ยนแปลงรูปสระ",
+    duration: "15:43",
+    url: "audio/92.m4a"
+  },
+  {
+    id: "093",
+    title: "093 พยัญชนะสนธิ",
+    subtitle: "วิธีต่อศัพท์ด้วยการเปลี่ยนแปลงพยัญชนะ",
+    duration: "11:22",
+    url: "audio/93.m4a"
+  },
+  {
+    id: "094",
+    title: "094 นิคคหิตสนธิ",
+    subtitle: "วิธีต่อศัพท์ด้วยการจัดการกับตัวนิคคหิต (อัง)",
+    duration: "06:50",
+    url: "audio/94.m4a"
+  },
+  {
+    id: "095",
+    title: "095 กลอนสังขยา",
+    subtitle: "บทกลอนสำหรับช่วยท่องจำตัวเลขบาลี",
+    duration: "02:44",
+    url: "audio/95.m4a"
+  },
+  {
+    id: "096",
+    title: "096 กลอนวิภัตติอาขยาต",
+    subtitle: "บทกลอนสำหรับช่วยท่องจำวิภัตติคำกริยา",
+    duration: "08:47",
+    url: "audio/96.m4a"
+  },
+  {
+    id: "097",
+    title: "097 หลักการแปลมคธเป็นไทย",
+    subtitle: "หลักเกณฑ์และลำดับการแปลประโยคบาลีเป็นไทย",
+    duration: "01:52",
+    url: "audio/97.m4a"
+  }
+];
+
+let currentAudioIndex = -1;
+let isBgPlayEnabled = true;
+let isLooping = false;
+let playbackSpeeds = [1.0, 1.25, 1.5, 0.75];
+let speedIndex = 0;
+
+// Global Audio Instance
+const audioPlayer = new Audio();
+
+// --- 2. Tab Navigation Logic ---
+function switchTab(tab) {
+  const bookPage = document.getElementById('page-book');
+  const audioPage = document.getElementById('page-audio');
+  const navBook = document.getElementById('nav-book');
+  const navAudio = document.getElementById('nav-audio');
+
+  if (tab === 'book') {
+    bookPage.classList.remove('hidden');
+    audioPage.classList.add('hidden');
+    navBook.classList.add('active');
+    navAudio.classList.remove('active');
+
+    // Clean URL hash as requested to return to clean main index view
+    if (window.location.hash) {
+      history.pushState("", document.title, window.location.pathname + window.location.search);
     }
 
-    function updateCheckinBadge() {
-        const STORAGE_KEY_COUNT = 'pali_checkin_count';
-        let count = parseInt(localStorage.getItem(STORAGE_KEY_COUNT) || '0');
-        const badge = document.getElementById('checkin-badge');
-        
-        if (badge) {
-            badge.innerText = count;
-            // ซ่อนถ้าเป็น 0 หรือ แสดงถ้ามากกว่า 0
-            if (count > 0) {
-                badge.classList.remove('hidden');
-            } else {
-                badge.classList.add('hidden');
-            }
-        }
+    // Check if background audio is allowed
+    if (!isBgPlayEnabled && !audioPlayer.paused) {
+      audioPlayer.pause();
+      updatePlayIcons(false);
     }
+  } else if (tab === 'audio') {
+    bookPage.classList.add('hidden');
+    audioPage.classList.remove('hidden');
+    navBook.classList.remove('active');
+    navAudio.classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+}
 
-    function showToast(message, type) {
-        const toast = document.getElementById("toast");
-        toast.textContent = message;
-        toast.className = type; // add class 'success' or 'warning'
-        toast.classList.add("show");
-        
-        // Hide after 3 seconds
-        setTimeout(function(){ toast.classList.remove("show"); }, 3000);
+// --- 3. Audio Playlist & Controller Logic ---
+function initPlaylist() {
+  const container = document.getElementById('playlist-container');
+  if (!container) return;
+
+  container.innerHTML = '';
+  chantingPlaylist.forEach((item, index) => {
+    const card = document.createElement('div');
+    card.id = `track-${index}`;
+    card.className = `audio-item-card bg-white p-3.5 rounded-2xl flex items-center justify-between cursor-pointer shadow-sm hover:shadow-md`;
+    card.onclick = () => selectAndPlayAudio(index);
+
+    card.innerHTML = `
+      <div class="flex items-center gap-3 min-w-0 flex-1">
+        <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center font-bold text-sm shrink-0 border border-amber-200">
+          ${index + 1}
+        </div>
+        <div class="min-w-0 flex-1">
+          <h4 class="font-bold text-sm text-gray-800 truncate">${item.title}</h4>
+          <p class="text-xs text-gray-500 truncate">${item.subtitle}</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-3 ml-2 shrink-0">
+        <span class="text-xs text-gray-400 font-mono">${item.duration}</span>
+        <button class="w-8 h-8 rounded-full bg-amber-50 text-amber-800 flex items-center justify-center hover:bg-amber-600 hover:text-white transition">
+          <svg class="w-4 h-4 fill-current ml-0.5" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        </button>
+      </div>
+    `;
+    container.appendChild(card);
+  });
+
+  document.getElementById('playlist-count').innerText = `${chantingPlaylist.length} รายการ`;
+}
+
+function selectAndPlayAudio(index) {
+  if (index < 0 || index >= chantingPlaylist.length) return;
+
+  currentAudioIndex = index;
+  const track = chantingPlaylist[index];
+
+  audioPlayer.src = track.url;
+  audioPlayer.playbackRate = playbackSpeeds[speedIndex];
+  audioPlayer.loop = isLooping;
+
+  // Update UI Details
+  document.getElementById('player-title').innerText = track.title;
+  document.getElementById('player-subtitle').innerText = track.subtitle;
+  document.getElementById('mini-title').innerText = track.title;
+  document.getElementById('mini-subtitle').innerText = track.subtitle;
+
+  // Show Mini player bar
+  document.getElementById('mini-player').classList.remove('hidden');
+
+  // Highlight active playlist item
+  chantingPlaylist.forEach((_, i) => {
+    const el = document.getElementById(`track-${i}`);
+    if (el) {
+      if (i === index) el.classList.add('playing');
+      else el.classList.remove('playing');
     }
+  });
 
-    function closeRewardModal() {
-        document.getElementById('reward-modal').classList.remove('open');
-    }
+  audioPlayer.play().then(() => {
+    updatePlayIcons(true);
+  }).catch((err) => {
+    console.log("Autoplay issue or file load error:", err);
+    showToast(`⚠️ ไม่สามารถเล่นไฟล์ได้ (${track.title})`, 'warning');
+    updatePlayIcons(false);
+  });
+}
 
-    // Call onload to set initial state
-    window.addEventListener('load', () => {
-        updateCheckinBadge();
-    });
+function togglePlayPause() {
+  if (currentAudioIndex === -1) {
+    selectAndPlayAudio(0);
+    return;
+  }
 
-    // --- 1. Search Logic ---
-    function filterContent() {
-      let filter = document.getElementById('searchInput').value.toUpperCase();
-      let buttons = document.getElementsByClassName('dbtn');
-      let grids = document.getElementsByClassName('category-grid');
-      let titles = document.getElementsByClassName('category-title');
+  if (audioPlayer.paused) {
+    audioPlayer.play();
+    updatePlayIcons(true);
+  } else {
+    audioPlayer.pause();
+    updatePlayIcons(false);
+  }
+}
 
-      for (let i = 0; i < buttons.length; i++) {
-        let txt = buttons[i].textContent || buttons[i].innerText;
-        buttons[i].classList.toggle('hidden', txt.toUpperCase().indexOf(filter) === -1);
-      }
+function updatePlayIcons(isPlaying) {
+  const playIconSVG = `<path d="M8 5v14l11-7z"/>`;
+  const pauseIconSVG = `<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>`;
 
-      for (let i = 0; i < grids.length; i++) {
-        let hasVisible = Array.from(grids[i].querySelectorAll('.dbtn')).some(b => !b.classList.contains('hidden'));
-        grids[i].classList.toggle('hidden', !hasVisible);
-        if(titles[i]) titles[i].classList.toggle('hidden', !hasVisible);
-      }
-    }
+  document.getElementById('main-play-icon').innerHTML = isPlaying ? pauseIconSVG : playIconSVG;
+  document.getElementById('mini-play-icon').innerHTML = isPlaying ? pauseIconSVG : playIconSVG;
+}
 
-    // --- 2. Chatbot Logic ---
-    const BACKEND_URL = 'https://solitary-leaf-3661.tontakankeawpang321.workers.dev'; 
+function playNextAudio() {
+  if (chantingPlaylist.length === 0) return;
+  let nextIndex = currentAudioIndex + 1;
+  if (nextIndex >= chantingPlaylist.length) nextIndex = 0;
+  selectAndPlayAudio(nextIndex);
+}
 
-    const SYSTEM_PROMPT = {
-        role: "user",
-        parts: [{ text: "System Instruction: คุณคือ AI ผู้เชี่ยวชาญด้าน 'บาลีไวยากรณ์' ให้ตอบด้วยภาษาที่สุภาพ ใช้สรรพนาม 'อาตมา' เน้นการแจกวิภัตติและหลักไวยากรณ์ หากผู้ใช้ถามเรื่องอื่นให้แจ้งว่าสามารถช่วยได้เฉพาะเรื่องบาลี" }]
-    };
-    const SYSTEM_ACK = {
-        role: "model",
-        parts: [{ text: "เจริญพร อาตมาพร้อมช่วยเหลือเรื่องบาลีไวยากรณ์แล้ว" }]
-    };
+function playPrevAudio() {
+  if (chantingPlaylist.length === 0) return;
+  let prevIndex = currentAudioIndex - 1;
+  if (prevIndex < 0) prevIndex = chantingPlaylist.length - 1;
+  selectAndPlayAudio(prevIndex);
+}
 
-    let chatHistory = [SYSTEM_PROMPT, SYSTEM_ACK];
+function togglePlaybackSpeed() {
+  speedIndex = (speedIndex + 1) % playbackSpeeds.length;
+  const currentSpeed = playbackSpeeds[speedIndex];
+  audioPlayer.playbackRate = currentSpeed;
+  document.getElementById('btn-speed').innerText = `${currentSpeed}x`;
+  showToast(`ความเร็วเสียง: ${currentSpeed}x`, 'success');
+}
 
-    const chatHistoryEl = document.getElementById('chat-history');
-    const userInput = document.getElementById('user-input');
-    const sendBtn = document.getElementById('send-btn');
-    const thinkingIndicator = document.getElementById('thinking-indicator');
+function toggleLoop() {
+  isLooping = !isLooping;
+  audioPlayer.loop = isLooping;
+  const btn = document.getElementById('btn-loop');
+  if (isLooping) {
+    btn.classList.remove('text-amber-400/50');
+    btn.classList.add('text-amber-300', 'scale-110');
+    showToast(`เปิดการวนซ้ำบทเดิม`, 'success');
+  } else {
+    btn.classList.add('text-amber-400/50');
+    btn.classList.remove('text-amber-300', 'scale-110');
+    showToast(`ปิดการวนซ้ำ`, 'warning');
+  }
+}
 
-    function formatMessage(text) {
-        return text
-            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-            .replace(/\n/g, '<br>');
-    }
+function toggleBackgroundPlay(enabled) {
+  isBgPlayEnabled = enabled;
+  showToast(enabled ? `เปิดการเล่นเสียงเบื้องหลัง` : `ปิดการเล่นเสียงเบื้องหลัง`, enabled ? 'success' : 'warning');
+}
 
-    function addChatBubble(message, isUser = true) {
-        const wrap = document.createElement('div');
-        wrap.className = `flex items-start space-x-2 ${isUser ? 'flex-row-reverse space-x-reverse' : ''}`;
-        
-        const bubbleClass = isUser ? 'bg-amber-800 text-white chat-bubble-user' : 'bg-white text-gray-800 border chat-bubble-model';
-        const icon = isUser ? '👤' : '🤖';
+function seekAudio(percent) {
+  if (audioPlayer.duration) {
+    audioPlayer.currentTime = (percent / 100) * audioPlayer.duration;
+  }
+}
 
-        wrap.innerHTML = `
-            <span class="text-2xl">${icon}</span>
-            <div class="chat-bubble ${bubbleClass} p-3 rounded-lg max-w-[85%] relative shadow-sm text-sm">
-                <p>${formatMessage(message)}</p>
-            </div>`;
-        
-        chatHistoryEl.appendChild(wrap);
-        chatHistoryEl.scrollTop = chatHistoryEl.scrollHeight;
-    }
+function formatTime(seconds) {
+  if (isNaN(seconds)) return "00:00";
+  const mins = Math.floor(seconds / 60);
+  const secs = Math.floor(seconds % 60);
+  return `${mins < 10 ? '0' : ''}${mins}:${secs < 10 ? '0' : ''}${secs}`;
+}
 
-    async function handleSend() {
-        const msg = userInput.value.trim();
-        if (!msg || sendBtn.disabled) return;
+// Audio Player Event Listeners
+audioPlayer.addEventListener('timeupdate', () => {
+  if (audioPlayer.duration) {
+    const pct = (audioPlayer.currentTime / audioPlayer.duration) * 100;
+    document.getElementById('main-progress').value = pct;
+    document.getElementById('current-time').innerText = formatTime(audioPlayer.currentTime);
+    document.getElementById('total-duration').innerText = formatTime(audioPlayer.duration);
+  }
+});
 
-        addChatBubble(msg, true);
-        userInput.value = '';
-        sendBtn.disabled = true;
-        thinkingIndicator.classList.remove('hidden');
-        chatHistoryEl.scrollTop = chatHistoryEl.scrollHeight;
+audioPlayer.addEventListener('ended', () => {
+  if (!isLooping) {
+    playNextAudio();
+  }
+});
 
-        chatHistory.push({ role: "user", parts: [{ text: msg }] });
-
-        try {
-            const res = await fetch(BACKEND_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ history: chatHistory })
-            });
-
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.error || 'Server Error');
-
-            const reply = data.reply;
-            chatHistory.push({ role: "model", parts: [{ text: reply }] });
-            addChatBubble(reply, false);
-        } catch (err) {
-            const errDiv = document.createElement('div');
-            errDiv.className = "text-center text-red-500 text-[10px] my-2 p-2 bg-red-50 rounded";
-            errDiv.innerText = `เกิดข้อผิดพลาด: ${err.message}`;
-            chatHistoryEl.appendChild(errDiv);
-        } finally {
-            sendBtn.disabled = false;
-            thinkingIndicator.classList.add('hidden');
-        }
-    }
-
-    // Modal Control
-    const fab = document.getElementById('fab-chat-toggle');
-    const fabCheckin = document.getElementById('fab-checkin'); // Get the checkin button too
-    const modal = document.getElementById('chatbot-modal');
+// --- 4. Daily Check-in Logic ---
+function handleDailyCheckIn() {
+    const STORAGE_KEY_DATE = 'pali_last_checkin';
+    const STORAGE_KEY_COUNT = 'pali_checkin_count';
     
-    fab.onclick = () => {
-        modal.classList.remove('chatbot-hidden');
-        fab.style.opacity = '0';
-        fabCheckin.style.opacity = '0'; // Hide check-in button too when chat is open
-    };
-    document.getElementById('chatbot-close-btn').onclick = () => {
-        modal.classList.add('chatbot-hidden');
-        fab.style.opacity = '1';
-        fabCheckin.style.opacity = '1'; // Show check-in button again
-    };
-    document.getElementById('new-chat-btn').onclick = () => {
-        chatHistory = [SYSTEM_PROMPT, SYSTEM_ACK];
-        chatHistoryEl.innerHTML = '';
-        addChatBubble("เจริญพร เริ่มบทสนทนาใหม่ได้เลย", false);
-    };
+    const today = new Date().toISOString().split('T')[0];
+    const lastCheckIn = localStorage.getItem(STORAGE_KEY_DATE);
+    let count = parseInt(localStorage.getItem(STORAGE_KEY_COUNT) || '0');
 
-    sendBtn.onclick = handleSend;
-    userInput.onkeydown = (e) => { if(e.key === 'Enter') handleSend(); };
+    if (lastCheckIn === today) {
+        showToast(`⚠️ วันนี้เช็คชื่อไปแล้ว สะสม 100 รับโค้ดลับ ลบ โฆษณาฟรีถาวร (สะสม ${count} วัน)`, 'warning');
+    } else {
+        count++;
+        localStorage.setItem(STORAGE_KEY_DATE, today);
+        localStorage.setItem(STORAGE_KEY_COUNT, count);
+        
+        updateCheckinBadge();
+
+        if (count === 100) {
+            document.getElementById('reward-modal').classList.add('open');
+        } else {
+            showToast(`✅ เช็คชื่อสำเร็จ! (วันที่ ${count})`, 'success');
+        }
+    }
+}
+
+function updateCheckinBadge() {
+    const STORAGE_KEY_COUNT = 'pali_checkin_count';
+    let count = parseInt(localStorage.getItem(STORAGE_KEY_COUNT) || '0');
+    const badge = document.getElementById('checkin-badge');
+    
+    if (badge) {
+        badge.innerText = count;
+        if (count > 0) {
+            badge.classList.remove('hidden');
+        } else {
+            badge.classList.add('hidden');
+        }
+    }
+}
+
+function showToast(message, type) {
+    const toast = document.getElementById("toast");
+    toast.textContent = message;
+    toast.className = type;
+    toast.classList.add("show");
+    
+    setTimeout(function(){ toast.classList.remove("show"); }, 3000);
+}
+
+function closeRewardModal() {
+    document.getElementById('reward-modal').classList.remove('open');
+}
+
+// --- 5. Search Logic ---
+function filterContent() {
+  let filter = document.getElementById('searchInput').value.toUpperCase();
+  let buttons = document.getElementsByClassName('dbtn');
+  let grids = document.getElementsByClassName('category-grid');
+  let titles = document.getElementsByClassName('category-title');
+
+  for (let i = 0; i < buttons.length; i++) {
+    let txt = buttons[i].textContent || buttons[i].innerText;
+    buttons[i].classList.toggle('hidden', txt.toUpperCase().indexOf(filter) === -1);
+  }
+
+  for (let i = 0; i < grids.length; i++) {
+    let hasVisible = Array.from(grids[i].querySelectorAll('.dbtn')).some(b => !b.classList.contains('hidden'));
+    grids[i].classList.toggle('hidden', !hasVisible);
+    if(titles[i]) titles[i].classList.toggle('hidden', !hasVisible);
+  }
+}
+
+// --- 6. Chatbot Logic ---
+const BACKEND_URL = 'https://solitary-leaf-3661.tontakankeawpang321.workers.dev'; 
+
+const SYSTEM_PROMPT = {
+    role: "user",
+    parts: [{ text: "System Instruction: คุณคือ AI ผู้เชี่ยวชาญด้าน 'บาลีไวยากรณ์' ให้ตอบด้วยภาษาที่สุภาพ ใช้สรรพนาม 'อาตมา' เน้นการแจกวิภัตติและหลักไวยากรณ์ หากผู้ใช้ถามเรื่องอื่นให้แจ้งว่าสามารถช่วยได้เฉพาะเรื่องบาลี" }]
+};
+const SYSTEM_ACK = {
+    role: "model",
+    parts: [{ text: "เจริญพร อาตมาพร้อมช่วยเหลือเรื่องบาลีไวยากรณ์แล้ว" }]
+};
+
+let chatHistory = [SYSTEM_PROMPT, SYSTEM_ACK];
+
+const chatHistoryEl = document.getElementById('chat-history');
+const userInput = document.getElementById('user-input');
+const sendBtn = document.getElementById('send-btn');
+const thinkingIndicator = document.getElementById('thinking-indicator');
+
+function formatMessage(text) {
+    return text
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\n/g, '<br>');
+}
+
+function addChatBubble(message, isUser = true) {
+    const wrap = document.createElement('div');
+    wrap.className = `flex items-start space-x-2 ${isUser ? 'flex-row-reverse space-x-reverse' : ''}`;
+    
+    const bubbleClass = isUser ? 'bg-amber-800 text-white chat-bubble-user' : 'bg-white text-gray-800 border chat-bubble-model';
+    const icon = isUser ? '👤' : '🤖';
+
+    wrap.innerHTML = `
+        <span class="text-2xl">${icon}</span>
+        <div class="chat-bubble ${bubbleClass} p-3 rounded-lg max-w-[85%] relative shadow-sm text-sm">
+            <p>${formatMessage(message)}</p>
+        </div>`;
+    
+    chatHistoryEl.appendChild(wrap);
+    chatHistoryEl.scrollTop = chatHistoryEl.scrollHeight;
+}
+
+async function handleSend() {
+    const msg = userInput.value.trim();
+    if (!msg || sendBtn.disabled) return;
+
+    addChatBubble(msg, true);
+    userInput.value = '';
+    sendBtn.disabled = true;
+    thinkingIndicator.classList.remove('hidden');
+    chatHistoryEl.scrollTop = chatHistoryEl.scrollHeight;
+
+    chatHistory.push({ role: "user", parts: [{ text: msg }] });
+
+    try {
+        const res = await fetch(BACKEND_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ history: chatHistory })
+        });
+
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Server Error');
+
+        const reply = data.reply;
+        chatHistory.push({ role: "model", parts: [{ text: reply }] });
+        addChatBubble(reply, false);
+    } catch (err) {
+        const errDiv = document.createElement('div');
+        errDiv.className = "text-center text-red-500 text-[10px] my-2 p-2 bg-red-50 rounded";
+        errDiv.innerText = `เกิดข้อผิดพลาด: ${err.message}`;
+        chatHistoryEl.appendChild(errDiv);
+    } finally {
+        sendBtn.disabled = false;
+        thinkingIndicator.classList.add('hidden');
+    }
+}
+
+// Modal Control Elements
+const fab = document.getElementById('fab-chat-toggle');
+const fabCheckin = document.getElementById('fab-checkin');
+const modal = document.getElementById('chatbot-modal');
+
+fab.onclick = () => {
+    modal.classList.remove('chatbot-hidden');
+    fab.style.opacity = '0';
+    fabCheckin.style.opacity = '0';
+};
+
+document.getElementById('chatbot-close-btn').onclick = () => {
+    modal.classList.add('chatbot-hidden');
+    fab.style.opacity = '1';
+    fabCheckin.style.opacity = '1';
+};
+
+document.getElementById('new-chat-btn').onclick = () => {
+    chatHistory = [SYSTEM_PROMPT, SYSTEM_ACK];
+    chatHistoryEl.innerHTML = '';
+    addChatBubble("เจริญพร เริ่มบทสนทนาใหม่ได้เลย", false);
+};
+
+sendBtn.onclick = handleSend;
+userInput.onkeydown = (e) => { if(e.key === 'Enter') handleSend(); };
+
+// --- On Window Load Initializers ---
+window.addEventListener('load', () => {
+    updateCheckinBadge();
+    initPlaylist();
+});
 </script>
 </body>
 </html>
