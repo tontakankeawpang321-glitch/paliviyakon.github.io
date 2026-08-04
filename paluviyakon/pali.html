@@ -134,26 +134,27 @@ body.light .control-btn{background:#ddd;color:#111; border-color:#ccc;}
   scroll-behavior:smooth;
 }
 
-.slide{
-  min-width:100vw;
-  height:100vh;
-  padding:60px 0px 0px 0px; 
-  overflow-y:auto;
-  overflow-x:auto;
-  overscroll-behavior-x:contain; /* ป้องกันการส่งต่อการเลื่อนแนวขวางไปยัง slider หลัก */
-  scroll-snap-align:start;
+.slide {
+  min-width: 100vw;
+  height: 100vh;
+  padding: 60px 0px 0px 0px; 
+  overflow-y: auto;
+  overflow-x: auto; /* รองรับการสกรอลล์แนวนอนเมื่อเนื้อหาใหญ่กว่าหน้าจอ */
+  overscroll-behavior-x: contain;
+  scroll-snap-align: start;
   position: relative;
   display: flex;
   flex-direction: column;
-  align-items: safe center;
+  align-items: center;
 }
 
 .slide-content {
-    width: 100%;
-    max-width: 800px;
-    padding: 0 20px 100px 20px;
-    margin: 0 auto;
-    transform-origin: top center;
+  width: 100%;
+  max-width: 800px;
+  padding: 0 20px 100px 20px;
+  margin: 0 auto;
+  transform-origin: top center;
+  transition: transform 0.2s ease-out; /* เพิ่มความสมูทขณะซูม */
 }
 
 .img-container {
@@ -2094,15 +2095,29 @@ function closeTOC(){
 }
 
 /* ================= FONT ================= */
-function fontSize(change){
+function fontSize(change) {
     currentZoom += change * 0.1;
-    if(currentZoom < 0.5) currentZoom = 0.5;
-    if(currentZoom > 3) currentZoom = 3;
+    if (currentZoom < 0.5) currentZoom = 0.5;
+    if (currentZoom > 3.0) currentZoom = 3.0;
 
-    document.querySelectorAll(".slide-content")
-        .forEach(el => el.style.zoom = currentZoom);
+    document.querySelectorAll(".slide-content").forEach(el => {
+        const parent = el.parentElement; // ตัวกล่อง .slide
+        
+        if (currentZoom > 1.0) {
+            // เมื่อซูมขยาย ให้ปรับการจัดวางเป็นชิดซ้าย/บน เพื่อให้สกรอลล์ไปทางขวาและลงล่างได้ครบถ้วน
+            parent.style.alignItems = "flex-start";
+            el.style.transform = `scale(${currentZoom})`;
+            el.style.transformOrigin = "top left"; // ให้ขยายออกจากมุมซ้ายบน
+            el.style.margin = "0 0 100px 20px";
+        } else {
+            // เมื่อขนาดปกติ คืนค่าจัดกึ่งกลาง
+            parent.style.alignItems = "center";
+            el.style.transform = `scale(${currentZoom})`;
+            el.style.transformOrigin = "top center";
+            el.style.margin = "0 auto";
+        }
+    });
 
-    // หากมีการซูมขยาย ให้ปิดการล็อกสไลด์หน้าเพื่อไม่ให้ปัดแล้วเปลี่ยนหน้า
     if (slider) {
         if (currentZoom > 1.0) {
             slider.style.scrollSnapType = "none";
