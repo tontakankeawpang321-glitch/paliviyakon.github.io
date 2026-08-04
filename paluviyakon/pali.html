@@ -1,4 +1,5 @@
-html lang="th"><head>
+<!DOCTYPE html>
+<html lang="th"><head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ebook Maker Pro (Cropper Edition)</title>
@@ -138,44 +139,49 @@ body.light .control-btn{background:#ddd;color:#111; border-color:#ccc;}
   height:100vh;
   padding:60px 0px 0px 0px; 
   overflow-y:auto;
+  overflow-x:auto;
   scroll-snap-align:start;
   position: relative;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: safe center;
 }
 
 .slide-content {
     width: 100%;
     max-width: 800px;
     padding: 0 20px 100px 20px;
-    transform-origin: top center; /* Ensure zoom starts from top */
+    margin: 0 auto;
+    transform-origin: top center;
 }
 
 .img-container {
     width: 100%;
     max-width: 100%;
     padding: 0;
-    margin: 0;
+    margin: 0 auto;
     display: flex;
     flex-direction: column;
+    align-items: center;
 }
 
 .img-wrapper {
     position: relative;
     width: 100%;
-    margin: 0;
+    max-width: 100%;
+    margin: 0 auto;
     padding: 0;
     display: block;
-    margin-bottom: 5px; /* Slight gap between images */
+    margin-bottom: 5px;
 }
 
 .slide img {
     display: block;
     width: 100%;
+    max-width: 100%;
     height: auto;
-    margin: 0;
-    object-fit: cover;
+    margin: 0 auto;
+    object-fit: contain;
 }
 
 /* Edit Tools on Image */
@@ -337,7 +343,6 @@ canvas#cropCanvas {
 
 <body class="light">
 
-<!-- Hidden Input -->
 <!-- FLOATING AUDIO BAR -->
 <div id="floating-audio-bar">
   <div class="audio-info">
@@ -346,25 +351,17 @@ canvas#cropCanvas {
   <button onclick="closeFloatingAudio()">✕</button>
 </div>
 
-
-<!-- Crop Modal -->
-
-
 <div class="topbar">
-  
-
   <div style="display:flex; gap:5px; align-items:center;">
     <button class="control-btn" onclick="toggleTOC()">สารบัญ</button>
     <button class="control-btn" onclick="fontSize(1)">A+</button>
     <button class="control-btn" onclick="fontSize(-1)">A-</button>
     
-    
-
     <select id="pageSelect" onchange="goSlide(this.value)" class="control-btn" style="max-width: 70px;"><option value="0">1</option><option value="1">2</option><option value="2">3</option><option value="3">4</option><option value="4">5</option><option value="5">6</option><option value="6">7</option><option value="7">8</option><option value="8">9</option><option value="9">10</option><option value="10">11</option><option value="11">12</option><option value="12">13</option><option value="13">14</option><option value="14">15</option><option value="15">16</option><option value="16">17</option><option value="17">18</option><option value="18">19</option><option value="19">20</option><option value="20">21</option><option value="21">22</option><option value="22">23</option><option value="23">24</option><option value="24">25</option><option value="25">26</option><option value="26">27</option><option value="27">28</option><option value="28">29</option><option value="29">30</option><option value="30">31</option><option value="31">32</option><option value="32">33</option><option value="33">34</option><option value="34">35</option><option value="35">36</option><option value="36">37</option><option value="37">38</option><option value="38">39</option><option value="39">40</option><option value="40">41</option><option value="41">42</option><option value="42">43</option><option value="43">44</option><option value="44">45</option><option value="45">46</option><option value="46">47</option><option value="47">48</option><option value="48">49</option><option value="49">50</option><option value="50">51</option><option value="51">52</option><option value="52">53</option><option value="53">54</option><option value="54">55</option><option value="55">56</option><option value="56">57</option><option value="57">58</option><option value="58">59</option><option value="59">60</option><option value="60">61</option><option value="61">62</option><option value="62">63</option><option value="63">64</option><option value="64">65</option><option value="65">66</option><option value="66">67</option><option value="67">68</option><option value="68">69</option><option value="69">70</option><option value="70">71</option><option value="71">72</option><option value="72">73</option><option value="73">74</option><option value="74">75</option><option value="75">76</option><option value="76">77</option><option value="77">78</option><option value="78">79</option><option value="79">80</option><option value="80">81</option><option value="81">82</option><option value="82">83</option><option value="83">84</option><option value="84">85</option><option value="85">86</option><option value="86">87</option><option value="87">88</option><option value="88">89</option><option value="89">90</option><option value="90">91</option><option value="91">92</option><option value="92">93</option><option value="93">94</option><option value="94">95</option><option value="95">96</option><option value="96">97</option><option value="97">98</option><option value="98">99</option><option value="99">100</option></select>
   </div>
 </div>
 
-<div class="toc show" id="toc"><div class="toc-item-wrapper" id="toc-wrap-0"><div class="toc-text" onclick="goSlide(0); toggleTOC()" style="cursor: pointer;">01 บทนำ</div></div><div class="toc-item-wrapper" id="toc-wrap-1"><div class="toc-text" onclick="goSlide(1); toggleTOC()" style="cursor: pointer;">02 นาม</div></div><div class="toc-item-wrapper" id="toc-wrap-2"><div class="toc-text" onclick="goSlide(2); toggleTOC()" style="cursor: pointer;">03 ลิงค์</div></div><div class="toc-item-wrapper" id="toc-wrap-3"><div class="toc-text" onclick="goSlide(3); toggleTOC()" style="cursor: pointer;">04 วจนะ</div></div><div class="toc-item-wrapper" id="toc-wrap-4"><div class="toc-text" onclick="goSlide(4); toggleTOC()" style="cursor: pointer;">05 วิภัตติ</div></div><div class="toc-item-wrapper" id="toc-wrap-5"><div class="toc-text" onclick="goSlide(5); toggleTOC()" style="cursor: pointer;">06 อายตนิบาต</div></div><div class="toc-item-wrapper" id="toc-wrap-6"><div class="toc-text" onclick="goSlide(6); toggleTOC()" style="cursor: pointer;">007 การันต์</div></div><div class="toc-item-wrapper" id="toc-wrap-7"><div class="toc-text" onclick="goSlide(7); toggleTOC()" style="cursor: pointer;">008 แจกปุลิงค์</div></div><div class="toc-item-wrapper" id="toc-wrap-8"><div class="toc-text" onclick="goSlide(8); toggleTOC()" style="cursor: pointer;">009 แจกอิตถีลิงค์</div></div><div class="toc-item-wrapper" id="toc-wrap-9"><div class="toc-text" onclick="goSlide(9); toggleTOC()" style="cursor: pointer;">010 แจกนปุสกลิงค์</div></div><div class="toc-item-wrapper" id="toc-wrap-10"><div class="toc-text" onclick="goSlide(10); toggleTOC()" style="cursor: pointer;">011 กติปยศัพท์</div></div><div class="toc-item-wrapper" id="toc-wrap-11"><div class="toc-text" onclick="goSlide(11); toggleTOC()" style="cursor: pointer;">012 มโนคณศัพท์</div></div><div class="toc-item-wrapper" id="toc-wrap-12"><div class="toc-text" onclick="goSlide(12); toggleTOC()" style="cursor: pointer;">013 สังขยา</div></div><div class="toc-item-wrapper" id="toc-wrap-13"><div class="toc-text" onclick="goSlide(13); toggleTOC()" style="cursor: pointer;">014 วิธีนับสังขยา</div></div><div class="toc-item-wrapper" id="toc-wrap-14"><div class="toc-text" onclick="goSlide(14); toggleTOC()" style="cursor: pointer;">015 ปกติสังขยาเป็นนาม-ลิงค์</div></div><div class="toc-item-wrapper" id="toc-wrap-15"><div class="toc-text" onclick="goSlide(15); toggleTOC()" style="cursor: pointer;">016 แจกปกติสังขยา</div></div><div class="toc-item-wrapper" id="toc-wrap-16"><div class="toc-text" onclick="goSlide(16); toggleTOC()" style="cursor: pointer;">017 แจกปูรณสังขยา</div></div><div class="toc-item-wrapper" id="toc-wrap-17"><div class="toc-text" onclick="goSlide(17); toggleTOC()" style="cursor: pointer;">018 สัพพนาม</div></div><div class="toc-item-wrapper" id="toc-wrap-18"><div class="toc-text" onclick="goSlide(18); toggleTOC()" style="cursor: pointer;">019 แจกปุริสสัพพนาม</div></div><div class="toc-item-wrapper" id="toc-wrap-19"><div class="toc-text" onclick="goSlide(19); toggleTOC()" style="cursor: pointer;">020 แจกอนิยมวิเสสนสัพพนาม</div></div><div class="toc-item-wrapper" id="toc-wrap-20"><div class="toc-text" onclick="goSlide(20); toggleTOC()" style="cursor: pointer;">021 แจกนิยมวิเสสนสัพพนาม</div></div><div class="toc-item-wrapper" id="toc-wrap-21"><div class="toc-text" onclick="goSlide(21); toggleTOC()" style="cursor: pointer;">022 อัพพยยศัพท์</div></div><div class="toc-item-wrapper" id="toc-wrap-22"><div class="toc-text" onclick="goSlide(22); toggleTOC()" style="cursor: pointer;">023 นิบาต</div></div><div class="toc-item-wrapper" id="toc-wrap-23"><div class="toc-text" onclick="goSlide(23); toggleTOC()" style="cursor: pointer;">024 ปัจจัยในอัพยยศัพท์</div></div><div class="toc-item-wrapper" id="toc-wrap-24"><div class="toc-text" onclick="goSlide(24); toggleTOC()" style="cursor: pointer;">025 อาขยาต วิภัตติ</div></div><div class="toc-item-wrapper" id="toc-wrap-26"><div class="toc-text" onclick="goSlide(25); toggleTOC()" style="cursor: pointer;">026 อาขยาต กาล</div></div><div class="toc-item-wrapper" id="toc-wrap-27"><div class="toc-text" onclick="goSlide(26); toggleTOC()" style="cursor: pointer;">027 อาขยาต บท</div></div><div class="toc-item-wrapper" id="toc-wrap-28"><div class="toc-text" onclick="goSlide(27); toggleTOC()" style="cursor: pointer;">028 อาขยาต วจนะ บุรุษ</div></div><div class="toc-item-wrapper" id="toc-wrap-29"><div class="toc-text" onclick="goSlide(28); toggleTOC()" style="cursor: pointer;">029 ธาตุ หมวด ภูธาตุ</div></div><div class="toc-item-wrapper" id="toc-wrap-30"><div class="toc-text" onclick="goSlide(29); toggleTOC()" style="cursor: pointer;">030 หมวด รุธฺ ธาตุ</div></div><div class="toc-item-wrapper" id="toc-wrap-31"><div class="toc-text" onclick="goSlide(30); toggleTOC()" style="cursor: pointer;">031 หมวด ทิวฺ ธาตุ</div></div><div class="toc-item-wrapper" id="toc-wrap-32"><div class="toc-text" onclick="goSlide(31); toggleTOC()" style="cursor: pointer;">032 หมวด สุ ธาตุ</div></div><div class="toc-item-wrapper" id="toc-wrap-33"><div class="toc-text" onclick="goSlide(32); toggleTOC()" style="cursor: pointer;">033 หมวด กี ธาตุ</div></div><div class="toc-item-wrapper" id="toc-wrap-34"><div class="toc-text" onclick="goSlide(33); toggleTOC()" style="cursor: pointer;">034 หมวด คหฺ และ ตนฺ ธาตุ</div></div><div class="toc-item-wrapper" id="toc-wrap-35"><div class="toc-text" onclick="goSlide(34); toggleTOC()" style="cursor: pointer;">035 หมวด จุรฺ ธาตุ</div></div><div class="toc-item-wrapper" id="toc-wrap-36"><div class="toc-text" onclick="goSlide(35); toggleTOC()" style="cursor: pointer;">036 สกัมม+อกัมมธาตุ</div></div><div class="toc-item-wrapper" id="toc-wrap-37"><div class="toc-text" onclick="goSlide(36); toggleTOC()" style="cursor: pointer;">037 วาจก</div></div><div class="toc-item-wrapper" id="toc-wrap-38"><div class="toc-text" onclick="goSlide(37); toggleTOC()" style="cursor: pointer;">038 ปัจจัย</div></div><div class="toc-item-wrapper" id="toc-wrap-39"><div class="toc-text" onclick="goSlide(38); toggleTOC()" style="cursor: pointer;">039 ปัจจัยพิเศษ 5&nbsp; ตัว</div></div><div class="toc-item-wrapper" id="toc-wrap-40"><div class="toc-text" onclick="goSlide(39); toggleTOC()" style="cursor: pointer;">040 คำอธิบายในกัตตุวาจก</div></div><div class="toc-item-wrapper" id="toc-wrap-41"><div class="toc-text" onclick="goSlide(40); toggleTOC()" style="cursor: pointer;">041 คำอธิบายในกัมมวาจก</div></div><div class="toc-item-wrapper" id="toc-wrap-42"><div class="toc-text" onclick="goSlide(41); toggleTOC()" style="cursor: pointer;">042 กิตก์&nbsp; นามกิตก์</div></div><div class="toc-item-wrapper" id="toc-wrap-43"><div class="toc-text" onclick="goSlide(42); toggleTOC()" style="cursor: pointer;">043 สาธนะ</div></div><div class="toc-item-wrapper" id="toc-wrap-44"><div class="toc-text" onclick="goSlide(43); toggleTOC()" style="cursor: pointer;">044 ปัจจัยแห่งนามกิตก์</div></div><div class="toc-item-wrapper" id="toc-wrap-45"><div class="toc-text" onclick="goSlide(44); toggleTOC()" style="cursor: pointer;">045 วิเคราะห์ ในกิตปัจจัย</div></div><div class="toc-item-wrapper" id="toc-wrap-46"><div class="toc-text" onclick="goSlide(45); toggleTOC()" style="cursor: pointer;">046 วิเคราะห์ ในกิจจปัจจัย</div></div><div class="toc-item-wrapper" id="toc-wrap-47"><div class="toc-text" onclick="goSlide(46); toggleTOC()" style="cursor: pointer;">047 วิเคราะห์ ในกิตกิจจปัจจัย</div></div><div class="toc-item-wrapper" id="toc-wrap-48"><div class="toc-text" onclick="goSlide(47); toggleTOC()" style="cursor: pointer;">048 กิริยากิตก์ วิภัตติและวาจก</div></div><div class="toc-item-wrapper" id="toc-wrap-49"><div class="toc-text" onclick="goSlide(48); toggleTOC()" style="cursor: pointer;">049 กิริยากิตก์ กาล</div></div><div class="toc-item-wrapper" id="toc-wrap-50"><div class="toc-text" onclick="goSlide(49); toggleTOC()" style="cursor: pointer;">050 กิริยากิตก์ วาจก</div></div><div class="toc-item-wrapper" id="toc-wrap-51"><div class="toc-text" onclick="goSlide(50); toggleTOC()" style="cursor: pointer;">051 ปัจจัยแห่งกิริยากิตก์</div></div><div class="toc-item-wrapper" id="toc-wrap-52"><div class="toc-text" onclick="goSlide(51); toggleTOC()" style="cursor: pointer;">052 กิตปัจจัย</div></div><div class="toc-item-wrapper" id="toc-wrap-53"><div class="toc-text" onclick="goSlide(52); toggleTOC()" style="cursor: pointer;">053 กิจจปัจจัย</div></div><div class="toc-item-wrapper" id="toc-wrap-54"><div class="toc-text" onclick="goSlide(53); toggleTOC()" style="cursor: pointer;">054 กิตกิจจปัจจัย</div></div><div class="toc-item-wrapper" id="toc-wrap-55"><div class="toc-text" onclick="goSlide(54); toggleTOC()" style="cursor: pointer;">055 ตูนาทิ ปัจจัย</div></div><div class="toc-item-wrapper" id="toc-wrap-56"><div class="toc-text" onclick="goSlide(55); toggleTOC()" style="cursor: pointer;">056 สมาส</div></div><div class="toc-item-wrapper" id="toc-wrap-57"><div class="toc-text" onclick="goSlide(56); toggleTOC()" style="cursor: pointer;">057 กัมมธารยสมาส</div></div><div class="toc-item-wrapper" id="toc-wrap-58"><div class="toc-text" onclick="goSlide(57); toggleTOC()" style="cursor: pointer;">058 ทิคุสมาส</div></div><div class="toc-item-wrapper" id="toc-wrap-59"><div class="toc-text" onclick="goSlide(58); toggleTOC()" style="cursor: pointer;">059 ตัปปุริสสมาส</div></div><div class="toc-item-wrapper" id="toc-wrap-60"><div class="toc-text" onclick="goSlide(59); toggleTOC()" style="cursor: pointer;">060 ทวันทวสมาส</div></div><div class="toc-item-wrapper" id="toc-wrap-61"><div class="toc-text" onclick="goSlide(60); toggleTOC()" style="cursor: pointer;">061 อัพยยีภาวสมาส</div></div><div class="toc-item-wrapper" id="toc-wrap-62"><div class="toc-text" onclick="goSlide(61); toggleTOC()" style="cursor: pointer;">062 พหุพพิหิสมาส 6 ตามวิภัตติ</div></div><div class="toc-item-wrapper" id="toc-wrap-63"><div class="toc-text" onclick="goSlide(62); toggleTOC()" style="cursor: pointer;">063 พหุพพิหิสมาส 5 ตามลักษณะ</div></div><div class="toc-item-wrapper" id="toc-wrap-64"><div class="toc-text" onclick="goSlide(63); toggleTOC()" style="cursor: pointer;">064 สมาสท้อง</div></div><div class="toc-item-wrapper" id="toc-wrap-65"><div class="toc-text" onclick="goSlide(64); toggleTOC()" style="cursor: pointer;">065 ตัทธิต</div></div><div class="toc-item-wrapper" id="toc-wrap-66"><div class="toc-text" onclick="goSlide(65); toggleTOC()" style="cursor: pointer;">066 โคตตตัทธิต</div></div><div class="toc-item-wrapper" id="toc-wrap-67"><div class="toc-text" onclick="goSlide(66); toggleTOC()" style="cursor: pointer;">067 ตรัตยาทิตัทธิต</div></div><div class="toc-item-wrapper" id="toc-wrap-68"><div class="toc-text" onclick="goSlide(67); toggleTOC()" style="cursor: pointer;">068 ราคาทิตัทธิต</div></div><div class="toc-item-wrapper" id="toc-wrap-69"><div class="toc-text" onclick="goSlide(68); toggleTOC()" style="cursor: pointer;">069 ชาตาทิตัทธิต</div></div><div class="toc-item-wrapper" id="toc-wrap-70"><div class="toc-text" onclick="goSlide(69); toggleTOC()" style="cursor: pointer;">070 สมุหตัทธิต</div></div><div class="toc-item-wrapper" id="toc-wrap-71"><div class="toc-text" onclick="goSlide(70); toggleTOC()" style="cursor: pointer;">071 ฐานตัทธิต</div></div><div class="toc-item-wrapper" id="toc-wrap-72"><div class="toc-text" onclick="goSlide(71); toggleTOC()" style="cursor: pointer;">072 พหุลตัทธิต</div></div><div class="toc-item-wrapper" id="toc-wrap-73"><div class="toc-text" onclick="goSlide(72); toggleTOC()" style="cursor: pointer;">073 เสฏฐตัทธิต</div></div><div class="toc-item-wrapper" id="toc-wrap-74"><div class="toc-text" onclick="goSlide(73); toggleTOC()" style="cursor: pointer;">074 ตทัสสัตถิตัทธิต</div></div><div class="toc-item-wrapper" id="toc-wrap-75"><div class="toc-text" onclick="goSlide(74); toggleTOC()" style="cursor: pointer;">075 ปกติตัทธิต</div></div><div class="toc-item-wrapper" id="toc-wrap-76"><div class="toc-text" onclick="goSlide(75); toggleTOC()" style="cursor: pointer;">076 ปูรณตัทธิต</div></div><div class="toc-item-wrapper" id="toc-wrap-77"><div class="toc-text" onclick="goSlide(76); toggleTOC()" style="cursor: pointer;">077 สังขยาตัทธิต</div></div><div class="toc-item-wrapper" id="toc-wrap-78"><div class="toc-text" onclick="goSlide(77); toggleTOC()" style="cursor: pointer;">078 วิภาคตัทธิต</div></div><div class="toc-item-wrapper" id="toc-wrap-79"><div class="toc-text" onclick="goSlide(78); toggleTOC()" style="cursor: pointer;">079 ภาวตัทธิต</div></div><div class="toc-item-wrapper" id="toc-wrap-80"><div class="toc-text" onclick="goSlide(79); toggleTOC()" style="cursor: pointer;">080 อัพยยตัทธิ</div></div><div class="toc-item-wrapper" id="toc-wrap-81"><div class="toc-text" onclick="goSlide(80); toggleTOC()" style="cursor: pointer;">081 ตัทธิตนอกแบบ</div></div><div class="toc-item-wrapper" id="toc-wrap-82"><div class="toc-text" onclick="goSlide(81); toggleTOC()" style="cursor: pointer;">082 สมัญญาภิธาน</div></div><div class="toc-item-wrapper" id="toc-wrap-83"><div class="toc-text" onclick="goSlide(82); toggleTOC()" style="cursor: pointer;">083 สระ</div></div><div class="toc-item-wrapper" id="toc-wrap-84"><div class="toc-text" onclick="goSlide(83); toggleTOC()" style="cursor: pointer;">084 พยัญชนะ</div></div><div class="toc-item-wrapper" id="toc-wrap-85"><div class="toc-text" onclick="goSlide(84); toggleTOC()" style="cursor: pointer;">085 ฐานกรณ์ของอักขระ</div></div><div class="toc-item-wrapper" id="toc-wrap-86"><div class="toc-text" onclick="goSlide(85); toggleTOC()" style="cursor: pointer;">086 เสียงของอักขระ</div></div><div class="toc-item-wrapper" id="toc-wrap-87"><div class="toc-text" onclick="goSlide(86); toggleTOC()" style="cursor: pointer;">087 พยัญชนะสังโยค</div></div><div class="toc-item-wrapper" id="toc-wrap-88"><div class="toc-text" onclick="goSlide(87); toggleTOC()" style="cursor: pointer;">088 อัฑฒสระ</div></div><div class="toc-item-wrapper" id="toc-wrap-89"><div class="toc-text" onclick="goSlide(88); toggleTOC()" style="cursor: pointer;">089 ลำดับสระ</div></div><div class="toc-item-wrapper" id="toc-wrap-90"><div class="toc-text" onclick="goSlide(89); toggleTOC()" style="cursor: pointer;">090 ลำดับการเรียงอักขระ</div></div><div class="toc-item-wrapper" id="toc-wrap-91"><div class="toc-text" onclick="goSlide(90); toggleTOC()" style="cursor: pointer;">091 สนธิ</div></div><div class="toc-item-wrapper" id="toc-wrap-92"><div class="toc-text" onclick="goSlide(91); toggleTOC()" style="cursor: pointer;">092 สระสนธิ</div></div><div class="toc-item-wrapper" id="toc-wrap-93"><div class="toc-text" onclick="goSlide(92); toggleTOC()" style="cursor: pointer;">093 พยัญชนะสนธิ</div></div><div class="toc-item-wrapper" id="toc-wrap-94"><div class="toc-text" onclick="goSlide(93); toggleTOC()" style="cursor: pointer;">094 นิคคหิตสนธิ</div></div><div class="toc-item-wrapper" id="toc-wrap-95"><div class="toc-text" onclick="goSlide(94); toggleTOC()" style="cursor: pointer;">หลักสัมพันธ์</div></div><div class="toc-item-wrapper" id="toc-wrap-96"><div class="toc-text" onclick="goSlide(95); toggleTOC()" style="cursor: pointer;">หลักการแปล</div></div><div class="toc-item-wrapper" id="toc-wrap-97"><div class="toc-text" onclick="goSlide(96); toggleTOC()" style="cursor: pointer;">กลอนช่วยจำ</div></div><div class="toc-item-wrapper" id="toc-wrap-98"><div class="toc-text" onclick="goSlide(97); toggleTOC()" style="cursor: pointer;">กาฬจำนวนธาตุ</div></div><div class="toc-item-wrapper active" id="toc-wrap-99"><div class="toc-text" onclick="goSlide(98); toggleTOC()" style="cursor: pointer;">หน้าใหม่ 100</div></div></div>
+<div class="toc show" id="toc"><div class="toc-item-wrapper" id="toc-wrap-0"><div class="toc-text" onclick="goSlide(0); toggleTOC()" style="cursor: pointer;">01 บทนำ</div></div><div class="toc-item-wrapper" id="toc-wrap-1"><div class="toc-text" onclick="goSlide(1); toggleTOC()" style="cursor: pointer;">02 นาม</div></div><div class="toc-item-wrapper" id="toc-wrap-2"><div class="toc-text" onclick="goSlide(2); toggleTOC()" style="cursor: pointer;">03 ลิงค์</div></div><div class="toc-item-wrapper" id="toc-wrap-3"><div class="toc-text" onclick="goSlide(3); toggleTOC()" style="cursor: pointer;">04 วจนะ</div></div><div class="toc-item-wrapper" id="toc-wrap-4"><div class="toc-text" onclick="goSlide(4); toggleTOC()" style="cursor: pointer;">05 วิภัตติ</div></div><div class="toc-item-wrapper" id="toc-wrap-5"><div class="toc-text" onclick="goSlide(5); toggleTOC()" style="cursor: pointer;">06 อายตนิบาต</div></div><div class="toc-item-wrapper" id="toc-wrap-6"><div class="toc-text" onclick="goSlide(6); toggleTOC()" style="cursor: pointer;">007 การันต์</div></div><div class="toc-item-wrapper" id="toc-wrap-7"><div class="toc-text" onclick="goSlide(7); toggleTOC()" style="cursor: pointer;">008 แจกปุลิงค์</div></div><div class="toc-item-wrapper" id="toc-wrap-8"><div class="toc-text" onclick="goSlide(8); toggleTOC()" style="cursor: pointer;">009 แจกอิตถีลิงค์</div></div><div class="toc-item-wrapper" id="toc-wrap-9"><div class="toc-text" onclick="goSlide(9); toggleTOC()" style="cursor: pointer;">010 แจกนปุสกลิงค์</div></div><div class="toc-item-wrapper" id="toc-wrap-10"><div class="toc-text" onclick="goSlide(10); toggleTOC()" style="cursor: pointer;">011 กติปยศัพท์</div></div><div class="toc-item-wrapper" id="toc-wrap-11"><div class="toc-text" onclick="goSlide(11); toggleTOC()" style="cursor: pointer;">012 มโนคณศัพท์</div></div><div class="toc-item-wrapper" id="toc-wrap-12"><div class="toc-text" onclick="goSlide(12); toggleTOC()" style="cursor: pointer;">013 สังขยา</div></div><div class="toc-item-wrapper" id="toc-wrap-13"><div class="toc-text" onclick="goSlide(13); toggleTOC()" style="cursor: pointer;">014 วิธีนับสังขยา</div></div><div class="toc-item-wrapper" id="toc-wrap-14"><div class="toc-text" onclick="goSlide(14); toggleTOC()" style="cursor: pointer;">015 ปกติสังขยาเป็นนาม-ลิงค์</div></div><div class="toc-item-wrapper" id="toc-wrap-15"><div class="toc-text" onclick="goSlide(15); toggleTOC()" style="cursor: pointer;">016 แจกปกติสังขยา</div></div><div class="toc-item-wrapper" id="toc-wrap-16"><div class="toc-text" onclick="goSlide(16); toggleTOC()" style="cursor: pointer;">017 แจกปูรณสังขยา</div></div><div class="toc-item-wrapper" id="toc-wrap-17"><div class="toc-text" onclick="goSlide(17); toggleTOC()" style="cursor: pointer;">018 สัพพนาม</div></div><div class="toc-item-wrapper" id="toc-wrap-18"><div class="toc-text" onclick="goSlide(18); toggleTOC()" style="cursor: pointer;">019 แจกปุริสสัพพนาม</div></div><div class="toc-item-wrapper" id="toc-wrap-19"><div class="toc-text" onclick="goSlide(19); toggleTOC()" style="cursor: pointer;">020 แจกอนิยมวิเสสนสัพพนาม</div></div><div class="toc-item-wrapper" id="toc-wrap-20"><div class="toc-text" onclick="goSlide(20); toggleTOC()" style="cursor: pointer;">021 แจกนิยมวิเสสนสัพพนาม</div></div><div class="toc-item-wrapper" id="toc-wrap-21"><div class="toc-text" onclick="goSlide(21); toggleTOC()" style="cursor: pointer;">022 อัพพยยศัพท์</div></div><div class="toc-item-wrapper" id="toc-wrap-22"><div class="toc-text" onclick="goSlide(22); toggleTOC()" style="cursor: pointer;">023 นิบาต</div></div><div class="toc-item-wrapper" id="toc-wrap-23"><div class="toc-text" onclick="goSlide(23); toggleTOC()" style="cursor: pointer;">024 ปัจจัยในอัพยยศัพท์</div></div><div class="toc-item-wrapper" id="toc-wrap-24"><div class="toc-text" onclick="goSlide(24); toggleTOC()" style="cursor: pointer;">025 อาขยาต วิภัตติ</div></div><div class="toc-item-wrapper" id="toc-wrap-26"><div class="toc-text" onclick="goSlide(25); toggleTOC()" style="cursor: pointer;">026 อาขยาต กาล</div></div><div class="toc-item-wrapper" id="toc-wrap-27"><div class="toc-text" onclick="goSlide(26); toggleTOC()" style="cursor: pointer;">027 อาขยาต บท</div></div><div class="toc-item-wrapper" id="toc-wrap-28"><div class="toc-text" onclick="goSlide(27); toggleTOC()" style="cursor: pointer;">028 อาขยาต วจนะ บุรุษ</div></div><div class="toc-item-wrapper" id="toc-wrap-29"><div class="toc-text" onclick="goSlide(28); toggleTOC()" style="cursor: pointer;">029 ธาตุ หมวด ภูธาตุ</div></div><div class="toc-item-wrapper" id="toc-wrap-30"><div class="toc-text" onclick="goSlide(29); toggleTOC()" style="cursor: pointer;">030 หมวด รุธฺ ธาตุ</div></div><div class="toc-item-wrapper" id="toc-wrap-31"><div class="toc-text" onclick="goSlide(30); toggleTOC()" style="cursor: pointer;">031 หมวด ทิวฺ ธาตุ</div></div><div class="toc-item-wrapper" id="toc-wrap-32"><div class="toc-text" onclick="goSlide(31); toggleTOC()" style="cursor: pointer;">032 หมวด สุ ธาตุ</div></div><div class="toc-item-wrapper" id="toc-wrap-33"><div class="toc-text" onclick="goSlide(32); toggleTOC()" style="cursor: pointer;">033 หมวด กี ธาตุ</div></div><div class="toc-item-wrapper" id="toc-wrap-34"><div class="toc-text" onclick="goSlide(33); toggleTOC()" style="cursor: pointer;">034 หมวด คหฺ และ ตนฺ ธาตุ</div></div><div class="toc-item-wrapper" id="toc-wrap-35"><div class="toc-text" onclick="goSlide(34); toggleTOC()" style="cursor: pointer;">035 หมวด จุรฺ ธาตุ</div></div><div class="toc-item-wrapper" id="toc-wrap-36"><div class="toc-text" onclick="goSlide(35); toggleTOC()" style="cursor: pointer;">036 สกัมม+อกัมมธาตุ</div></div><div class="toc-item-wrapper" id="toc-wrap-37"><div class="toc-text" onclick="goSlide(36); toggleTOC()" style="cursor: pointer;">037 วาจก</div></div><div class="toc-item-wrapper" id="toc-wrap-38"><div class="toc-text" onclick="goSlide(37); toggleTOC()" style="cursor: pointer;">038 ปัจจัย</div></div><div class="toc-item-wrapper" id="toc-wrap-39"><div class="toc-text" onclick="goSlide(38); toggleTOC()" style="cursor: pointer;">039 ปัจจัยพิเศษ 5  ตัว</div></div><div class="toc-item-wrapper" id="toc-wrap-40"><div class="toc-text" onclick="goSlide(39); toggleTOC()" style="cursor: pointer;">040 คำอธิบายในกัตตุวาจก</div></div><div class="toc-item-wrapper" id="toc-wrap-41"><div class="toc-text" onclick="goSlide(40); toggleTOC()" style="cursor: pointer;">041 คำอธิบายในกัมมวาจก</div></div><div class="toc-item-wrapper" id="toc-wrap-42"><div class="toc-text" onclick="goSlide(41); toggleTOC()" style="cursor: pointer;">042 กิตก์ นามกิตก์</div></div><div class="toc-item-wrapper" id="toc-wrap-43"><div class="toc-text" onclick="goSlide(42); toggleTOC()" style="cursor: pointer;">043 สาธนะ</div></div><div class="toc-item-wrapper" id="toc-wrap-44"><div class="toc-text" onclick="goSlide(43); toggleTOC()" style="cursor: pointer;">044 ปัจจัยแห่งนามกิตก์</div></div><div class="toc-item-wrapper" id="toc-wrap-45"><div class="toc-text" onclick="goSlide(44); toggleTOC()" style="cursor: pointer;">045 วิเคราะห์ ในกิตปัจจัย</div></div><div class="toc-item-wrapper" id="toc-wrap-46"><div class="toc-text" onclick="goSlide(45); toggleTOC()" style="cursor: pointer;">046 วิเคราะห์ ในกิจจปัจจัย</div></div><div class="toc-item-wrapper" id="toc-wrap-47"><div class="toc-text" onclick="goSlide(46); toggleTOC()" style="cursor: pointer;">047 วิเคราะห์ ในกิตกิจจปัจจัย</div></div><div class="toc-item-wrapper" id="toc-wrap-48"><div class="toc-text" onclick="goSlide(47); toggleTOC()" style="cursor: pointer;">048 กิริยากิตก์ วิภัตติและวาจก</div></div><div class="toc-item-wrapper" id="toc-wrap-49"><div class="toc-text" onclick="goSlide(48); toggleTOC()" style="cursor: pointer;">049 กิริยากิตก์ กาล</div></div><div class="toc-item-wrapper" id="toc-wrap-50"><div class="toc-text" onclick="goSlide(49); toggleTOC()" style="cursor: pointer;">050 กิริยากิตก์ วาจก</div></div><div class="toc-item-wrapper" id="toc-wrap-51"><div class="toc-text" onclick="goSlide(50); toggleTOC()" style="cursor: pointer;">051 ปัจจัยแห่งกิริยากิตก์</div></div><div class="toc-item-wrapper" id="toc-wrap-52"><div class="toc-text" onclick="goSlide(51); toggleTOC()" style="cursor: pointer;">052 กิตปัจจัย</div></div><div class="toc-item-wrapper" id="toc-wrap-53"><div class="toc-text" onclick="goSlide(52); toggleTOC()" style="cursor: pointer;">053 กิจจปัจจัย</div></div><div class="toc-item-wrapper" id="toc-wrap-54"><div class="toc-text" onclick="goSlide(53); toggleTOC()" style="cursor: pointer;">054 กิตกิจจปัจจัย</div></div><div class="toc-item-wrapper" id="toc-wrap-55"><div class="toc-text" onclick="goSlide(54); toggleTOC()" style="cursor: pointer;">055 ตูนาทิ ปัจจัย</div></div><div class="toc-item-wrapper" id="toc-wrap-56"><div class="toc-text" onclick="goSlide(55); toggleTOC()" style="cursor: pointer;">056 สมาส</div></div><div class="toc-item-wrapper" id="toc-wrap-57"><div class="toc-text" onclick="goSlide(56); toggleTOC()" style="cursor: pointer;">057 กัมมธารยสมาส</div></div><div class="toc-item-wrapper" id="toc-wrap-58"><div class="toc-text" onclick="goSlide(57); toggleTOC()" style="cursor: pointer;">058 ทิคุสมาส</div></div><div class="toc-item-wrapper" id="toc-wrap-59"><div class="toc-text" onclick="goSlide(58); toggleTOC()" style="cursor: pointer;">059 ตัปปุริสสมาส</div></div><div class="toc-item-wrapper" id="toc-wrap-60"><div class="toc-text" onclick="goSlide(59); toggleTOC()" style="cursor: pointer;">060 ทวันทวสมาส</div></div><div class="toc-item-wrapper" id="toc-wrap-61"><div class="toc-text" onclick="goSlide(60); toggleTOC()" style="cursor: pointer;">061 อัพยยีภาวสมาส</div></div><div class="toc-item-wrapper" id="toc-wrap-62"><div class="toc-text" onclick="goSlide(61); toggleTOC()" style="cursor: pointer;">062 พหุพพิหิสมาส 6 ตามวิภัตติ</div></div><div class="toc-item-wrapper" id="toc-wrap-63"><div class="toc-text" onclick="goSlide(62); toggleTOC()" style="cursor: pointer;">063 พหุพพิหิสมาส 5 ตามลักษณะ</div></div><div class="toc-item-wrapper" id="toc-wrap-64"><div class="toc-text" onclick="goSlide(63); toggleTOC()" style="cursor: pointer;">064 สมาสท้อง</div></div><div class="toc-item-wrapper" id="toc-wrap-65"><div class="toc-text" onclick="goSlide(64); toggleTOC()" style="cursor: pointer;">065 ตัทธิต</div></div><div class="toc-item-wrapper" id="toc-wrap-66"><div class="toc-text" onclick="goSlide(65); toggleTOC()" style="cursor: pointer;">066 โคตตตัทธิต</div></div><div class="toc-item-wrapper" id="toc-wrap-67"><div class="toc-text" onclick="goSlide(66); toggleTOC()" style="cursor: pointer;">067 ตรัตยาทิตัทธิต</div></div><div class="toc-item-wrapper" id="toc-wrap-68"><div class="toc-text" onclick="goSlide(67); toggleTOC()" style="cursor: pointer;">068 ราคาทิตัทธิต</div></div><div class="toc-item-wrapper" id="toc-wrap-69"><div class="toc-text" onclick="goSlide(68); toggleTOC()" style="cursor: pointer;">069 ชาตาทิตัทธิต</div></div><div class="toc-item-wrapper" id="toc-wrap-70"><div class="toc-text" onclick="goSlide(69); toggleTOC()" style="cursor: pointer;">070 สมุหตัทธิต</div></div><div class="toc-item-wrapper" id="toc-wrap-71"><div class="toc-text" onclick="goSlide(70); toggleTOC()" style="cursor: pointer;">071 ฐานตัทธิต</div></div><div class="toc-item-wrapper" id="toc-wrap-72"><div class="toc-text" onclick="goSlide(71); toggleTOC()" style="cursor: pointer;">072 พหุลตัทธิต</div></div><div class="toc-item-wrapper" id="toc-wrap-73"><div class="toc-text" onclick="goSlide(72); toggleTOC()" style="cursor: pointer;">073 เสฏฐตัทธิต</div></div><div class="toc-item-wrapper" id="toc-wrap-74"><div class="toc-text" onclick="goSlide(73); toggleTOC()" style="cursor: pointer;">074 ตทัสสัตถิตัทธิต</div></div><div class="toc-item-wrapper" id="toc-wrap-75"><div class="toc-text" onclick="goSlide(74); toggleTOC()" style="cursor: pointer;">075 ปกติตัทธิต</div></div><div class="toc-item-wrapper" id="toc-wrap-76"><div class="toc-text" onclick="goSlide(75); toggleTOC()" style="cursor: pointer;">076 ปูรณตัทธิต</div></div><div class="toc-item-wrapper" id="toc-wrap-77"><div class="toc-text" onclick="goSlide(76); toggleTOC()" style="cursor: pointer;">077 สังขยาตัทธิต</div></div><div class="toc-item-wrapper" id="toc-wrap-78"><div class="toc-text" onclick="goSlide(77); toggleTOC()" style="cursor: pointer;">078 วิภาคตัทธิต</div></div><div class="toc-item-wrapper" id="toc-wrap-79"><div class="toc-text" onclick="goSlide(78); toggleTOC()" style="cursor: pointer;">079 ภาวตัทธิต</div></div><div class="toc-item-wrapper" id="toc-wrap-80"><div class="toc-text" onclick="goSlide(79); toggleTOC()" style="cursor: pointer;">080 อัพยยตัทธิ</div></div><div class="toc-item-wrapper" id="toc-wrap-81"><div class="toc-text" onclick="goSlide(80); toggleTOC()" style="cursor: pointer;">081 ตัทธิตนอกแบบ</div></div><div class="toc-item-wrapper" id="toc-wrap-82"><div class="toc-text" onclick="goSlide(81); toggleTOC()" style="cursor: pointer;">082 สมัญญาภิธาน</div></div><div class="toc-item-wrapper" id="toc-wrap-83"><div class="toc-text" onclick="goSlide(82); toggleTOC()" style="cursor: pointer;">083 สระ</div></div><div class="toc-item-wrapper" id="toc-wrap-84"><div class="toc-text" onclick="goSlide(83); toggleTOC()" style="cursor: pointer;">084 พยัญชนะ</div></div><div class="toc-item-wrapper" id="toc-wrap-85"><div class="toc-text" onclick="goSlide(84); toggleTOC()" style="cursor: pointer;">085 ฐานกรณ์ของอักขระ</div></div><div class="toc-item-wrapper" id="toc-wrap-86"><div class="toc-text" onclick="goSlide(85); toggleTOC()" style="cursor: pointer;">086 เสียงของอักขระ</div></div><div class="toc-item-wrapper" id="toc-wrap-87"><div class="toc-text" onclick="goSlide(86); toggleTOC()" style="cursor: pointer;">087 พยัญชนะสังโยค</div></div><div class="toc-item-wrapper" id="toc-wrap-88"><div class="toc-text" onclick="goSlide(87); toggleTOC()" style="cursor: pointer;">088 อัฑฒสระ</div></div><div class="toc-item-wrapper" id="toc-wrap-89"><div class="toc-text" onclick="goSlide(88); toggleTOC()" style="cursor: pointer;">089 ลำดับสระ</div></div><div class="toc-item-wrapper" id="toc-wrap-90"><div class="toc-text" onclick="goSlide(89); toggleTOC()" style="cursor: pointer;">090 ลำดับการเรียงอักขระ</div></div><div class="toc-item-wrapper" id="toc-wrap-91"><div class="toc-text" onclick="goSlide(90); toggleTOC()" style="cursor: pointer;">091 สนธิ</div></div><div class="toc-item-wrapper" id="toc-wrap-92"><div class="toc-text" onclick="goSlide(91); toggleTOC()" style="cursor: pointer;">092 สระสนธิ</div></div><div class="toc-item-wrapper" id="toc-wrap-93"><div class="toc-text" onclick="goSlide(92); toggleTOC()" style="cursor: pointer;">093 พยัญชนะสนธิ</div></div><div class="toc-item-wrapper" id="toc-wrap-94"><div class="toc-text" onclick="goSlide(93); toggleTOC()" style="cursor: pointer;">094 นิคคหิตสนธิ</div></div><div class="toc-item-wrapper" id="toc-wrap-95"><div class="toc-text" onclick="goSlide(94); toggleTOC()" style="cursor: pointer;">หลักสัมพันธ์</div></div><div class="toc-item-wrapper" id="toc-wrap-96"><div class="toc-text" onclick="goSlide(95); toggleTOC()" style="cursor: pointer;">หลักการแปล</div></div><div class="toc-item-wrapper" id="toc-wrap-97"><div class="toc-text" onclick="goSlide(96); toggleTOC()" style="cursor: pointer;">กลอนช่วยจำ</div></div><div class="toc-item-wrapper" id="toc-wrap-98"><div class="toc-text" onclick="goSlide(97); toggleTOC()" style="cursor: pointer;">กาฬจำนวนธาตุ</div></div><div class="toc-item-wrapper active" id="toc-wrap-99"><div class="toc-text" onclick="goSlide(98); toggleTOC()" style="cursor: pointer;">หน้าใหม่ 100</div></div></div>
 <div class="slider" id="slider">
 
     <!-- Slide 0 -->
@@ -520,7 +517,7 @@ canvas#cropCanvas {
 			  <div class="img-wrapper"><img src="image/46.jpg"></div>
 				<div class="img-wrapper"><img src="image/47.jpg"></div>
 				<div class="img-wrapper"><img src="image/48.jpg"></div>
-								         <div class="img-wrapper"><img src="image/49.jpg"></div>				   
+								         <div class="img-wrapper"><img src="image/49.jpg"></div>				    
         </div>
         <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726969491&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
     </div>
@@ -561,7 +558,7 @@ canvas#cropCanvas {
         <div class="img-container" id="img-cont-13">
 		 <div class="img-wrapper"><img src="image/58.jpg"></div>
 		  <div class="img-wrapper"><img src="image/59.jpg"></div>
-  <div class="img-wrapper"><img src="image/60.jpg"></div>
+ <div class="img-wrapper"><img src="image/60.jpg"></div>
       
         </div>
         <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726969476&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
@@ -588,7 +585,7 @@ canvas#cropCanvas {
 				      <div class="img-wrapper"><img src="image/65.jpg"></div>
 					    <div class="img-wrapper"><img src="image/66.jpg"></div>
 						  <div class="img-wrapper"><img src="image/67.jpg"></div>
-						  	
+						 	
         </div>
         <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726969452&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
     </div>
@@ -643,7 +640,7 @@ canvas#cropCanvas {
 		      <div class="img-wrapper"><img src="image/82.jpg"></div>
 			  <div class="img-wrapper"><img src="image/83.jpg"></div>
 				    <div class="img-wrapper"><img src="image/84.jpg"></div>
-			 
+			
 	   </div>
         <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726969398&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
     </div>
@@ -671,7 +668,7 @@ canvas#cropCanvas {
 <div class="slide" id="slide-21" data-name="022 อัพพยยศัพท์">
     <div class="slide-content">
         <div class="img-container" id="img-cont-21">
-         
+          
 				    <div class="img-wrapper"><img src="image/93.jpg"></div>
 						<div class="img-wrapper"><img src="image/94.jpg"></div>
 			
@@ -701,7 +698,7 @@ canvas#cropCanvas {
 <div class="slide" id="slide-23" data-name="024 ปัจจัยในอัพยยศัพท์">
     <div class="slide-content">
         <div class="img-container" id="img-cont-23">
-         		
+          		
 				<div class="img-wrapper"><img src="image/102.jpg"></div>
 					<div class="img-wrapper"><img src="image/103.jpg"></div>
 							<div class="img-wrapper"><img src="image/104.jpg"></div>
@@ -718,7 +715,7 @@ canvas#cropCanvas {
 <div class="slide" id="slide-24" data-name="025 อาขยาต วิภัตติ">
     <div class="slide-content">
         <div class="img-container" id="img-cont-24">
- <div class="img-wrapper"><img src="image/107.jpg"></div>  
+<div class="img-wrapper"><img src="image/107.jpg"></div>  
 <div class="img-wrapper"><img src="image/108.jpg"></div>   
 <div class="img-wrapper"><img src="image/109.jpg"></div>  
 <div class="img-wrapper"><img src="image/110.jpg"></div>  
@@ -750,7 +747,7 @@ canvas#cropCanvas {
 
 	  <div class="img-wrapper"><img src="image/116.jpg"></div> 
 	    <div class="img-wrapper"><img src="image/117.jpg"></div>
-           			  
+            			  
         </div>
         <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726969338&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
     </div>
@@ -879,7 +876,7 @@ canvas#cropCanvas {
         <div class="img-container" id="img-cont-37">
 		   <div class="img-wrapper"><img src="image/131.jpg"></div>
             <div class="img-wrapper"><img src="image/132.jpg"></div>
-         
+          
         </div>
         <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726969257&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
     </div>
@@ -930,7 +927,7 @@ canvas#cropCanvas {
 			 <div class="img-wrapper"><img src="image/148.jpg"></div>
 			  <div class="img-wrapper"><img src="image/149.jpg"></div>
 			   <div class="img-wrapper"><img src="image/150.jpg"></div>
-			 
+			
         </div>
         <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726969218&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
     </div>
@@ -940,7 +937,7 @@ canvas#cropCanvas {
 <div class="slide" id="slide-41" data-name="042 กิตก์ นามกิตก์">
     <div class="slide-content">
         <div class="img-container" id="img-cont-41">
-         
+          
 			    <div class="img-wrapper"><img src="image/151.jpg"></div>
 						  				
 			   
@@ -955,8 +952,8 @@ canvas#cropCanvas {
         <div class="img-container" id="img-cont-42">
 		  <div class="img-wrapper"><img src="image/152.jpg"></div>
            <div class="img-wrapper"><img src="image/153.jpg"></div>
-		   			<div class="img-wrapper"><img src="image/154.jpg">   </div>
-					   			<div class="img-wrapper"><img src="image/155.jpg">   </div>
+		  			<div class="img-wrapper"><img src="image/154.jpg">   </div>
+					  			<div class="img-wrapper"><img src="image/155.jpg">   </div>
 										<div class="img-wrapper"><img src="image/156.jpg">   </div>
         </div>
         <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726969209&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
@@ -967,9 +964,9 @@ canvas#cropCanvas {
 <div class="slide" id="slide-43" data-name="044 ปัจจัยแห่งนามกิตก์">
     <div class="slide-content">
         <div class="img-container" id="img-cont-43">
-             							   		
-						   			<div class="img-wrapper"><img src="image/157.jpg">   </div>
-									   			
+              							   		
+						  			<div class="img-wrapper"><img src="image/157.jpg">   </div>
+									  			
         </div>
         <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726969194&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
     </div>
@@ -1035,7 +1032,7 @@ canvas#cropCanvas {
         <div class="img-container" id="img-cont-47">
                       <div class="img-wrapper"><img src="image/177-1.jpg"></div>
             <div class="img-wrapper"><img src="image/178.jpg"></div>
-			 
+			
 			  
         </div>
         <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726969164&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
@@ -1081,6 +1078,7 @@ canvas#cropCanvas {
         <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726969125&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
     </div>
 </div>
+
 <!-- ================= SLIDE 51 ================= -->
 <div class="slide" id="slide-51" data-name="052 กิตปัจจัย">
     <div class="slide-content">
@@ -1088,8 +1086,8 @@ canvas#cropCanvas {
         <div class="img-wrapper"><img src="image/183.jpg"></div>
 			  <div class="img-wrapper"><img src="image/184.jpg"></div>
             
-		 
-		 
+		
+		
        <div class="img-wrapper"><img src="image/189.jpg"></div>
         </div>
         <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726969113&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
@@ -1102,7 +1100,7 @@ canvas#cropCanvas {
         <div class="img-container" id="img-cont-52">
 		  <div class="img-wrapper"><img src="image/184-1.jpg"></div>
       <div class="img-wrapper"><img src="image/185.jpg"></div>
-			 
+			
         </div>
         <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726969089&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
     </div>
@@ -1113,7 +1111,7 @@ canvas#cropCanvas {
     <div class="slide-content">
         <div class="img-container" id="img-cont-53">
 		   <div class="img-wrapper"><img src="image/185-1.jpg"></div>
-     <div class="img-wrapper"><img src="image/186.jpg"></div>
+      <div class="img-wrapper"><img src="image/186.jpg"></div>
          <div class="img-wrapper"><img src="image/187.jpg"></div>
 		      <div class="img-wrapper"><img src="image/188.jpg"></div>
             <div class="img-wrapper"><img src="image/189.jpg"></div>
@@ -1405,7 +1403,7 @@ canvas#cropCanvas {
             <div class="img-wrapper"><img src="image/257.jpg"></div>
             <div class="img-wrapper"><img src="image/258.jpg"></div>
 			 <div class="img-wrapper"><img src="image/259.jpg"></div>
-			 
+			
         </div>
         <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726968897&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
     </div>
@@ -1414,7 +1412,7 @@ canvas#cropCanvas {
 <div class="slide" id="slide-76" data-name="077 สังขยาตัทธิต">
     <div class="slide-content">
         <div class="img-container" id="img-cont-76">
-       		 <div class="img-wrapper"><img src="image/259-1.jpg"></div>
+        		 <div class="img-wrapper"><img src="image/259-1.jpg"></div>
 			
         </div>
         <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726968891&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
@@ -1426,7 +1424,7 @@ canvas#cropCanvas {
     <div class="slide-content">
         <div class="img-container" id="img-cont-77">
 		     <div class="img-wrapper"><img src="image/260.jpg"></div>
-			 
+			
         </div>
         <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726968885&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
     </div>
@@ -1623,7 +1621,7 @@ canvas#cropCanvas {
             <div class="img-wrapper"><img src="image/298.jpg"></div>
 			 <div class="img-wrapper"><img src="image/299.jpg"></div>
 			        <div class="img-wrapper"><img src="image/300.jpg"></div>
-			 
+			
         </div>
         <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726968768&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
     </div>
@@ -1673,7 +1671,7 @@ canvas#cropCanvas {
 			      <div class="img-wrapper"><img src="image/327.jpg"></div>
 				    
 					
-			 
+			
 						
         </div>
     </div>
@@ -1726,8 +1724,6 @@ canvas#cropCanvas {
   <button onclick="prev()">◀</button>
   <button onclick="next()">▶</button>
 </div>
-
-
 
 <script>
 
@@ -2144,7 +2140,6 @@ document.addEventListener("click",function(e){
   </iframe>
 `;
 
-
     bar.style.display="flex";
   }
 });
@@ -2156,6 +2151,5 @@ function closeFloatingAudio(){
 }
 
 </script>
-
 
 </body></html>
