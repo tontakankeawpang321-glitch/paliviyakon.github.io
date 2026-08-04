@@ -3,1214 +3,2089 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>บาลีไวยากรณ์ & เสียงบาลีไวยากรณ์ (AI Chatbot)</title>
-<link href="https://fonts.googleapis.com/css2?family=Kodchasan:wght@400;500;600;700&display=swap" rel="stylesheet">
+<title>บาลีไวยากรณ์ - Ebook Reader & Audio Player (AI Chatbot)</title>
+<link href="https://fonts.googleapis.com/css2?family=Kodchasan:wght@400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com"></script>
 
 <style>
-  :root {
-    --bg: #f9fafb; 
-    --ink: #1e1e1e;
-    --line: #d1d5db; 
-    --edge: #9ca3af;
-    --primary: #111827; 
-    --accent: #4b5563;
-    --y-200: #fff7d6; 
-    --y-300: #ffd966;
-    --amber-main: #b45309;
-    --amber-light: #fef3c7;
-    --radius: 16px; 
-    --shadow: 0 10px 22px rgba(0,0,0,.12);
-  }
-  
-  * { box-sizing: border-box; }
-  html, body { 
-    margin: 0; 
-    background: var(--bg); 
-    color: var(--ink); 
-    font-family: "Kodchasan", system-ui, sans-serif;
-    padding-bottom: 110px; /* Space for bottom nav & mini player */
-    -webkit-tap-highlight-color: transparent;
-  }
+:root {
+  --bg: #f9fafb; 
+  --ink: #1e1e1e;
+  --line: #d1d5db; 
+  --edge: #9ca3af;
+  --primary: #111827; 
+  --accent: #4b5563;
+  --y-200: #fff7d6; 
+  --y-300: #ffd966;
+  --amber-main: #b45309;
+  --amber-light: #fef3c7;
+  --radius: 16px; 
+  --shadow: 0 10px 22px rgba(0,0,0,.12);
+}
 
-  .wrap { 
-    max-width: 1100px; 
-    margin: 0 auto; 
-    padding: 16px; 
-  }
-  
-  .title { 
-    font-size: clamp(22px, 3.6vw, 34px); 
-    font-weight: 700; 
-    margin-bottom: 4px;
-    background: linear-gradient(110deg, var(--primary), #374151);
-    -webkit-background-clip: text; 
-    background-clip: text; 
-    color: transparent; 
-  }
-  
-  .sub { margin: 0 0 16px; color: var(--accent); font-size: 14px; }
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
-  /* --- Search Bar --- */
-  .search-wrap { position: relative; margin: 16px 0 8px; }
-  .search-input {
-    width: 100%; height: 52px; padding: 0 60px 0 20px;
-    border-radius: var(--radius); border: 1px solid var(--line);
-    background-color: #fff; font-size: 16px; font-family: inherit;
-    color: var(--ink); box-shadow: var(--shadow); -webkit-appearance: none;
-    transition: all 0.2s ease;
-  }
-  .search-input:focus { outline: none; border-color: var(--amber-main); box-shadow: 0 0 0 3px rgba(180, 83, 9, 0.15); }
-  .search-btn {
-    position: absolute; top: 6px; right: 6px; bottom: 6px; width: 42px;
-    border: none; background: var(--amber-main); border-radius: 12px; cursor: pointer;
-    display: flex; align-items: center; justify-content: center; color: white;
-  }
-  
-  .search-desc { font-size: 12px; color: #6b7280; margin: 0 8px 20px; display: flex; align-items: center; gap: 4px; }
+body { 
+  background: var(--bg); 
+  color: var(--ink); 
+  font-family: "Sarabun", "Kodchasan", system-ui, sans-serif;
+  padding-bottom: 70px;
+  overflow-x: hidden;
+  user-select: none;
+}
 
-  /* Section Titles */
-  h2.category-title {
-    display: flex; align-items: center; gap: 10px; margin: 24px 0 12px; font-size: 18px;
-    color: #4b3a00; font-weight: 700;
-    background: linear-gradient(90deg, var(--y-300), var(--y-200));
-    padding: 10px 16px; border-radius: var(--radius);
-  }
-  h2.category-title .dot { width: 10px; height: 10px; border-radius: 50%; background: linear-gradient(180deg, #ffd04d, #d6a31a); }
+/* === THEME STYLES === */
+body.light { background: #f8f9fa; color: #111; }
+body.paper { background: #f4ecd8; color: #3a2f1b; }
+body.dark { background: #0f0f0f; color: #eee; }
 
-  /* Grid Layout */
-  .grid { display: grid; gap: 12px; margin: 0 0 24px; grid-template-columns: repeat(2, 1fr); }
+/* === INDEX PAGE STYLING === */
+.wrap { 
+  max-width: 1000px; 
+  margin: 0 auto; 
+  padding: 16px 16px 40px 16px; 
+}
 
-  /* Lesson Button */
-  .dbtn {
-    display: flex; align-items: center; gap: 10px;
-    padding: 14px; border-radius: var(--radius);
-    background: linear-gradient(180deg, #fff, #f9fafb);
-    border: 1px solid var(--line);
-    box-shadow: 0 2px 5px rgba(0,0,0,0.04);
-    text-decoration: none; color: var(--ink); font-weight: 600; min-height: 56px;
-    transition: all .2s ease;
-  }
-  .dbtn:hover { transform: translateY(-2px); border-color: var(--amber-main); box-shadow: 0 10px 18px rgba(0,0,0,0.08); }
-  .dbtn .dot { width: 8px; height: 8px; border-radius: 50%; background: #9ca3af; flex-shrink: 0; }
-  .dbtn .name { line-height: 1.2; font-size: 14.5px; }
+.title { 
+  font-size: clamp(22px, 3.6vw, 32px); 
+  font-weight: 700; 
+  margin-bottom: 4px;
+  font-family: 'Kodchasan', sans-serif;
+  background: linear-gradient(110deg, var(--primary), #374151);
+  -webkit-background-clip: text; 
+  background-clip: text; 
+  color: transparent; 
+}
 
-  @media (max-width: 600px) {
-    .grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
-    .dbtn { padding: 10px 12px; min-height: 52px; }
-    .dbtn .name { font-size: 13.5px; }
-  }
+.sub { margin: 0 0 16px; color: var(--accent); font-size: 14px; }
 
-  /* --- Chatbot UI --- */
-  #fab-chat-toggle {
-    position: fixed; bottom: 90px; right: 20px;
-    width: 58px; height: 58px;
-    background-color: var(--amber-main); color: white;
-    border: none; border-radius: 50%;
-    font-size: 22px; font-weight: bold;
-    box-shadow: 0 6px 18px rgba(180, 83, 9, 0.4);
-    cursor: pointer; z-index: 990; transition: all 0.3s ease;
-    display: flex; align-items: center; justify-content: center;
-  }
-  #fab-chat-toggle:hover { transform: scale(1.05); }
+/* Search Bar */
+.search-wrap { position: relative; margin: 16px 0 8px; }
+.search-input {
+  width: 100%; height: 50px; padding: 0 54px 0 18px;
+  border-radius: var(--radius); border: 1px solid var(--line);
+  background-color: #fff; font-size: 15px; font-family: inherit;
+  color: var(--ink); box-shadow: 0 4px 12px rgba(0,0,0,0.05); -webkit-appearance: none;
+  transition: all 0.2s ease;
+}
+.search-input:focus { outline: none; border-color: var(--amber-main); box-shadow: 0 0 0 3px rgba(180, 83, 9, 0.15); }
+.search-btn {
+  position: absolute; top: 5px; right: 5px; bottom: 5px; width: 40px;
+  border: none; background: var(--amber-main); border-radius: 12px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; color: white;
+}
 
-  #chatbot-modal {
-    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-    z-index: 1000; transition: 0.3s ease-in-out;
-  }
-  .chatbot-hidden { opacity: 0; transform: translateY(100%); pointer-events: none; }
+.search-desc { font-size: 12px; color: #6b7280; margin: 0 4px 18px; display: flex; align-items: center; gap: 4px; }
 
-  .chat-bubble-user::before {
-    content: ''; position: absolute; width: 0; height: 0; border-style: solid;
-    border-width: 0 10px 10px 10px; border-color: transparent transparent #b45309 transparent;
-    top: -8px; right: 12px;
-  }
-  .chat-bubble-model::before {
-    content: ''; position: absolute; width: 0; height: 0; border-style: solid;
-    border-width: 0 10px 10px 10px; border-color: transparent transparent #ffffff transparent;
-    top: -8px; left: 12px;
-  }
-  .gemini-thinking-bar {
-    position: relative; width: 100%; height: 4px; background-color: #e0e0e0;
-    border-radius: 2px; overflow: hidden;
-  }
-  .gemini-thinking-bar::before {
-    content: ''; position: absolute; top: 0; left: 0; height: 100%; width: 100%;
-    background: linear-gradient(90deg, #b45309, #fbbf24, #b45309);
-    background-size: 200% 100%; animation: thinking-gradient 2s linear infinite;
-  }
-  @keyframes thinking-gradient { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+/* Category Headers & Grids */
+h2.category-title {
+  display: flex; align-items: center; gap: 8px; margin: 20px 0 10px; font-size: 16px;
+  color: #4b3a00; font-weight: 700; font-family: 'Kodchasan', sans-serif;
+  background: linear-gradient(90deg, var(--y-300), var(--y-200));
+  padding: 8px 14px; border-radius: var(--radius);
+}
+h2.category-title .dot { width: 8px; height: 8px; border-radius: 50%; background: linear-gradient(180deg, #ffd04d, #d6a31a); }
 
-  /* --- Daily Check-in FAB & Badges --- */
-  #fab-checkin {
-    position: fixed; bottom: 158px; right: 24px;
-    width: 50px; height: 50px;
-    background: linear-gradient(135deg, #FFD700, #F59E0B);
-    color: #92400e; border: 2px solid #fff; border-radius: 50%;
-    font-size: 20px; box-shadow: 0 4px 14px rgba(245, 158, 11, 0.4);
-    cursor: pointer; z-index: 990; transition: all 0.3s ease;
-    display: flex; align-items: center; justify-content: center;
-  }
-  #fab-checkin:active { transform: scale(0.92); }
+.grid { display: grid; gap: 10px; margin: 0 0 20px; grid-template-columns: repeat(2, 1fr); }
 
-  #checkin-badge {
-    position: absolute; top: -4px; right: -4px;
-    background-color: #ef4444; color: white;
-    font-size: 10px; font-weight: bold; padding: 2px 6px;
-    border-radius: 10px; border: 2px solid white;
-    min-width: 20px; text-align: center;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-  }
+.dbtn {
+  display: flex; align-items: center; gap: 8px;
+  padding: 12px; border-radius: var(--radius);
+  background: #ffffff;
+  border: 1px solid var(--line);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+  text-decoration: none; color: var(--ink); font-weight: 600; min-height: 52px;
+  transition: all .2s ease; cursor: pointer;
+}
+.dbtn:active { transform: scale(0.97); border-color: var(--amber-main); }
+.dbtn .dot { width: 7px; height: 7px; border-radius: 50%; background: #9ca3af; flex-shrink: 0; }
+.dbtn .name { line-height: 1.25; font-size: 13.5px; }
 
-  /* Toast Notification */
-  #toast {
-    visibility: hidden; min-width: 280px; transform: translateX(-50%);
-    background-color: #333; color: #fff; text-align: center;
-    border-radius: 12px; padding: 14px 20px;
-    position: fixed; z-index: 2500; left: 50%; bottom: 85px;
-    font-size: 14px; box-shadow: 0 10px 25px rgba(0,0,0,0.25);
-    opacity: 0; transition: opacity 0.3s, bottom 0.3s;
-  }
-  #toast.show { visibility: visible; opacity: 1; bottom: 100px; }
-  #toast.success { background-color: #065f46; border: 1px solid #10b981; }
-  #toast.warning { background-color: #9a3412; border: 1px solid #f97316; }
+/* === EBOOK READER STYLING === */
+#page-reader {
+  position: relative;
+  width: 100vw;
+  height: calc(100vh - 60px);
+  overflow: hidden;
+  background: #0f0f0f;
+}
 
-  /* Reward Modal */
-  #reward-modal {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.75); backdrop-filter: blur(4px); z-index: 3000;
-    display: flex; justify-content: center; align-items: center;
-    opacity: 0; pointer-events: none; transition: 0.3s ease;
-  }
-  #reward-modal.open { opacity: 1; pointer-events: auto; }
-  .reward-box {
-    background: linear-gradient(to bottom, #fff, #fff7ed);
-    width: 90%; max-width: 380px; padding: 28px;
-    border-radius: 24px; text-align: center;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.3);
-    transform: scale(0.85); transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    border: 3px solid #F59E0B;
-  }
-  #reward-modal.open .reward-box { transform: scale(1); }
+.reader-topbar {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 50px;
+  background: rgba(20, 20, 20, 0.92);
+  backdrop-filter: blur(8px);
+  padding: 6px 12px;
+  display: flex; justify-content: space-between; align-items: center;
+  z-index: 80; border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
 
-  .code-box { 
-    background: #111827; color: #10B981; font-family: monospace; 
-    padding: 14px; border-radius: 12px; margin: 16px 0; font-size: 22px; letter-spacing: 2px;
-  }
+.reader-brand {
+  font-size: 14px; font-weight: 600; color: #00bfff;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 140px;
+}
 
-  /* --- Bottom Navigation & Mini Player Styling --- */
-  .bottom-bar-wrap {
-    position: fixed; bottom: 0; left: 0; right: 0;
-    z-index: 950; background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    border-top: 1px solid rgba(209, 213, 219, 0.8);
-    box-shadow: 0 -4px 20px rgba(0,0,0,0.06);
-  }
+button.control-btn {
+  padding: 6px 10px; border: 1px solid #444; border-radius: 8px;
+  background: #2a2a2a; color: #fff; font-size: 13px; font-weight: 500;
+  cursor: pointer; transition: transform 0.1s;
+}
+button.control-btn:active { transform: scale(0.95); }
 
-  .nav-item {
-    flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
-    padding: 8px 0; color: #6b7280; font-size: 12px; font-weight: 600; cursor: pointer;
-    transition: all 0.2s ease; border: none; background: transparent;
-  }
-  .nav-item.active { color: #b45309; }
-  .nav-item svg { width: 22px; height: 22px; margin-bottom: 2px; fill: currentColor; }
+.toc-btn-trigger {
+  background: linear-gradient(135deg, #00bfff, #0066ff);
+  color: white; border: none; font-weight: 600; padding: 6px 12px;
+  box-shadow: 0 2px 8px rgba(0, 191, 255, 0.3);
+}
 
-  /* Audio Slider Custom Styling */
-  input[type=range] {
-    -webkit-appearance: none; width: 100%; background: transparent;
-  }
-  input[type=range]:focus { outline: none; }
-  input[type=range]::-webkit-slider-runnable-track {
-    width: 100%; height: 6px; cursor: pointer;
-    background: #e5e7eb; border-radius: 3px;
-  }
-  input[type=range]::-webkit-slider-thumb {
-    height: 16px; width: 16px; border-radius: 50%;
-    background: #b45309; cursor: pointer;
-    -webkit-appearance: none; margin-top: -5px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-  }
+.slider {
+  display: flex;
+  height: 100%;
+  width: 100vw;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
 
-  .audio-item-card {
-    transition: all 0.2s ease;
-    border: 1px solid #f3f4f6;
-  }
-  .audio-item-card.playing {
-    border-color: #f59e0b;
-    background-color: #fffbe0;
-  }
+.slide {
+  min-width: 100vw;
+  height: 100%;
+  padding: 56px 0 70px 0;
+  overflow-y: auto; overflow-x: hidden;
+  scroll-snap-align: start;
+  position: relative;
+  display: flex; flex-direction: column; align-items: center;
+}
 
-  .hidden { display: none !important; }
+.slide-content {
+  width: 100%; max-width: 720px;
+  padding: 10px 15px 40px 15px; margin: 0 auto;
+  transform-origin: top center;
+  transition: transform 0.2s ease-out;
+  display: flex; flex-direction: column; align-items: center;
+}
+
+.img-container {
+  width: 100%; display: flex; flex-direction: column; align-items: center; gap: 10px;
+}
+
+.img-wrapper {
+  position: relative; width: 100%; margin: 0 auto;
+  border-radius: 8px; overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3); background: #1a1a1a;
+}
+
+.slide img {
+  display: block; width: 100%; height: auto; object-fit: contain; border-radius: 6px;
+}
+
+.img-tools {
+  position: absolute; top: 8px; right: 8px; display: flex; gap: 6px; z-index: 50;
+}
+
+.tool-btn {
+  background: rgba(0, 0, 0, 0.75); color: white;
+  border: 1px solid rgba(255,255,255,0.4); padding: 5px 9px;
+  border-radius: 6px; font-size: 11px; backdrop-filter: blur(4px);
+}
+.tool-btn.delete-btn { background: rgba(220, 53, 69, 0.85); }
+
+/* SoundCloud Button */
+.sc-play {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 10px 20px; font-size: 14px; font-weight: 600; color: #fff;
+  background: linear-gradient(135deg, #ff5500, #ff2200);
+  border: none; border-radius: 25px; cursor: pointer;
+  box-shadow: 0 4px 15px rgba(255, 85, 0, 0.3); margin-top: 15px;
+  width: 100%; max-width: 280px;
+}
+
+/* Floating Audio Bar for SoundCloud */
+#floating-audio-bar {
+  position: fixed; bottom: 60px; left: 0; width: 100%;
+  background: #111; padding: 8px 12px;
+  box-shadow: 0 -4px 15px rgba(0,0,0,0.6); display: none;
+  flex-direction: column; z-index: 900; border-top: 1px solid #333;
+}
+#floating-audio-bar .audio-info {
+  font-size: 12px; margin-bottom: 4px; color: #00bfff;
+  display: flex; justify-space-between; align-items: center;
+}
+#floating-audio-bar .close-audio-btn {
+  background: none; border: none; color: #fff; font-size: 16px; padding: 0 6px;
+}
+
+/* TOC Drawer (CLOSED BY DEFAULT) */
+.toc-backdrop {
+  position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+  background: rgba(0,0,0,0.65); backdrop-filter: blur(3px);
+  z-index: 940; opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+}
+.toc-backdrop.show { opacity: 1; pointer-events: auto; }
+
+.toc-drawer {
+  position: fixed; top: 0; left: 0; width: 82%; max-width: 320px; height: 100%;
+  background: #181818; overflow-y: auto;
+  transform: translateX(-100%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 56px 12px 20px 12px; z-index: 950;
+  box-shadow: 5px 0 25px rgba(0,0,0,0.6); color: #eee;
+}
+.toc-drawer.show { transform: translateX(0); }
+
+.toc-header {
+  font-weight: 600; font-size: 15px; color: #00bfff;
+  margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid #333;
+  display: flex; justify-content: space-between; align-items: center;
+}
+
+.toc-item-wrapper {
+  display: flex; align-items: center; margin-bottom: 4px;
+  padding: 10px 12px; border-radius: 8px; font-size: 13.5px;
+  transition: background 0.2s; cursor: pointer;
+}
+.toc-item-wrapper:active { background: rgba(255,255,255,0.1); }
+.toc-item-wrapper.active { background: #00bfff; color: #ffffff; font-weight: 600; }
+.toc-text { flex-grow: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* Bottom Dock in Reader */
+.bottom-dock {
+  position: absolute; bottom: 0; left: 0; width: 100%; height: 52px;
+  background: rgba(20, 20, 20, 0.95); backdrop-filter: blur(10px);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 4px 12px; z-index: 80; border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+.dock-nav-btn {
+  width: 38px; height: 38px; border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12); color: #fff; font-size: 16px; border: none;
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
+}
+
+.page-select-wrapper { flex: 1; margin: 0 10px; }
+.page-select-wrapper select {
+  width: 100%; height: 36px; background: #282828; color: #fff;
+  border: 1px solid #444; border-radius: 8px; padding: 0 8px; font-size: 12.5px; text-align: center;
+}
+
+/* Crop Modal */
+.crop-modal {
+  position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+  background: rgba(0,0,0,0.92); z-index: 2000; display: none;
+  flex-direction: column; align-items: center; justify-content: center; padding: 15px;
+}
+.crop-container {
+  position: relative; max-width: 95%; max-height: 75vh; overflow: hidden;
+  border: 1px solid #555; background: #000; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+}
+.crop-controls { margin-top: 15px; display: flex; gap: 12px; width: 100%; max-width: 300px; }
+.crop-controls button { flex: 1; padding: 10px; font-weight: 600; }
+canvas#cropCanvas { display: block; touch-action: none; }
+
+/* === AI CHATBOT & CHECKIN STYLING === */
+#fab-chat-toggle {
+  position: fixed; bottom: 125px; right: 18px;
+  width: 52px; height: 52px; background-color: var(--amber-main); color: white;
+  border: none; border-radius: 50%; font-size: 18px; font-weight: bold;
+  box-shadow: 0 6px 18px rgba(180, 83, 9, 0.4); cursor: pointer; z-index: 850;
+  display: flex; align-items: center; justify-content: center; transition: transform 0.2s;
+}
+#fab-chat-toggle:active { transform: scale(0.92); }
+
+#fab-checkin {
+  position: fixed; bottom: 185px; right: 20px;
+  width: 46px; height: 42px;
+  background: linear-gradient(135deg, #FFD700, #F59E0B);
+  color: #92400e; border: 2px solid #fff; border-radius: 50%;
+  font-size: 18px; box-shadow: 0 4px 14px rgba(245, 158, 11, 0.4);
+  cursor: pointer; z-index: 850; display: flex; align-items: center; justify-content: center;
+}
+#checkin-badge {
+  position: absolute; top: -4px; right: -4px;
+  background-color: #ef4444; color: white; font-size: 10px; font-weight: bold;
+  padding: 2px 5px; border-radius: 10px; border: 2px solid white; min-width: 18px; text-align: center;
+}
+
+#chatbot-modal {
+  position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+  z-index: 1500; transition: 0.3s ease-in-out;
+}
+.chatbot-hidden { opacity: 0; transform: translateY(100%); pointer-events: none; }
+
+.chat-bubble-user::before {
+  content: ''; position: absolute; width: 0; height: 0; border-style: solid;
+  border-width: 0 8px 8px 8px; border-color: transparent transparent #b45309 transparent; top: -6px; right: 10px;
+}
+.chat-bubble-model::before {
+  content: ''; position: absolute; width: 0; height: 0; border-style: solid;
+  border-width: 0 8px 8px 8px; border-color: transparent transparent #ffffff transparent; top: -6px; left: 10px;
+}
+
+.gemini-thinking-bar {
+  position: relative; width: 100%; height: 4px; background-color: #e0e0e0; border-radius: 2px; overflow: hidden;
+}
+.gemini-thinking-bar::before {
+  content: ''; position: absolute; top: 0; left: 0; height: 100%; width: 100%;
+  background: linear-gradient(90deg, #b45309, #fbbf24, #b45309);
+  background-size: 200% 100%; animation: thinking-gradient 2s linear infinite;
+}
+@keyframes thinking-gradient { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+/* Toast Notification */
+#toast {
+  visibility: hidden; min-width: 260px; transform: translateX(-50%);
+  background-color: #333; color: #fff; text-align: center;
+  border-radius: 12px; padding: 12px 18px;
+  position: fixed; z-index: 2500; left: 50%; bottom: 85px;
+  font-size: 13.5px; box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+  opacity: 0; transition: opacity 0.3s, bottom 0.3s;
+}
+#toast.show { visibility: visible; opacity: 1; bottom: 95px; }
+#toast.success { background-color: #065f46; border: 1px solid #10b981; }
+#toast.warning { background-color: #9a3412; border: 1px solid #f97316; }
+
+/* Reward Modal */
+#reward-modal {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,0.75); backdrop-filter: blur(4px); z-index: 3000;
+  display: flex; justify-content: center; align-items: center;
+  opacity: 0; pointer-events: none; transition: 0.3s ease;
+}
+#reward-modal.open { opacity: 1; pointer-events: auto; }
+.reward-box {
+  background: linear-gradient(to bottom, #fff, #fff7ed);
+  width: 90%; max-width: 360px; padding: 24px; border-radius: 20px; text-align: center;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.3); transform: scale(0.85); transition: 0.3s ease;
+  border: 3px solid #F59E0B;
+}
+#reward-modal.open .reward-box { transform: scale(1); }
+.code-box { background: #111827; color: #10B981; font-family: monospace; padding: 12px; border-radius: 10px; margin: 14px 0; font-size: 20px; letter-spacing: 2px; }
+
+/* === BOTTOM NAVIGATION === */
+.bottom-bar-wrap {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  z-index: 900; background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(10px); border-top: 1px solid rgba(209, 213, 219, 0.8);
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.06);
+}
+
+.nav-item {
+  flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 8px 0; color: #6b7280; font-size: 11.5px; font-weight: 600; cursor: pointer;
+  transition: all 0.2s ease; border: none; background: transparent;
+}
+.nav-item.active { color: #b45309; }
+.nav-item svg { width: 20px; height: 22px; margin-bottom: 2px; fill: currentColor; }
+
+input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
+input[type=range]:focus { outline: none; }
+input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 5px; cursor: pointer; background: #e5e7eb; border-radius: 3px; }
+input[type=range]::-webkit-slider-thumb { height: 15px; width: 15px; border-radius: 50%; background: #b45309; cursor: pointer; -webkit-appearance: none; margin-top: -5px; }
+
+.audio-item-card { transition: all 0.2s ease; border: 1px solid #f3f4f6; }
+.audio-item-card.playing { border-color: #f59e0b; background-color: #fffbe0; }
+
+.hidden { display: none !important; }
 </style>
 </head>
-<body>
 
-  <!-- ===== PAGE 1: หนังสือ / สารบัญหน้า (LESSONS PAGE) ===== -->
-  <div id="page-book" class="wrap">
-    <div class="title">สารบัญหน้า</div>
-    <p class="sub">แยกตามหมวดหมู่บาลีไวยากรณ์</p>
+<body class="light">
 
-    <!-- Search input -->
-    <div class="search-wrap">
-      <input type="text" id="searchInput" class="search-input" placeholder="ค้นหาบทเรียน (เช่น นาม, สนธิ, สมาส)..." onkeyup="filterContent()">
-      <button class="search-btn" title="ค้นหา">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M10 18a7.952 7.952 0 0 0 4.897-1.688l4.396 4.396 1.414-1.414-4.396-4.396A7.952 7.952 0 0 0 18 10c0-4.411-3.589-8-8-8s-8 3.589-8 8 3.589 8 8 8zm0-14c3.309 0 6 2.691 6 6s-2.691 6-6 6-6-2.691-6-6 2.691-6 6-6z"></path></svg>
-      </button>
-    </div>
-    <div class="search-desc">
-       <span>💡 ค้นหาหัวข้อที่ต้องการ หรือกดปุ่ม AI สีส้มขวามือเพื่อสอบถาม</span>
-    </div>
+<!-- FLOATING SOUNDCLOUD BAR -->
+<div id="floating-audio-bar">
+  <div class="audio-info">
+    <span>🎵 กำลังเล่นเสียง...</span>
+    <button class="close-audio-btn" onclick="closeFloatingAudio()">✕</button>
+  </div>
+  <div id="audioIframeContainer"></div>
+</div>
 
-    <!-- Content Categories -->
-    <div id="content-area">
-      <h2 class="category-title"><span class="dot"></span><span>นาม / สัพพนาม</span></h2>
-      <div class="grid category-grid">
-        <a class="dbtn" target="_blank" href="paluviyakon/pali.html#slide-0"><span class="dot"></span><span class="name">บทนำ</span></a>
-        <a class="dbtn" target="_blank" href="paluviyakon/pali.html#slide-1"><span class="dot"></span><span class="name">นาม</span></a>
-        <a class="dbtn" target="_blank" href="paluviyakon/pali.html#slide-2"><span class="dot"></span><span class="name">ลิงค์</span></a>
-        <a class="dbtn" target="_blank" href="paluviyakon/pali.html#slide-3"><span class="dot"></span><span class="name">วจนะ</span></a>
-        <a class="dbtn" target="_blank" href="paluviyakon/pali.html#slide-4"><span class="dot"></span><span class="name">วิภัตติ</span></a>
-        <a class="dbtn" target="_blank" href="paluviyakon/pali.html#slide-5"><span class="dot"></span><span class="name">อายตนิบาต</span></a>
-        <a class="dbtn" target="_blank" href="paluviyakon/pali.html#slide-6"><span class="dot"></span><span class="name">การันต์</span></a>
-        <a class="dbtn" target="_blank" href="paluviyakon/pali.html#slide-7"><span class="dot"></span><span class="name">แจกปุลิงค์</span></a>
-        <a class="dbtn" target="_blank" href="paluviyakon/pali.html#slide-8"><span class="dot"></span><span class="name">แจกอิตถีลิงค์</span></a>
-        <a class="dbtn" target="_blank" href="paluviyakon/pali.html#slide-9"><span class="dot"></span><span class="name">แจกนปุสกลิงค์</span></a>
-        <a class="dbtn" target="_blank" href="paluviyakon/pali.html#slide-10"><span class="dot"></span><span class="name">กติปยศัพท์</span></a>
-        <a class="dbtn" target="_blank" href="paluviyakon/pali.html#slide-11"><span class="dot"></span><span class="name">มโนคณศัพท์</span></a>
-        <a class="dbtn" target="_blank" href="paluviyakon/pali.html#slide-17"><span class="dot"></span><span class="name">สัพพนาม</span></a>
-        <a class="dbtn" target="_blank" href="paluviyakon/pali.html#slide-18"><span class="dot"></span><span class="name">แจกปุริสสัพพนาม</span></a>
-        <a class="dbtn" target="_blank" href="paluviyakon/pali.html#slide-21"><span class="dot"></span><span class="name">อัพยยศัพท์</span></a>
-        <a class="dbtn" target="_blank" href="paluviyakon/pali.html#slide-22"><span class="dot"></span><span class="name">นิบาต</span></a>
-      </div>
+<input type="file" id="imgInputGlobal" accept="image/*" style="display:none;" />
 
-      <h2 class="category-title"><span class="dot"></span><span>อาขยาต (กริยา)</span></h2>
-      <div class="grid category-grid">
-        <a class="dbtn" target="_blank" href="paluviyakon/pali.html#slide-24"><span class="dot"></span><span class="name">อาขยาต วิภัตติ</span></a>
-        <a class="dbtn" target="_blank" href="paluviyakon/pali.html#slide-26"><span class="dot"></span><span class="name">อาขยาต กาล</span></a>
-        <a class="dbtn" target="_blank" href="paluviyakon/pali.html#slide-27"><span class="dot"></span><span class="name">อาขยาต บท</span></a>
-        <a class="dbtn" target="_blank" href="paluviyakon/pali.html#slide-37"><span class="dot"></span><span class="name">วาจก</span></a>
-        <a class="dbtn" target="_blank" href="paluviyakon/pali.html#slide-48"><span class="dot"></span><span class="name">กิริยากิตก์ วาจก</span></a>
-        <a class="dbtn" target="_blank" href="paluviyakon/pali.html#slide-51"><span class="dot"></span><span class="name">ปัจจัยกิริยากิตก์</span></a>
-      </div>
+<!-- ===== PAGE 1: สารบัญหลัก (INDEX / HOME) ===== -->
+<div id="page-index" class="wrap">
+  <div class="title">บาลีไวยากรณ์</div>
+  <p class="sub">สารบัญหมวดหมู่บทเรียน & ค้นหาเนื้อหาฉับไว</p>
 
-      <h2 class="category-title"><span class="dot"></span><span>สนธิ / สมาส / ตัทธิต</span></h2>
-      <div class="grid category-grid">
-        <a class="dbtn" target="_blank" href="paluviyakon/pali.html#slide-91"><span class="dot"></span><span class="name">สนธิ</span></a>
-        <a class="dbtn" target="_blank" href="paluviyakon/pali.html#slide-56"><span class="dot"></span><span class="name">สมาส</span></a>
-        <a class="dbtn" target="_blank" href="paluviyakon/pali.html#slide-64"><span class="dot"></span><span class="name">สมาสท้อง</span></a>
-        <a class="dbtn" target="_blank" href="paluviyakon/pali.html#slide-65"><span class="dot"></span><span class="name">ตัทธิต</span></a>
-        <a class="dbtn" target="_blank" href="paluviyakon/pali.html#slide-79"><span class="dot"></span><span class="name">ภาวตัทธิต</span></a>
-        <a class="dbtn" target="_blank" href="paluviyakon/pali.html#slide-81"><span class="dot"></span><span class="name">ตัทธิตนอกแบบ</span></a>
-      </div>
-
-      <h2 class="category-title"><span class="dot"></span><span>สังขยา</span></h2>
-      <div class="grid category-grid">
-        <a class="dbtn" target="_blank" href="paluviyakon/pali.html#slide-12"><span class="dot"></span><span class="name">สังขยา</span></a>
-        <a class="dbtn" target="_blank" href="paluviyakon/pali.html#slide-13"><span class="dot"></span><span class="name">วิธีนับสังขยา</span></a>
-        <a class="dbtn" target="_blank" href="paluviyakon/pali.html#slide-15"><span class="dot"></span><span class="name">แจกปกติสังขยา</span></a>
-      </div>
-
-      <h2 class="category-title"><span class="dot"></span><span>สมัญญาภิธาน (อักขระ)</span></h2>
-      <div class="grid category-grid">
-        <a class="dbtn" target="_blank" href="paluviyakon/pali.html#slide-82"><span class="dot"></span><span class="name">สมัญญาภิธาน</span></a>
-        <a class="dbtn" target="_blank" href="paluviyakon/pali.html#slide-83"><span class="dot"></span><span class="name">สระ</span></a>
-        <a class="dbtn" target="_blank" href="paluviyakon/pali.html#slide-84"><span class="dot"></span><span class="name">พยัญชนะ</span></a>
-        <a class="dbtn" target="_blank" href="paluviyakon/pali.html#slide-85"><span class="dot"></span><span class="name">ฐานกรณ์</span></a>
-      </div>
-
-      <h2 class="category-title"><span class="dot"></span><span>กลอน / หลักการแปล</span></h2>
-      <div class="grid category-grid">
-        <a class="dbtn" target="_blank" href="paluviyakon/pali.html#slide-97"><span class="dot"></span><span class="name">กลอนช่วยจำ</span></a>
-        <a class="dbtn" target="_blank" href="paluviyakon/pali.html#slide-98"><span class="dot"></span><span class="name">กาพย์จำนวนธาตุ</span></a>
-        <a class="dbtn" target="_blank" href="paluviyakon/pali.html#slide-96"><span class="dot"></span><span class="name">หลักการแปล</span></a>
-      </div>
-    </div>
+  <!-- Search Input -->
+  <div class="search-wrap">
+    <input type="text" id="searchInput" class="search-input" placeholder="ค้นหาบทเรียน (เช่น นาม, สนธิ, สมาส)..." onkeyup="filterContent()">
+    <button class="search-btn" title="ค้นหา">
+      <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M10 18a7.952 7.952 0 0 0 4.897-1.688l4.396 4.396 1.414-1.414-4.396-4.396A7.952 7.952 0 0 0 18 10c0-4.411-3.589-8-8-8s-8 3.589-8 8 3.589 8 8 8zm0-14c3.309 0 6 2.691 6 6s-2.691 6-6 6-6-2.691-6-6 2.691-6 6-6z"></path></svg>
+    </button>
+  </div>
+  <div class="search-desc">
+    <span>💡 คลิกเลือกบทเรียนเพื่อเปิดอ่านสไลด์ หรือกดปุ่ม AI สีส้มเพื่อถามคำถาม</span>
   </div>
 
-  <!-- ===== PAGE 2: เสียงบาลีไวยากรณ์ (AUDIO PLAYER PAGE) ===== -->
-  <div id="page-audio" class="wrap hidden">
-    <div class="title">เสียงบาลีไวยากรณ์</div>
-    <p class="sub">เสียงอ่านบทเรียนและหลักบาลีไวยากรณ์</p>
-
-    <!-- Main Full Player Display Box -->
-    <div class="bg-gradient-to-b from-amber-900 to-amber-950 text-white rounded-3xl p-6 shadow-xl mb-6 relative overflow-hidden">
-      <!-- Background decoration -->
-      <div class="absolute -right-10 -top-10 w-40 h-40 bg-amber-500/10 rounded-full blur-2xl"></div>
-      
-      <div class="flex flex-col md:flex-row gap-6 items-center">
-        <!-- Album Art / Icon -->
-        <div class="w-32 h-32 md:w-40 md:h-40 bg-amber-800/80 rounded-2xl flex items-center justify-center border-2 border-amber-500/30 shadow-inner shrink-0">
-          <span class="text-6xl select-none">☸️</span>
-        </div>
-
-        <!-- Player Controls & Details -->
-        <div class="flex-1 w-full text-center md:text-left">
-          <span class="inline-block px-3 py-1 bg-amber-500/20 text-amber-300 text-xs font-semibold rounded-full mb-2">
-            กำลังเล่นเสียงบาลีไวยากรณ์
-          </span>
-          <h3 id="player-title" class="text-xl md:text-2xl font-bold text-amber-100 truncate">
-            กรุณาเลือกบทเรียน
-          </h3>
-          <p id="player-subtitle" class="text-xs md:text-sm text-amber-300/80 mt-1 mb-4 truncate">
-            กดเลือกรายการจากด้านล่าง
-          </p>
-
-          <!-- Timeline & Progress Bar -->
-          <div class="space-y-1 mb-4">
-            <input type="range" id="main-progress" min="0" max="100" value="0" step="0.1" oninput="seekAudio(this.value)">
-            <div class="flex justify-between text-xs text-amber-300/70">
-              <span id="current-time">00:00</span>
-              <span id="total-duration">00:00</span>
-            </div>
-          </div>
-
-          <!-- Main Player Control Buttons -->
-          <div class="flex items-center justify-center md:justify-start gap-4">
-            <!-- Speed Button -->
-            <button id="btn-speed" onclick="togglePlaybackSpeed()" class="text-xs font-bold bg-amber-800/80 hover:bg-amber-700 text-amber-200 px-3 py-2 rounded-xl transition border border-amber-600/40">
-              1.0x
-            </button>
-
-            <!-- Prev Button -->
-            <button onclick="playPrevAudio()" class="text-amber-200 hover:text-white p-2 transition">
-              <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
-            </button>
-
-            <!-- Main Play/Pause Button -->
-            <button id="btn-main-play" onclick="togglePlayPause()" class="w-14 h-14 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 rounded-full flex items-center justify-center shadow-lg transition transform active:scale-95">
-              <svg id="main-play-icon" class="w-8 h-8 fill-current ml-1" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-            </button>
-
-            <!-- Next Button -->
-            <button onclick="playNextAudio()" class="text-amber-200 hover:text-white p-2 transition">
-              <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
-            </button>
-
-            <!-- Loop Button -->
-            <button id="btn-loop" onclick="toggleLoop()" class="text-amber-400/50 hover:text-amber-300 p-2 transition" title="วนซ้ำบทเดิม">
-              <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/></svg>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Settings Option Bar (Background Playback Option) -->
-      <div class="mt-6 pt-4 border-t border-amber-800/60 flex items-center justify-between text-xs text-amber-200/90">
-        <label class="flex items-center gap-2 cursor-pointer select-none">
-          <input type="checkbox" id="bg-play-toggle" class="w-4 h-4 accent-amber-500 rounded cursor-pointer" onchange="toggleBackgroundPlay(this.checked)" checked>
-          <span>อนุญาตให้เล่นเสียงเบื้องหลัง (เมื่อเปลี่ยนหน้า)</span>
-        </label>
-        <span class="text-[11px] opacity-75">เล่นต่อเนื่องอัตโนมัติ</span>
-      </div>
+  <!-- Content Categories -->
+  <div id="content-area">
+    <h2 class="category-title"><span class="dot"></span><span>นาม / สัพพนาม</span></h2>
+    <div class="grid category-grid">
+      <div class="dbtn" onclick="openReaderAtSlide(0)"><span class="dot"></span><span class="name">บทนำ</span></div>
+      <div class="dbtn" onclick="openReaderAtSlide(1)"><span class="dot"></span><span class="name">นาม</span></div>
+      <div class="dbtn" onclick="openReaderAtSlide(2)"><span class="dot"></span><span class="name">ลิงค์</span></div>
+      <div class="dbtn" onclick="openReaderAtSlide(3)"><span class="dot"></span><span class="name">วจนะ</span></div>
+      <div class="dbtn" onclick="openReaderAtSlide(4)"><span class="dot"></span><span class="name">วิภัตติ</span></div>
+      <div class="dbtn" onclick="openReaderAtSlide(5)"><span class="dot"></span><span class="name">อายตนิบาต</span></div>
+      <div class="dbtn" onclick="openReaderAtSlide(6)"><span class="dot"></span><span class="name">การันต์</span></div>
+      <div class="dbtn" onclick="openReaderAtSlide(7)"><span class="dot"></span><span class="name">แจกปุลิงค์</span></div>
+      <div class="dbtn" onclick="openReaderAtSlide(8)"><span class="dot"></span><span class="name">แจกอิตถีลิงค์</span></div>
+      <div class="dbtn" onclick="openReaderAtSlide(9)"><span class="dot"></span><span class="name">แจกนปุสกลิงค์</span></div>
+      <div class="dbtn" onclick="openReaderAtSlide(10)"><span class="dot"></span><span class="name">กติปยศัพท์</span></div>
+      <div class="dbtn" onclick="openReaderAtSlide(11)"><span class="dot"></span><span class="name">มโนคณศัพท์</span></div>
+      <div class="dbtn" onclick="openReaderAtSlide(17)"><span class="dot"></span><span class="name">สัพพนาม</span></div>
+      <div class="dbtn" onclick="openReaderAtSlide(18)"><span class="dot"></span><span class="name">แจกปุริสสัพพนาม</span></div>
+      <div class="dbtn" onclick="openReaderAtSlide(21)"><span class="dot"></span><span class="name">อัพยยศัพท์</span></div>
+      <div class="dbtn" onclick="openReaderAtSlide(22)"><span class="dot"></span><span class="name">นิบาต</span></div>
     </div>
 
-    <!-- Playlist Section Title -->
-    <div class="flex items-center justify-between mb-3 px-1">
-      <h3 class="font-bold text-gray-800 text-lg">รายการเสียงบาลีไวยากรณ์ทั้งหมด</h3>
-      <span class="text-xs text-amber-800 bg-amber-100 font-semibold px-2.5 py-1 rounded-full" id="playlist-count">8 รายการ</span>
+    <h2 class="category-title"><span class="dot"></span><span>อาขยาต (กริยา)</span></h2>
+    <div class="grid category-grid">
+      <div class="dbtn" onclick="openReaderAtSlide(24)"><span class="dot"></span><span class="name">อาขยาต วิภัตติ</span></div>
+      <div class="dbtn" onclick="openReaderAtSlide(25)"><span class="dot"></span><span class="name">อาขยาต กาล</span></div>
+      <div class="dbtn" onclick="openReaderAtSlide(26)"><span class="dot"></span><span class="name">อาขยาต บท</span></div>
+      <div class="dbtn" onclick="openReaderAtSlide(36)"><span class="dot"></span><span class="name">วาจก</span></div>
+      <div class="dbtn" onclick="openReaderAtSlide(47)"><span class="dot"></span><span class="name">กิริยากิตก์ วาจก</span></div>
+      <div class="dbtn" onclick="openReaderAtSlide(50)"><span class="dot"></span><span class="name">ปัจจัยกิริยากิตก์</span></div>
     </div>
 
-    <!-- Chanting Playlist Cards -->
-    <div id="playlist-container" class="space-y-2.5 mb-8">
-      <!-- Generated via JS -->
+    <h2 class="category-title"><span class="dot"></span><span>สนธิ / สมาส / ตัทธิต</span></h2>
+    <div class="grid category-grid">
+      <div class="dbtn" onclick="openReaderAtSlide(90)"><span class="dot"></span><span class="name">สนธิ</span></div>
+      <div class="dbtn" onclick="openReaderAtSlide(55)"><span class="dot"></span><span class="name">สมาส</span></div>
+      <div class="dbtn" onclick="openReaderAtSlide(63)"><span class="dot"></span><span class="name">สมาสท้อง</span></div>
+      <div class="dbtn" onclick="openReaderAtSlide(64)"><span class="dot"></span><span class="name">ตัทธิต</span></div>
+      <div class="dbtn" onclick="openReaderAtSlide(78)"><span class="dot"></span><span class="name">ภาวตัทธิต</span></div>
+      <div class="dbtn" onclick="openReaderAtSlide(80)"><span class="dot"></span><span class="name">ตัทธิตนอกแบบ</span></div>
+    </div>
+
+    <h2 class="category-title"><span class="dot"></span><span>สังขยา</span></h2>
+    <div class="grid category-grid">
+      <div class="dbtn" onclick="openReaderAtSlide(12)"><span class="dot"></span><span class="name">สังขยา</span></div>
+      <div class="dbtn" onclick="openReaderAtSlide(13)"><span class="dot"></span><span class="name">วิธีนับสังขยา</span></div>
+      <div class="dbtn" onclick="openReaderAtSlide(15)"><span class="dot"></span><span class="name">แจกปกติสังขยา</span></div>
+    </div>
+
+    <h2 class="category-title"><span class="dot"></span><span>สมัญญาภิธาน (อักขระ)</span></h2>
+    <div class="grid category-grid">
+      <div class="dbtn" onclick="openReaderAtSlide(81)"><span class="dot"></span><span class="name">สมัญญาภิธาน</span></div>
+      <div class="dbtn" onclick="openReaderAtSlide(82)"><span class="dot"></span><span class="name">สระ</span></div>
+      <div class="dbtn" onclick="openReaderAtSlide(83)"><span class="dot"></span><span class="name">พยัญชนะ</span></div>
+      <div class="dbtn" onclick="openReaderAtSlide(84)"><span class="dot"></span><span class="name">ฐานกรณ์</span></div>
+    </div>
+
+    <h2 class="category-title"><span class="dot"></span><span>กลอน / หลักการแปล</span></h2>
+    <div class="grid category-grid">
+      <div class="dbtn" onclick="openReaderAtSlide(96)"><span class="dot"></span><span class="name">กลอนช่วยจำ</span></div>
+      <div class="dbtn" onclick="openReaderAtSlide(97)"><span class="dot"></span><span class="name">กาฬจำนวนธาตุ</span></div>
+      <div class="dbtn" onclick="openReaderAtSlide(95)"><span class="dot"></span><span class="name">หลักการแปล</span></div>
     </div>
   </div>
+</div>
 
-  <!-- ===== GLOBAL FLOATING ACTION BUTTONS & MODALS ===== -->
+<!-- ===== PAGE 2: อ่านหนังสือ (EBOOK READER) ===== -->
+<div id="page-reader" class="hidden">
   
-  <!-- AI Chatbot Modal -->
-  <div id="chatbot-modal" class="chatbot-hidden">
-    <div class="flex flex-col h-screen bg-gray-100">
-      <header class="bg-amber-800 text-white p-4 flex justify-between items-center shadow-lg">
-        <div class="flex items-center gap-2">
-            <span class="text-2xl">☸️</span>
-            <div>
-                <h1 class="text-lg font-bold">AI บาลีไวยากรณ์</h1>
-                <p class="text-[10px] opacity-80">ผู้ช่วยส่วนตัวด้านภาษาบาลี</p>
+  <div class="reader-topbar">
+    <button class="control-btn toc-btn-trigger" onclick="toggleTOC()">☰ สารบัญ</button>
+    <div class="reader-brand">Pali Grammar</div>
+    <div class="flex gap-1.5">
+      <button class="control-btn" onclick="fontSize(1)">A+</button>
+      <button class="control-btn" onclick="fontSize(-1)">A-</button>
+    </div>
+  </div>
+
+  <!-- TOC Drawer Backdrop & Drawer (Closed by default!) -->
+  <div class="toc-backdrop" id="tocBackdrop" onclick="closeTOC()"></div>
+  <div class="toc-drawer" id="tocDrawer">
+    <div class="toc-header">
+      <span>สารบัญเนื้อหา</span>
+      <button class="control-btn" onclick="closeTOC()" style="padding: 2px 8px;">✕</button>
+    </div>
+    <div id="tocContent"></div>
+  </div>
+
+  <!-- Horizontal Slide Canvas -->
+  <div class="slider" id="slider">
+
+    <!-- Slide 0 -->
+    <div class="slide" id="slide-0" data-name="01 บทนำ">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-0">
+                <div class="img-wrapper"><img src="paluviyakon/image/4.jpg" alt="01 บทนำ"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/story-live-171496914/001a1&color=%23ff5500&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 1 -->
+    <div class="slide" id="slide-1" data-name="02 นาม">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-1">
+                <div class="img-wrapper"><img src="paluviyakon/image/8.jpg" alt="02 นาม"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/9.jpg" alt="02 นาม"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/10.jpg" alt="02 นาม"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726969584&color=%23ff5500&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 2 -->
+    <div class="slide" id="slide-2" data-name="03 ลิงค์">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-2">
+                <div class="img-wrapper"><img src="paluviyakon/image/11.jpg" alt="03 ลิงค์"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/12.jpg" alt="03 ลิงค์"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/13.jpg" alt="03 ลิงค์"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/14.jpg" alt="03 ลิงค์"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/14-1.jpg" alt="03 ลิงค์"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/15-1.jpg" alt="03 ลิงค์"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/15-2.jpg" alt="03 ลิงค์"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726969575&color=%23ff5500&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 3 -->
+    <div class="slide" id="slide-3" data-name="04 วจนะ">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-3">
+                <div class="img-wrapper"><img src="paluviyakon/image/15-3.jpg" alt="04 วจนะ"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726969566&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 4 -->
+    <div class="slide" id="slide-4" data-name="05 วิภัตติ">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-4">
+                <div class="img-wrapper"><img src="paluviyakon/image/15-4.jpg" alt="05 วิภัตติ"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/16.jpg" alt="05 วิภัตติ"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726969557&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 5 -->
+    <div class="slide" id="slide-5" data-name="06 อายตนิบาต">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-5">
+                <div class="img-wrapper"><img src="paluviyakon/image/17.jpg" alt="06 อายตนิบาต"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726969548&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 6 -->
+    <div class="slide" id="slide-6" data-name="007 การันต์">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-6">
+                <div class="img-wrapper"><img src="paluviyakon/image/18.jpg" alt="007 การันต์"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726969536&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 7 -->
+    <div class="slide" id="slide-7" data-name="008 แจกปุลิงค์">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-7">
+                <div class="img-wrapper"><img src="paluviyakon/image/20.jpg" alt="008 แจกปุลิงค์"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/21.jpg" alt="008 แจกปุลิงค์"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/22.jpg" alt="008 แจกปุลิงค์"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/23.jpg" alt="008 แจกปุลิงค์"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/24.jpg" alt="008 แจกปุลิงค์"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/25.jpg" alt="008 แจกปุลิงค์"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726969524&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 8 -->
+    <div class="slide" id="slide-8" data-name="009 แจกอิตถีลิงค์">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-8">
+                <div class="img-wrapper"><img src="paluviyakon/image/26.jpg" alt="009 แจกอิตถีลิงค์"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/27.jpg" alt="009 แจกอิตถีลิงค์"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/28.jpg" alt="009 แจกอิตถีลิงค์"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/29.jpg" alt="009 แจกอิตถีลิงค์"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/30.jpg" alt="009 แจกอิตถีลิงค์"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/31.jpg" alt="009 แจกอิตถีลิงค์"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/32.jpg" alt="009 แจกอิตถีลิงค์"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726969515&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 9 -->
+    <div class="slide" id="slide-9" data-name="010 แจกนปุสกลิงค์">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-9">
+                <div class="img-wrapper"><img src="paluviyakon/image/33.jpg" alt="010 แจกนปุสกลิงค์"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/34.jpg" alt="010 แจกนปุสกลิงค์"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/35.jpg" alt="010 แจกนปุสกลิงค์"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/36.jpg" alt="010 แจกนปุสกลิงค์"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726969503&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 10 -->
+    <div class="slide" id="slide-10" data-name="011 กติปยศัพท์">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-10">
+                <div class="img-wrapper"><img src="paluviyakon/image/37.jpg" alt="011 กติปยศัพท์"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/38.jpg" alt="011 กติปยศัพท์"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/39.jpg" alt="011 กติปยศัพท์"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/40.jpg" alt="011 กติปยศัพท์"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/41.jpg" alt="011 กติปยศัพท์"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/42.jpg" alt="011 กติปยศัพท์"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/43.jpg" alt="011 กติปยศัพท์"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/44.jpg" alt="011 กติปยศัพท์"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/45.jpg" alt="011 กติปยศัพท์"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/46.jpg" alt="011 กติปยศัพท์"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/47.jpg" alt="011 กติปยศัพท์"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/48.jpg" alt="011 กติปยศัพท์"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/49.jpg" alt="011 กติปยศัพท์"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726969491&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 11 -->
+    <div class="slide" id="slide-11" data-name="012 มโนคณศัพท์">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-11">
+                <div class="img-wrapper"><img src="paluviyakon/image/50.jpg" alt="012 มโนคณศัพท์"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/51.jpg" alt="012 มโนคณศัพท์"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/52.jpg" alt="012 มโนคณศัพท์"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/53.jpg" alt="012 มโนคณศัพท์"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/54.jpg" alt="012 มโนคณศัพท์"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/55.jpg" alt="012 มโนคณศัพท์"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/56.jpg" alt="012 มโนคณศัพท์"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726969485&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 12 -->
+    <div class="slide" id="slide-12" data-name="013 สังขยา">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-12">
+                <div class="img-wrapper"><img src="paluviyakon/image/57.jpg" alt="013 สังขยา"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/58.jpg" alt="013 สังขยา"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726969479&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 13 -->
+    <div class="slide" id="slide-13" data-name="014 วิธีนับสังขยา">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-13">
+                <div class="img-wrapper"><img src="paluviyakon/image/58.jpg" alt="014 วิธีนับสังขยา"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/59.jpg" alt="014 วิธีนับสังขยา"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/60.jpg" alt="014 วิธีนับสังขยา"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726969476&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 14 -->
+    <div class="slide" id="slide-14" data-name="015 ปกติสังขยาเป็นนาม-ลิงค์">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-14">
+                <div class="img-wrapper"><img src="paluviyakon/image/61.jpg" alt="015 ปกติสังขยา"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726969455&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 15 -->
+    <div class="slide" id="slide-15" data-name="016 แจกปกติสังขยา">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-15">
+                <div class="img-wrapper"><img src="paluviyakon/image/62.jpg" alt="016 แจกปกติสังขยา"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/63.jpg" alt="016 แจกปกติสังขยา"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/64.jpg" alt="016 แจกปกติสังขยา"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/65.jpg" alt="016 แจกปกติสังขยา"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/66.jpg" alt="016 แจกปกติสังขยา"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/67.jpg" alt="016 แจกปกติสังขยา"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726969452&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 16 -->
+    <div class="slide" id="slide-16" data-name="017 แจกปูรณสังขยา">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-16">
+                <div class="img-wrapper"><img src="paluviyakon/image/68.jpg" alt="017 แจกปูรณสังขยา"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/69.jpg" alt="017 แจกปูรณสังขยา"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726969446&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 17 -->
+    <div class="slide" id="slide-17" data-name="018 สัพพนาม">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-17">
+                <div class="img-wrapper"><img src="paluviyakon/image/70.jpg" alt="018 สัพพนาม"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/71.jpg" alt="018 สัพพนาม"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726969419&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 18 -->
+    <div class="slide" id="slide-18" data-name="019 แจกปุริสสัพพนาม">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-18">
+                <div class="img-wrapper"><img src="paluviyakon/image/72.jpg" alt="019 แจกปุริสสัพพนาม"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/73.jpg" alt="019 แจกปุริสสัพพนาม"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/74.jpg" alt="019 แจกปุริสสัพพนาม"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/75.jpg" alt="019 แจกปุริสสัพพนาม"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/76.jpg" alt="019 แจกปุริสสัพพนาม"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726969410&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 19 -->
+    <div class="slide" id="slide-19" data-name="020 แจกอนิยมวิเสสนสัพพนาม">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-19">
+                <div class="img-wrapper"><img src="paluviyakon/image/77.jpg" alt="020 แจกอนิยม"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/78.jpg" alt="020 แจกอนิยม"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/79.jpg" alt="020 แจกอนิยม"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/80.jpg" alt="020 แจกอนิยม"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/81.jpg" alt="020 แจกอนิยม"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/82.jpg" alt="020 แจกอนิยม"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/83.jpg" alt="020 แจกอนิยม"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/84.jpg" alt="020 แจกอนิยม"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726969398&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 20 -->
+    <div class="slide" id="slide-20" data-name="021 แจกนิยมวิเสสนสัพพนาม">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-20">
+                <div class="img-wrapper"><img src="paluviyakon/image/84-1.jpg" alt="021 แจกนิยม"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/85.jpg" alt="021 แจกนิยม"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/86.jpg" alt="021 แจกนิยม"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/87.jpg" alt="021 แจกนิยม"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/88.jpg" alt="021 แจกนิยม"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/89.jpg" alt="021 แจกนิยม"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/90.jpg" alt="021 แจกนิยม"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/91.jpg" alt="021 แจกนิยม"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/92.jpg" alt="021 แจกนิยม"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726969389&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 21 -->
+    <div class="slide" id="slide-21" data-name="022 อัพพยยศัพท์">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-21">
+                <div class="img-wrapper"><img src="paluviyakon/image/93.jpg" alt="022 อัพพยยศัพท์"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/94.jpg" alt="022 อัพพยยศัพท์"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726969383&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 22 -->
+    <div class="slide" id="slide-22" data-name="023 นิบาต">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-22">
+                <div class="img-wrapper"><img src="paluviyakon/image/95.jpg" alt="023 นิบาต"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/96.jpg" alt="023 นิบาต"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/97.jpg" alt="023 นิบาต"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/98.jpg" alt="023 นิบาต"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/99.jpg" alt="023 นิบาต"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/100.jpg" alt="023 นิบาต"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/101.jpg" alt="023 นิบาต"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726969380&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 23 -->
+    <div class="slide" id="slide-23" data-name="024 ปัจจัยในอัพยยศัพท์">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-23">
+                <div class="img-wrapper"><img src="paluviyakon/image/102.jpg" alt="024 ปัจจัย"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/103.jpg" alt="024 ปัจจัย"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/104.jpg" alt="024 ปัจจัย"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/105.jpg" alt="024 ปัจจัย"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/106.jpg" alt="024 ปัจจัย"></div>
+            </div>  
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726969362&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 24 -->
+    <div class="slide" id="slide-24" data-name="025 อาขยาต วิภัตติ">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-24">
+                <div class="img-wrapper"><img src="paluviyakon/image/107.jpg" alt="025 อาขยาต"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/108.jpg" alt="025 อาขยาต"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/109.jpg" alt="025 อาขยาต"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/110.jpg" alt="025 อาขยาต"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726969359&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 25 -->
+    <div class="slide" id="slide-25" data-name="026 อาขยาต กาล">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-25">
+                <div class="img-wrapper"><img src="paluviyakon/image/110-1.jpg" alt="026 อาขยาต"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/111.jpg" alt="026 อาขยาต"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/112.jpg" alt="026 อาขยาต"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/113.jpg" alt="026 อาขยาต"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/114.jpg" alt="026 อาขยาต"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/115.jpg" alt="026 อาขยาต"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726969353&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 26 -->
+    <div class="slide" id="slide-26" data-name="027 อาขยาต บท">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-26">
+                <div class="img-wrapper"><img src="paluviyakon/image/116.jpg" alt="027 อาขยาต บท"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/117.jpg" alt="027 อาขยาต บท"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726969338&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 27 -->
+    <div class="slide" id="slide-27" data-name="028 อาขยาต วจนะ บุรุษ">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-27">
+                <div class="img-wrapper"><img src="paluviyakon/image/117-1.jpg" alt="028 อาขยาต"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/118.jpg" alt="028 อาขยาต"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726969329&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 28 -->
+    <div class="slide" id="slide-28" data-name="029 ธาตุ หมวด ภูธาตุ">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-28">
+                <div class="img-wrapper"><img src="paluviyakon/image/119.jpg" alt="029 ธาตุ"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/120.jpg" alt="029 ธาตุ"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726969323&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 29 -->
+    <div class="slide" id="slide-29" data-name="030 หมวด รุธฺ ธาตุ">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-29">
+                <div class="img-wrapper"><img src="paluviyakon/image/121.jpg" alt="030 หมวด รุธฺ ธาตุ"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726969314&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 30 -->
+    <div class="slide" id="slide-30" data-name="031 หมวด ทิวฺ ธาตุ">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-30">
+                <div class="img-wrapper"><img src="paluviyakon/image/122.jpg" alt="031 หมวด ทิวฺ"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/123.jpg" alt="031 หมวด ทิวฺ"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726969305&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 31 -->
+    <div class="slide" id="slide-31" data-name="032 หมวด สุ ธาตุ">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-31">
+                <div class="img-wrapper"><img src="paluviyakon/image/123-1.jpg" alt="032 หมวด สุ"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/124.jpg" alt="032 หมวด สุ"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726969299&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 32 -->
+    <div class="slide" id="slide-32" data-name="033 หมวด กี ธาตุ">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-32">
+                <div class="img-wrapper"><img src="paluviyakon/image/124-1.jpg" alt="033 หมวด กี"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/125.jpg" alt="033 หมวด กี"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726969296&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 33 -->
+    <div class="slide" id="slide-33" data-name="034 หมวด คหฺ และ ตนฺ ธาตุ">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-33">
+                <div class="img-wrapper"><img src="paluviyakon/image/125-1.jpg" alt="034 หมวด คหฺ"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/126.jpg" alt="034 หมวด คหฺ"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726969290&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 34 -->
+    <div class="slide" id="slide-34" data-name="035 หมวด จุรฺ ธาตุ">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-34">
+                <div class="img-wrapper"><img src="paluviyakon/image/126-1.jpg" alt="035 หมวด จุรฺ"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/127.jpg" alt="035 หมวด จุรฺ"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726969284&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 35 -->
+    <div class="slide" id="slide-35" data-name="036 สกัมม+อกัมมธาตุ">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-35">
+                <div class="img-wrapper"><img src="paluviyakon/image/127-1.jpg" alt="036 ธาตุ"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/128.jpg" alt="036 ธาตุ"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726969266&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 36 -->
+    <div class="slide" id="slide-36" data-name="037 วาจก">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-36">
+                <div class="img-wrapper"><img src="paluviyakon/image/128-1.jpg" alt="037 วาจก"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/129.jpg" alt="037 วาจก"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/130.jpg" alt="037 วาจก"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726969263&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 37 -->
+    <div class="slide" id="slide-37" data-name="038 ปัจจัย">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-37">
+                <div class="img-wrapper"><img src="paluviyakon/image/131.jpg" alt="038 ปัจจัย"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/132.jpg" alt="038 ปัจจัย"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726969257&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 38 -->
+    <div class="slide" id="slide-38" data-name="039 ปัจจัยพิเศษ 5 ตัว">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-38">
+                <div class="img-wrapper"><img src="paluviyakon/image/133.jpg" alt="039 ปัจจัยพิเศษ"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/134.jpg" alt="039 ปัจจัยพิเศษ"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/135.jpg" alt="039 ปัจจัยพิเศษ"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/136.jpg" alt="039 ปัจจัยพิเศษ"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/137.jpg" alt="039 ปัจจัยพิเศษ"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/138.jpg" alt="039 ปัจจัยพิเศษ"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726969245&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 39 -->
+    <div class="slide" id="slide-39" data-name="040 คำอธิบายในกัตตุวาจก">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-39">
+                <div class="img-wrapper"><img src="paluviyakon/image/139.jpg" alt="040 กัตตุวาจก"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/140.jpg" alt="040 กัตตุวาจก"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/141.jpg" alt="040 กัตตุวาจก"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/142.jpg" alt="040 กัตตุวาจก"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726969227&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 40 -->
+    <div class="slide" id="slide-40" data-name="041 คำอธิบายในกัมมวาจก">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-40">
+                <div class="img-wrapper"><img src="paluviyakon/image/142-1.jpg" alt="041 กัมมวาจก"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/143.jpg" alt="041 กัมมวาจก"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/144.jpg" alt="041 กัมมวาจก"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/145.jpg" alt="041 กัมมวาจก"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/146.jpg" alt="041 กัมมวาจก"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/147.jpg" alt="041 กัมมวาจก"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/148.jpg" alt="041 กัมมวาจก"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/149.jpg" alt="041 กัมมวาจก"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/150.jpg" alt="041 กัมมวาจก"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726969218&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 41 -->
+    <div class="slide" id="slide-41" data-name="042 กิตก์ นามกิตก์">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-41">
+                <div class="img-wrapper"><img src="paluviyakon/image/151.jpg" alt="042 นามกิตก์"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726969215&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 42 -->
+    <div class="slide" id="slide-42" data-name="043 สาธนะ">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-42">
+                <div class="img-wrapper"><img src="paluviyakon/image/152.jpg" alt="043 สาธนะ"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/153.jpg" alt="043 สาธนะ"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/154.jpg" alt="043 สาธนะ"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/155.jpg" alt="043 สาธนะ"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/156.jpg" alt="043 สาธนะ"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726969209&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 43 -->
+    <div class="slide" id="slide-43" data-name="044 ปัจจัยแห่งนามกิตก์">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-43">
+                <div class="img-wrapper"><img src="paluviyakon/image/157.jpg" alt="044 ปัจจัยแห่งนามกิตก์"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726969194&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 44 -->
+    <div class="slide" id="slide-44" data-name="045 วิเคราะห์ ในกิตปัจจัย">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-44">
+                <div class="img-wrapper"><img src="paluviyakon/image/158.jpg" alt="045 วิเคราะห์"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/159.jpg" alt="045 วิเคราะห์"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/160.jpg" alt="045 วิเคราะห์"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/161.jpg" alt="045 วิเคราะห์"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/162.jpg" alt="045 วิเคราะห์"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/163.jpg" alt="045 วิเคราะห์"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/164.jpg" alt="045 วิเคราะห์"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726969191&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 45 -->
+    <div class="slide" id="slide-45" data-name="046 วิเคราะห์ ในกิจจปัจจัย">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-45">
+                <div class="img-wrapper"><img src="paluviyakon/image/164-1.jpg" alt="046 วิเคราะห์"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/165.jpg" alt="046 วิเคราะห์"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/166.jpg" alt="046 วิเคราะห์"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/167.jpg" alt="046 วิเคราะห์"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726969179&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 46 -->
+    <div class="slide" id="slide-46" data-name="047 วิเคราะห์ ในกิตกิจจปัจจัย">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-46">
+                <div class="img-wrapper"><img src="paluviyakon/image/167-1.jpg" alt="047 วิเคราะห์"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/168.jpg" alt="047 วิเคราะห์"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/169.jpg" alt="047 วิเคราะห์"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/170.jpg" alt="047 วิเคราะห์"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/171.jpg" alt="047 วิเคราะห์"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/172.jpg" alt="047 วิเคราะห์"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/173.jpg" alt="047 วิเคราะห์"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/174.jpg" alt="047 วิเคราะห์"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/175.jpg" alt="047 วิเคราะห์"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/176.jpg" alt="047 วิเคราะห์"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/177.jpg" alt="047 วิเคราะห์"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726969176&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 47 -->
+    <div class="slide" id="slide-47" data-name="048 กิริยากิตก์ วิภัตติและวาจก">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-47">
+                <div class="img-wrapper"><img src="paluviyakon/image/177-1.jpg" alt="048 กิริยากิตก์"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/178.jpg" alt="048 กิริยากิตก์"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726969164&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 48 -->
+    <div class="slide" id="slide-48" data-name="049 กิริยากิตก์ กาล">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-48">
+                <div class="img-wrapper"><img src="paluviyakon/image/178-1.jpg" alt="049 กิริยากิตก์"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/179.jpg" alt="049 กิริยากิตก์"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/180.jpg" alt="049 กิริยากิตก์"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726969146&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 49 -->
+    <div class="slide" id="slide-49" data-name="050 กิริยากิตก์ วาจก">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-49">
+                <div class="img-wrapper"><img src="paluviyakon/image/181.jpg" alt="050 กิริยากิตก์ วาจก"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726969128&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 50 -->
+    <div class="slide" id="slide-50" data-name="051 ปัจจัยแห่งกิริยากิตก์">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-50">
+                <div class="img-wrapper"><img src="paluviyakon/image/182.jpg" alt="051 ปัจจัย"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726969125&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 51 -->
+    <div class="slide" id="slide-51" data-name="052 กิตปัจจัย">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-51">
+                <div class="img-wrapper"><img src="paluviyakon/image/183.jpg" alt="052 กิตปัจจัย"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/184.jpg" alt="052 กิตปัจจัย"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/189.jpg" alt="052 กิตปัจจัย"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726969113&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 52 -->
+    <div class="slide" id="slide-52" data-name="053 กิจจปัจจัย">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-52">
+                <div class="img-wrapper"><img src="paluviyakon/image/184-1.jpg" alt="053 กิจจปัจจัย"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/185.jpg" alt="053 กิจจปัจจัย"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726969089&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 53 -->
+    <div class="slide" id="slide-53" data-name="054 กิตกิจจปัจจัย">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-53">
+                <div class="img-wrapper"><img src="paluviyakon/image/185-1.jpg" alt="054 กิตกิจจปัจจัย"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/186.jpg" alt="054 กิตกิจจปัจจัย"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/187.jpg" alt="054 กิตกิจจปัจจัย"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/188.jpg" alt="054 กิตกิจจปัจจัย"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/189.jpg" alt="054 กิตกิจจปัจจัย"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/190.jpg" alt="054 กิตกิจจปัจจัย"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726969089&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 54 -->
+    <div class="slide" id="slide-54" data-name="055 ตูนาทิ ปัจจัย">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-54">
+                <div class="img-wrapper"><img src="paluviyakon/image/190-1.jpg" alt="055 ตูนาทิ ปัจจัย"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/191.jpg" alt="055 ตูนาทิ ปัจจัย"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/192.jpg" alt="055 ตูนาทิ ปัจจัย"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/193.jpg" alt="055 ตูนาทิ ปัจจัย"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/194.jpg" alt="055 ตูนาทิ ปัจจัย"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/195.jpg" alt="055 ตูนาทิ ปัจจัย"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/196.jpg" alt="055 ตูนาทิ ปัจจัย"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726969086&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 55 -->
+    <div class="slide" id="slide-55" data-name="056 สมาส">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-55">
+                <div class="img-wrapper"><img src="paluviyakon/image/195.jpg" alt="056 สมาส"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/196.jpg" alt="056 สมาส"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726969080&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 56 -->
+    <div class="slide" id="slide-56" data-name="057 กัมมธารยสมาส">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-56">
+                <div class="img-wrapper"><img src="paluviyakon/image/197.jpg" alt="057 กัมมธารยสมาส"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/198.jpg" alt="057 กัมมธารยสมาส"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/199.jpg" alt="057 กัมมธารยสมาส"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/200.jpg" alt="057 กัมมธารยสมาส"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/201.jpg" alt="057 กัมมธารยสมาส"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/202.jpg" alt="057 กัมมธารยสมาส"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/203.jpg" alt="057 กัมมธารยสมาส"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726969077&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 57 -->
+    <div class="slide" id="slide-57" data-name="058 ทิคุสมาส">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-57">
+                <div class="img-wrapper"><img src="paluviyakon/image/204.jpg" alt="058 ทิคุสมาส"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726969071&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 58 -->
+    <div class="slide" id="slide-58" data-name="059 ตัปปุริสสมาส">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-58">
+                <div class="img-wrapper"><img src="paluviyakon/image/205.jpg" alt="059 ตัปปุริสสมาส"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/206.jpg" alt="059 ตัปปุริสสมาส"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/207.jpg" alt="059 ตัปปุริสสมาส"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/208.jpg" alt="059 ตัปปุริสสมาส"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/209.jpg" alt="059 ตัปปุริสสมาส"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726969065&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 59 -->
+    <div class="slide" id="slide-59" data-name="060 ทวันทวสมาส">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-59">
+                <div class="img-wrapper"><img src="paluviyakon/image/210.jpg" alt="060 ทวันทวสมาส"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/211.jpg" alt="060 ทวันทวสมาส"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/212.jpg" alt="060 ทวันทวสมาส"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726969047&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 60 -->
+    <div class="slide" id="slide-60" data-name="061 อัพยยีภาวสมาส">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-60">
+                <div class="img-wrapper"><img src="paluviyakon/image/213.jpg" alt="061 อัพยยีภาวสมาส"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/214.jpg" alt="061 อัพยยีภาวสมาส"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/215.jpg" alt="061 อัพยยีภาวสมาส"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726969038&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 61 -->
+    <div class="slide" id="slide-61" data-name="062 พหุพพิหิสมาส 6 ตามวิภัตติ">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-61">
+                <div class="img-wrapper"><img src="paluviyakon/image/216.jpg" alt="062 พหุพพิหิสมาส"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/217.jpg" alt="062 พหุพพิหิสมาส"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/218.jpg" alt="062 พหุพพิหิสมาส"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/219.jpg" alt="062 พหุพพิหิสมาส"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/220.jpg" alt="062 พหุพพิหิสมาส"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/221.jpg" alt="062 พหุพพิหิสมาส"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/222.jpg" alt="062 พหุพพิหิสมาส"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/223.jpg" alt="062 พหุพพิหิสมาส"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/224.jpg" alt="062 พหุพพิหิสมาส"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/225.jpg" alt="062 พหุพพิหิสมาส"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726969032&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 62 -->
+    <div class="slide" id="slide-62" data-name="063 พหุพพิหิสมาส 5 ตามลักษณะ">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-62">
+                <div class="img-wrapper"><img src="paluviyakon/image/226.jpg" alt="063 พหุพพิหิสมาส"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/227.jpg" alt="063 พหุพพิหิสมาส"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726969026&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 63 -->
+    <div class="slide" id="slide-63" data-name="064 สมาสท้อง">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-63">
+                <div class="img-wrapper"><img src="paluviyakon/image/227-1.jpg" alt="064 สมาสท้อง"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/228.jpg" alt="064 สมาสท้อง"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/229.jpg" alt="064 สมาสท้อง"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/230.jpg" alt="064 สมาสท้อง"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726969014&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 64 -->
+    <div class="slide" id="slide-64" data-name="065 ตัทธิต">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-64">
+                <div class="img-wrapper"><img src="paluviyakon/image/231.jpg" alt="065 ตัทธิต"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/232.jpg" alt="065 ตัทธิต"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726969002&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 65 -->
+    <div class="slide" id="slide-65" data-name="066 โคตตตัทธิต">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-65">
+                <div class="img-wrapper"><img src="paluviyakon/image/233.jpg" alt="066 โคตตตัทธิต"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/234.jpg" alt="066 โคตตตัทธิต"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/235.jpg" alt="066 โคตตตัทธิต"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/236.jpg" alt="066 โคตตตัทธิต"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726968996&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 66 -->
+    <div class="slide" id="slide-66" data-name="067 ตรัตยาทิตัทธิต">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-66">
+                <div class="img-wrapper"><img src="paluviyakon/image/237.jpg" alt="067 ตรัตยาทิตัทธิต"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/238.jpg" alt="067 ตรัตยาทิตัทธิต"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/239.jpg" alt="067 ตรัตยาทิตัทธิต"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726968981&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 67 -->
+    <div class="slide" id="slide-67" data-name="068 ราคาทิตัทธิต">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-67">
+                <div class="img-wrapper"><img src="paluviyakon/image/239-1.jpg" alt="068 ราคาทิตัทธิต"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/240.jpg" alt="068 ราคาทิตัทธิต"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726968969&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 68 -->
+    <div class="slide" id="slide-68" data-name="069 ชาตาทิตัทธิต">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-68">
+                <div class="img-wrapper"><img src="paluviyakon/image/241.jpg" alt="069 ชาตาทิตัทธิต"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/242.jpg" alt="069 ชาตาทิตัทธิต"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/243.jpg" alt="069 ชาตาทิตัทธิต"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726968957&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 69 -->
+    <div class="slide" id="slide-69" data-name="070 สมุหตัทธิต">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-69">
+                <div class="img-wrapper"><img src="paluviyakon/image/243-1.jpg" alt="070 สมุหตัทธิต"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/244.jpg" alt="070 สมุหตัทธิต"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726968948&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 70 -->
+    <div class="slide" id="slide-70" data-name="071 ฐานตัทธิต">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-70">
+                <div class="img-wrapper"><img src="paluviyakon/image/245.jpg" alt="071 ฐานตัทธิต"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/246.jpg" alt="071 ฐานตัทธิต"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726968939&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 71 -->
+    <div class="slide" id="slide-71" data-name="072 พหุลตัทธิต">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-71">
+                <div class="img-wrapper"><img src="paluviyakon/image/247.jpg" alt="072 พหุลตัทธิต"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/248.jpg" alt="072 พหุลตัทธิต"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726968933&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 72 -->
+    <div class="slide" id="slide-72" data-name="073 เสฏฐตัทธิต">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-72">
+                <div class="img-wrapper"><img src="paluviyakon/image/248-1.jpg" alt="073 เสฏฐตัทธิต"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/249.jpg" alt="073 เสฏฐตัทธิต"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/250.jpg" alt="073 เสฏฐตัทธิต"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726968927&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 73 -->
+    <div class="slide" id="slide-73" data-name="074 ตทัสสัตถิตัทธิต">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-73">
+                <div class="img-wrapper"><img src="paluviyakon/image/250-1.jpg" alt="074 ตทัสสัตถิตัทธิต"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/251.jpg" alt="074 ตทัสสัตถิตัทธิต"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/252.jpg" alt="074 ตทัสสัตถิตัทธิต"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/253.jpg" alt="074 ตทัสสัตถิตัทธิต"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/254.jpg" alt="074 ตทัสสัตถิตัทธิต"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/255.jpg" alt="074 ตทัสสัตถิตัทธิต"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726968909&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 74 -->
+    <div class="slide" id="slide-74" data-name="075 ปกติตัทธิต">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-74">
+                <div class="img-wrapper"><img src="paluviyakon/image/255-1.jpg" alt="075 ปกติตัทธิต"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/256.jpg" alt="075 ปกติตัทธิต"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726968906&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 75 -->
+    <div class="slide" id="slide-75" data-name="076 ปูรณตัทธิต">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-75">
+                <div class="img-wrapper"><img src="paluviyakon/image/257.jpg" alt="076 ปูรณตัทธิต"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/258.jpg" alt="076 ปูรณตัทธิต"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/259.jpg" alt="076 ปูรณตัทธิต"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726968897&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 76 -->
+    <div class="slide" id="slide-76" data-name="077 สังขยาตัทธิต">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-76">
+                <div class="img-wrapper"><img src="paluviyakon/image/259-1.jpg" alt="077 สังขยาตัทธิต"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726968891&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 77 -->
+    <div class="slide" id="slide-77" data-name="078 วิภาคตัทธิต">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-77">
+                <div class="img-wrapper"><img src="paluviyakon/image/260.jpg" alt="078 วิภาคตัทธิต"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726968885&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 78 -->
+    <div class="slide" id="slide-78" data-name="079 ภาวตัทธิต">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-78">
+                <div class="img-wrapper"><img src="paluviyakon/image/261.jpg" alt="079 ภาวตัทธิต"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/262.jpg" alt="079 ภาวตัทธิต"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/263.jpg" alt="079 ภาวตัทธิต"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/264.jpg" alt="079 ภาวตัทธิต"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/265.jpg" alt="079 ภาวตัทธิต"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726968873&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 79 -->
+    <div class="slide" id="slide-79" data-name="080 อัพยยตัทธิ">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-79">
+                <div class="img-wrapper"><img src="paluviyakon/image/266.jpg" alt="080 อัพยยตัทธิ"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726968867&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 80 -->
+    <div class="slide" id="slide-80" data-name="081 ตัทธิตนอกแบบ">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-80">
+                <div class="img-wrapper"><img src="paluviyakon/image/267.jpg" alt="081 ตัทธิตนอกแบบ"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/268.jpg" alt="081 ตัทธิตนอกแบบ"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726968864&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 81 -->
+    <div class="slide" id="slide-81" data-name="082 สมัญญาภิธาน">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-81">
+                <div class="img-wrapper"><img src="paluviyakon/image/269.jpg" alt="082 สมัญญาภิธาน"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/270.jpg" alt="082 สมัญญาภิธาน"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/271.jpg" alt="082 สมัญญาภิธาน"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726968858&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 82 -->
+    <div class="slide" id="slide-82" data-name="083 สระ">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-82">
+                <div class="img-wrapper"><img src="paluviyakon/image/271-1.jpg" alt="083 สระ"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/272.jpg" alt="083 สระ"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/273.jpg" alt="083 สระ"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726968849&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 83 -->
+    <div class="slide" id="slide-83" data-name="084 พยัญชนะ">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-83">
+                <div class="img-wrapper"><img src="paluviyakon/image/273-1.jpg" alt="084 พยัญชนะ"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/274.jpg" alt="084 พยัญชนะ"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/275.jpg" alt="084 พยัญชนะ"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726968846&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 84 -->
+    <div class="slide" id="slide-84" data-name="085 ฐานกรณ์ของอักขระ">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-84">
+                <div class="img-wrapper"><img src="paluviyakon/image/275-1.jpg" alt="085 ฐานกรณ์"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/276.jpg" alt="085 ฐานกรณ์"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/277.jpg" alt="085 ฐานกรณ์"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/278.jpg" alt="085 ฐานกรณ์"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726968837&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 85 -->
+    <div class="slide" id="slide-85" data-name="086 เสียงของอักขระ">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-85">
+                <div class="img-wrapper"><img src="paluviyakon/image/278-1.jpg" alt="086 เสียงของอักขระ"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/279.jpg" alt="086 เสียงของอักขระ"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/280.jpg" alt="086 เสียงของอักขระ"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/281.jpg" alt="086 เสียงของอักขระ"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726968822&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 86 -->
+    <div class="slide" id="slide-86" data-name="087 พยัญชนะสังโยค">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-86">
+                <div class="img-wrapper"><img src="paluviyakon/image/281-1.jpg" alt="087 พยัญชนะสังโยค"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/282.jpg" alt="087 พยัญชนะสังโยค"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726968816&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 87 -->
+    <div class="slide" id="slide-87" data-name="088 อัฑฒสระ">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-87">
+                <div class="img-wrapper"><img src="paluviyakon/image/283.jpg" alt="088 อัฑฒสระ"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726968813&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 88 -->
+    <div class="slide" id="slide-88" data-name="089 ลำดับสระ">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-88">
+                <div class="img-wrapper"><img src="paluviyakon/image/283-1.jpg" alt="089 ลำดับสระ"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/284.jpg" alt="089 ลำดับสระ"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/285.jpg" alt="089 ลำดับสระ"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726968807&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 89 -->
+    <div class="slide" id="slide-89" data-name="090 ลำดับการเรียงอักขระ">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-89">
+                <div class="img-wrapper"><img src="paluviyakon/image/285-1.jpg" alt="090 ลำดับการเรียง"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726968801&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 90 -->
+    <div class="slide" id="slide-90" data-name="091 สนธิ">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-90">
+                <div class="img-wrapper"><img src="paluviyakon/image/287.jpg" alt="091 สนธิ"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/288.jpg" alt="091 สนธิ"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726968789&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 91 -->
+    <div class="slide" id="slide-91" data-name="092 สระสนธิ">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-91">
+                <div class="img-wrapper"><img src="paluviyakon/image/289.jpg" alt="092 สระสนธิ"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/290.jpg" alt="092 สระสนธิ"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/291.jpg" alt="092 สระสนธิ"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/292.jpg" alt="092 สระสนธิ"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/293.jpg" alt="092 สระสนธิ"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/294.jpg" alt="092 สระสนธิ"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/295.jpg" alt="092 สระสนธิ"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/296.jpg" alt="092 สระสนธิ"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726968786&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 92 -->
+    <div class="slide" id="slide-92" data-name="093 พยัญชนะสนธิ">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-92">
+                <div class="img-wrapper"><img src="paluviyakon/image/296-1.jpg" alt="093 พยัญชนะสนธิ"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/297.jpg" alt="093 พยัญชนะสนธิ"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/298.jpg" alt="093 พยัญชนะสนธิ"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/299.jpg" alt="093 พยัญชนะสนธิ"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/300.jpg" alt="093 พยัญชนะสนธิ"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726968768&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 93 -->
+    <div class="slide" id="slide-93" data-name="094 นิคคหิตสนธิ">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-93">
+                <div class="img-wrapper"><img src="paluviyakon/image/301.jpg" alt="094 นิคคหิตสนธิ"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/302.jpg" alt="094 นิคคหิตสนธิ"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/303.jpg" alt="094 นิคคหิตสนธิ"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/304.jpg" alt="094 นิคคหิตสนธิ"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726968762&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 94 -->
+    <div class="slide" id="slide-94" data-name="หลักสัมพันธ์">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-94">
+                <div class="img-wrapper"><img src="paluviyakon/image/305.jpg" alt="หลักสัมพันธ์"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/306.jpg" alt="หลักสัมพันธ์"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/307.jpg" alt="หลักสัมพันธ์"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/308.jpg" alt="หลักสัมพันธ์"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/309.jpg" alt="หลักสัมพันธ์"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/310.jpg" alt="หลักสัมพันธ์"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/311.jpg" alt="หลักสัมพันธ์"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/312.jpg" alt="หลักสัมพันธ์"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/313.jpg" alt="หลักสัมพันธ์"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/314.jpg" alt="หลักสัมพันธ์"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/315.jpg" alt="หลักสัมพันธ์"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/316.jpg" alt="หลักสัมพันธ์"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/317.jpg" alt="หลักสัมพันธ์"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/318.jpg" alt="หลักสัมพันธ์"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/319.jpg" alt="หลักสัมพันธ์"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/320.jpg" alt="หลักสัมพันธ์"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/321.jpg" alt="หลักสัมพันธ์"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/322.jpg" alt="หลักสัมพันธ์"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/323.jpg" alt="หลักสัมพันธ์"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/324.jpg" alt="หลักสัมพันธ์"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/325.jpg" alt="หลักสัมพันธ์"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/326.jpg" alt="หลักสัมพันธ์"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/327.jpg" alt="หลักสัมพันธ์"></div>
             </div>
         </div>
-        <div class="flex gap-2">
-          <button id="new-chat-btn" class="bg-amber-700 hover:bg-amber-900 text-xs px-3 py-1.5 rounded-lg border border-amber-600 transition">เริ่มใหม่</button>
-          <button id="chatbot-close-btn" class="bg-gray-800 text-xs px-3 py-1.5 rounded-lg">ปิด</button>
-        </div>
-      </header>
+    </div>
 
-      <main id="chat-history" class="flex-1 overflow-y-auto p-4 space-y-4 bg-orange-50/30">
-        <div class="flex items-start space-x-2">
-          <span class="text-2xl">🤖</span>
-          <div class="chat-bubble chat-bubble-model bg-white text-gray-800 p-3 rounded-lg max-w-[80%] relative border border-gray-200 shadow-sm">
-            <p>เจริญพร... มีเรื่องบาลีไวยากรณ์ส่วนไหนที่โยมสงสัย? สอบถามอาตมาได้เลย</p>
+    <!-- Slide 95 -->
+    <div class="slide" id="slide-95" data-name="หลักการแปล">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-95">
+                <div class="img-wrapper"><img src="paluviyakon/image/356.png" alt="หลักการแปล"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726968738&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 96 -->
+    <div class="slide" id="slide-96" data-name="กลอนช่วยจำ">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-96">
+                <div class="img-wrapper"><img src="paluviyakon/image/328.jpg" alt="กลอนช่วยจำ"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/329.jpg" alt="กลอนช่วยจำ"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/330.jpg" alt="กลอนช่วยจำ"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/331.jpg" alt="กลอนช่วยจำ"></div>
+            </div>
+            <button class="sc-play" data-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1726968759&color=%2300bfff&auto_play=true">▶ เล่นเสียง</button>
+        </div>
+    </div>
+
+    <!-- Slide 97 -->
+    <div class="slide" id="slide-97" data-name="กาฬจำนวนธาตุ">
+        <div class="slide-content">
+            <div class="img-container" id="img-cont-97">
+                <div class="img-wrapper"><img src="paluviyakon/image/332.jpg" alt="กาฬจำนวนธาตุ"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/333.jpg" alt="กาฬจำนวนธาตุ"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/334.jpg" alt="กาฬจำนวนธาตุ"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/335.jpg" alt="กาฬจำนวนธาตุ"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/336.jpg" alt="กาฬจำนวนธาตุ"></div>
+                <div class="img-wrapper"><img src="paluviyakon/image/337.jpg" alt="กาฬจำนวนธาตุ"></div>
+            </div>
+        </div>
+    </div>
+
+  </div>
+
+  <!-- Bottom Control Dock for Ebook Reader -->
+  <div class="bottom-dock">
+    <button class="dock-nav-btn" onclick="prevSlide()">◀</button>
+    <div class="page-select-wrapper">
+      <select id="pageSelect" onchange="goSlide(this.value)"></select>
+    </div>
+    <button class="dock-nav-btn" onclick="nextSlide()">▶</button>
+  </div>
+</div>
+
+<!-- ===== PAGE 3: เสียงบาลีไวยากรณ์ (AUDIO PLAYER) ===== -->
+<div id="page-audio" class="wrap hidden">
+  <div class="title">เสียงบาลีไวยากรณ์</div>
+  <p class="sub">ฟังเสียงอ่านบทเรียนภาษาบาลีไวยากรณ์</p>
+
+  <!-- Main Player Display Box -->
+  <div class="bg-gradient-to-b from-amber-900 to-amber-950 text-white rounded-3xl p-5 shadow-xl mb-6 relative overflow-hidden">
+    <div class="flex flex-col md:flex-row gap-5 items-center">
+      <div class="w-28 h-28 md:w-36 md:h-36 bg-amber-800/80 rounded-2xl flex items-center justify-center border-2 border-amber-500/30 shadow-inner shrink-0">
+        <span class="text-5xl select-none">☸️</span>
+      </div>
+
+      <div class="flex-1 w-full text-center md:text-left">
+        <span class="inline-block px-3 py-1 bg-amber-500/20 text-amber-300 text-xs font-semibold rounded-full mb-2">
+          กำลังเล่นเสียงบาลีไวยากรณ์
+        </span>
+        <h3 id="player-title" class="text-lg md:text-2xl font-bold text-amber-100 truncate">
+          กรุณาเลือกบทเรียน
+        </h3>
+        <p id="player-subtitle" class="text-xs md:text-sm text-amber-300/80 mt-1 mb-3 truncate">
+          กดเลือกรายการจากด้านล่าง
+        </p>
+
+        <!-- Timeline & Progress -->
+        <div class="space-y-1 mb-3">
+          <input type="range" id="main-progress" min="0" max="100" value="0" step="0.1" oninput="seekAudio(this.value)">
+          <div class="flex justify-between text-xs text-amber-300/70">
+            <span id="current-time">00:00</span>
+            <span id="total-duration">00:00</span>
           </div>
         </div>
-      </main>
 
-      <div id="thinking-indicator" class="p-4 hidden bg-orange-50/30">
-        <div class="flex items-center space-x-2">
-          <span class="text-2xl">🤖</span>
-          <div class="chat-bubble bg-white p-3 rounded-lg w-28 border border-gray-200 shadow-sm">
-            <div class="gemini-thinking-bar"></div>
+        <!-- Controls -->
+        <div class="flex items-center justify-center md:justify-start gap-3">
+          <button id="btn-speed" onclick="togglePlaybackSpeed()" class="text-xs font-bold bg-amber-800/80 hover:bg-amber-700 text-amber-200 px-2.5 py-1.5 rounded-xl border border-amber-600/40">
+            1.0x
+          </button>
+
+          <button onclick="playPrevAudio()" class="text-amber-200 hover:text-white p-1.5 transition">
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
+          </button>
+
+          <button id="btn-main-play" onclick="togglePlayPause()" class="w-12 h-12 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 text-slate-950 rounded-full flex items-center justify-center shadow-lg transition active:scale-95">
+            <svg id="main-play-icon" class="w-7 h-7 fill-current ml-0.5" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+          </button>
+
+          <button onclick="playNextAudio()" class="text-amber-200 hover:text-white p-1.5 transition">
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+          </button>
+
+          <button id="btn-loop" onclick="toggleLoop()" class="text-amber-400/50 hover:text-amber-300 p-1.5 transition" title="วนซ้ำ">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Background Audio Toggle -->
+    <div class="mt-4 pt-3 border-t border-amber-800/60 flex items-center justify-between text-xs text-amber-200/90">
+      <label class="flex items-center gap-2 cursor-pointer select-none">
+        <input type="checkbox" id="bg-play-toggle" class="w-4 h-4 accent-amber-500 rounded cursor-pointer" onchange="toggleBackgroundPlay(this.checked)" checked>
+        <span>อนุญาตให้เล่นเสียงเบื้องหลัง</span>
+      </label>
+      <span class="text-[11px] opacity-75">เล่นต่อเนื่องอัตโนมัติ</span>
+    </div>
+  </div>
+
+  <div class="flex items-center justify-between mb-3 px-1">
+    <h3 class="font-bold text-gray-800 text-base">รายการเสียงบาลีไวยากรณ์ทั้งหมด</h3>
+    <span class="text-xs text-amber-800 bg-amber-100 font-semibold px-2.5 py-1 rounded-full" id="playlist-count">97 รายการ</span>
+  </div>
+
+  <div id="playlist-container" class="space-y-2 mb-8"></div>
+</div>
+
+<!-- ===== GLOBAL MODALS & FABs ===== -->
+
+<!-- CROP MODAL FOR IMAGE EDITING -->
+<div class="crop-modal" id="cropModal">
+    <div class="crop-container">
+        <canvas id="cropCanvas"></canvas>
+    </div>
+    <div class="crop-controls">
+        <button class="control-btn" style="background:#00bfff; color:#fff;" onclick="applyCrop()">ตกลง (Crop)</button>
+        <button class="control-btn" onclick="closeCrop()">ยกเลิก</button>
+    </div>
+</div>
+
+<!-- AI Chatbot Modal -->
+<div id="chatbot-modal" class="chatbot-hidden">
+  <div class="flex flex-col h-screen bg-gray-100">
+    <header class="bg-amber-800 text-white p-3.5 flex justify-between items-center shadow-lg">
+      <div class="flex items-center gap-2">
+          <span class="text-2xl">☸️</span>
+          <div>
+              <h1 class="text-base font-bold">AI บาลีไวยากรณ์</h1>
+              <p class="text-[10px] opacity-80">ผู้ช่วยส่วนตัวด้านภาษาบาลี</p>
           </div>
+      </div>
+      <div class="flex gap-2">
+        <button id="new-chat-btn" class="bg-amber-700 hover:bg-amber-900 text-xs px-3 py-1.5 rounded-lg border border-amber-600 transition">เริ่มใหม่</button>
+        <button id="chatbot-close-btn" class="bg-gray-800 text-xs px-3 py-1.5 rounded-lg">ปิด</button>
+      </div>
+    </header>
+
+    <main id="chat-history" class="flex-1 overflow-y-auto p-4 space-y-3 bg-orange-50/30">
+      <div class="flex items-start space-x-2">
+        <span class="text-2xl">🤖</span>
+        <div class="chat-bubble chat-bubble-model bg-white text-gray-800 p-3 rounded-lg max-w-[85%] relative border border-gray-200 shadow-sm text-sm">
+          <p>เจริญพร... มีเรื่องบาลีไวยากรณ์ส่วนไหนที่โยมสงสัย? สอบถามอาตมาได้เลย</p>
         </div>
       </div>
+    </main>
 
-      <footer class="bg-white p-4 border-t">
-        <div class="flex space-x-2">
-          <input id="user-input" type="text" placeholder="ถามเรื่องศัพท์, วิภัตติ, หรือสมาส..." class="flex-1 p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-amber-600 outline-none font-sans text-sm">
-          <button id="send-btn" class="bg-amber-800 hover:bg-amber-900 text-white px-5 py-2 rounded-xl font-bold transition">ส่ง</button>
+    <div id="thinking-indicator" class="p-3 hidden bg-orange-50/30">
+      <div class="flex items-center space-x-2">
+        <span class="text-2xl">🤖</span>
+        <div class="chat-bubble bg-white p-3 rounded-lg w-28 border border-gray-200 shadow-sm">
+          <div class="gemini-thinking-bar"></div>
         </div>
-      </footer>
+      </div>
     </div>
+
+    <footer class="bg-white p-3 border-t">
+      <div class="flex space-x-2">
+        <input id="user-input" type="text" placeholder="ถามเรื่องศัพท์, วิภัตติ, หรือสมาส..." class="flex-1 p-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-amber-600 outline-none font-sans text-sm">
+        <button id="send-btn" class="bg-amber-800 hover:bg-amber-900 text-white px-4 py-2 rounded-xl font-bold transition text-sm">ส่ง</button>
+      </div>
+    </footer>
   </div>
+</div>
 
-  <!-- Check-in FAB -->
-  <button id="fab-checkin" title="เช็คชื่อรายวัน" onclick="handleDailyCheckIn()">
-    📅
-    <span id="checkin-badge" class="hidden">0</span>
-  </button>
-  
-  <!-- AI FAB -->
-  <button id="fab-chat-toggle" title="ถาม AI">AI</button>
+<!-- Check-in FAB -->
+<button id="fab-checkin" title="เช็คชื่อรายวัน" onclick="handleDailyCheckIn()">
+  📅
+  <span id="checkin-badge" class="hidden">0</span>
+</button>
 
-  <!-- Toast Notification -->
-  <div id="toast"></div>
+<!-- AI FAB -->
+<button id="fab-chat-toggle" title="ถาม AI">AI</button>
 
-  <!-- Reward Modal (100 days streak) -->
-  <div id="reward-modal">
-    <div class="reward-box">
-        <span class="text-5xl block mb-2">🎉👑</span>
-        <h2 class="text-2xl font-bold text-amber-700 mb-1">ยินดีด้วย!</h2>
-        <p class="text-gray-600 text-sm mb-4">คุณเช็คชื่อสะสมครบ 100 วันแล้ว!</p>
-        <p class="text-xs text-gray-500">รหัสส่วนลด/ปลดล็อกพิเศษ:</p>
-        <div class="code-box">no-ads-2025</div>
-        <p class="text-[11px] text-gray-400 mb-6">บันทึกหรือแคปหน้าจอนี้เก็บไว้เป็นหลักฐาน</p>
-        <button onclick="closeRewardModal()" class="bg-amber-600 hover:bg-amber-700 text-white font-bold py-2.5 px-6 rounded-full transition w-full shadow-md text-sm">ปิดหน้าต่าง</button>
-    </div>
+<!-- Toast Notification -->
+<div id="toast"></div>
+
+<!-- Reward Modal (100 days streak) -->
+<div id="reward-modal">
+  <div class="reward-box">
+      <span class="text-5xl block mb-2">🎉👑</span>
+      <h2 class="text-xl font-bold text-amber-700 mb-1">ยินดีด้วย!</h2>
+      <p class="text-gray-600 text-xs mb-3">คุณเช็คชื่อสะสมครบ 100 วันแล้ว!</p>
+      <p class="text-xs text-gray-500">รหัสส่วนลด/ปลดล็อกพิเศษ:</p>
+      <div class="code-box">no-ads-2025</div>
+      <p class="text-[11px] text-gray-400 mb-5">บันทึกหรือแคปหน้าจอนี้เก็บไว้เป็นหลักฐาน</p>
+      <button onclick="closeRewardModal()" class="bg-amber-600 hover:bg-amber-700 text-white font-bold py-2 px-5 rounded-full transition w-full shadow-md text-sm">ปิดหน้าต่าง</button>
   </div>
+</div>
 
-  <!-- ===== BOTTOM NAVIGATION & MINI PLAYER ===== -->
-  <div class="bottom-bar-wrap">
-    <!-- Mini Player Bar (Appears when audio played) -->
-    <div id="mini-player" class="hidden border-b border-gray-100 bg-gradient-to-r from-amber-50 to-orange-50 px-4 py-2 flex items-center justify-between cursor-pointer" onclick="switchTab('audio')">
-      <div class="flex items-center gap-3 min-w-0 flex-1">
-        <div class="w-9 h-9 bg-amber-700 text-white rounded-lg flex items-center justify-center text-sm shrink-0 shadow-sm">
-          ☸️
-        </div>
-        <div class="min-w-0 flex-1">
-          <p id="mini-title" class="text-xs font-bold text-gray-800 truncate">ชื่อบทเรียน</p>
-          <p id="mini-subtitle" class="text-[10px] text-gray-500 truncate">คำอธิบายสั้น</p>
-        </div>
+<!-- ===== BOTTOM NAVIGATION BAR ===== -->
+<div class="bottom-bar-wrap">
+  <!-- Mini Player Bar -->
+  <div id="mini-player" class="hidden border-b border-gray-100 bg-gradient-to-r from-amber-50 to-orange-50 px-3.5 py-1.5 flex items-center justify-between cursor-pointer" onclick="switchTab('audio')">
+    <div class="flex items-center gap-2.5 min-w-0 flex-1">
+      <div class="w-8 h-8 bg-amber-700 text-white rounded-lg flex items-center justify-center text-xs shrink-0 shadow-sm">
+        ☸️
       </div>
-
-      <!-- Mini Play Controls -->
-      <div class="flex items-center gap-2 shrink-0 ml-2" onclick="event.stopPropagation()">
-        <button onclick="togglePlayPause()" class="w-8 h-8 bg-amber-800 text-white rounded-full flex items-center justify-center shadow">
-          <svg id="mini-play-icon" class="w-4 h-4 fill-current ml-0.5" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-        </button>
-        <button onclick="playNextAudio()" class="text-gray-600 hover:text-amber-800 p-1">
-          <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
-        </button>
+      <div class="min-w-0 flex-1">
+        <p id="mini-title" class="text-xs font-bold text-gray-800 truncate">ชื่อบทเรียน</p>
+        <p id="mini-subtitle" class="text-[10px] text-gray-500 truncate">คำอธิบายสั้น</p>
       </div>
     </div>
 
-    <!-- Tab Buttons Navigation Bar -->
-    <div class="flex justify-around items-center h-14 max-w-lg mx-auto">
-      <button id="nav-book" class="nav-item active" onclick="switchTab('book')">
-        <svg viewBox="0 0 24 24"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>
-        <span>หนังสือ</span>
+    <div class="flex items-center gap-1.5 shrink-0 ml-2" onclick="event.stopPropagation()">
+      <button onclick="togglePlayPause()" class="w-7 h-7 bg-amber-800 text-white rounded-full flex items-center justify-center shadow">
+        <svg id="mini-play-icon" class="w-3.5 h-3.5 fill-current ml-0.5" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
       </button>
-
-      <button id="nav-audio" class="nav-item" onclick="switchTab('audio')">
-        <svg viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
-        <span>เสียงบาลีไวยากรณ์</span>
+      <button onclick="playNextAudio()" class="text-gray-600 hover:text-amber-800 p-1">
+        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
       </button>
     </div>
   </div>
 
+  <!-- Bottom Navigation Buttons -->
+  <div class="flex justify-around items-center h-14 max-w-lg mx-auto">
+    <button id="nav-index" class="nav-item active" onclick="switchTab('index')">
+      <svg viewBox="0 0 24 24"><path d="M12 3L2 12h3v8h6v-6h2v6h6v-8h3L12 3z"/></svg>
+      <span>สารบัญ</span>
+    </button>
+
+    <button id="nav-reader" class="nav-item" onclick="switchTab('reader')">
+      <svg viewBox="0 0 24 24"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>
+      <span>อ่านหนังสือ</span>
+    </button>
+
+    <button id="nav-audio" class="nav-item" onclick="switchTab('audio')">
+      <svg viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+      <span>ฟังเสียง</span>
+    </button>
+  </div>
+</div>
+
+<!-- ===== APPLICATION JAVASCRIPT ===== -->
 <script>
+/* ================= GLOBAL STATE ================= */
+let currentZoom = 1.0;
+let totalSlides = 1;
+let currentSlideIndexForImg = 0;
+let slider = null;
 
-// --- 1. Audio Player State & Data ---
+let cropCanvas = null;
+let ctx = null;
+let currentCropImg = null;
+let modal = null;
+let startX, startY, isDragging = false;
+let rect = {x:0, y:0, w:0, h:0};
+let imgObj = new Image();
+
 const chantingPlaylist = [
-  
-
-{
-    id: "001",
-    title: "001 บทนำ",
-    subtitle: "เกริ่นนำเบื้องต้นเกี่ยวกับบาลีไวยากรณ์",
-    duration: "03:06",
-    url: "audio/1.m4a"
-  },
-  {
-    id: "002",
-    title: "002 นาม",
-    subtitle: "ความหมายและการจำแนกคำนามในภาษาบาลี",
-    duration: "07:22",
-    url: "audio/2.m4a"
-  },
-  {
-    id: "003",
-    title: "003 ลิงค์",
-    subtitle: "เพศของคำนาม (ปุลิงค์ อิตถีลิงค์ นปุสกลิงค์)",
-    duration: "16:08",
-    url: "audio/3.m4a"
-  },
-  {
-    id: "004",
-    title: "004 วจนะ",
-    subtitle: "พจน์หรือจำนวน (เอกวจนะ พหุวจนะ)",
-    duration: "01:38",
-    url: "audio/4.m4a"
-  },
-  {
-    id: "005",
-    title: "005 วิภัตติ",
-    subtitle: "การจำแนกคำนามเพื่อแสดงหน้าที่ในประโยค",
-    duration: "03:14",
-    url: "audio/5.m4a"
-  },
-  {
-    id: "006",
-    title: "006 อายตนิบาต",
-    subtitle: "คำแปลอรรถวิภัตติหรือหน้าที่ของนามวิภัตติ",
-    duration: "01:59",
-    url: "audio/6.m4a"
-  },
-  {
-    id: "007",
-    title: "007 การันต์",
-    subtitle: "สระที่สุดแห่งสัญลักษณ์นาม",
-    duration: "01:25",
-    url: "audio/7.m4a"
-  },
-  {
-    id: "008",
-    title: "008 แจกปุลิงค์",
-    subtitle: "การแจกวิภัตตินามสำหรับเพศชาย",
-    duration: "12:10",
-    url: "audio/8.m4a"
-  },
-  {
-    id: "009",
-    title: "009 แจกอิตถีลิงค์",
-    subtitle: "การแจกวิภัตตินามสำหรับเพศหญิง",
-    duration: "12:35",
-    url: "audio/9.m4a"
-  },
-  {
-    id: "010",
-    title: "010 แจกนปุสกลิงค์",
-    subtitle: "การแจกวิภัตตินามสำหรับเพศกลาง",
-    duration: "07:09",
-    url: "audio/10.m4a"
-  },
-  {
-    id: "011",
-    title: "011 กติปยศัพท์",
-    subtitle: "ศัพท์พิเศษที่มีการแจกวิภัตติเฉพาะตัว",
-    duration: "24:24",
-    url: "audio/11.m4a"
-  },
-  {
-    id: "012",
-    title: "012 มโนคณศัพท์",
-    subtitle: "กลุ่มศัพท์ 12 ตัวที่แจกวิภัตติเหมือน มนัส",
-    duration: "17:03",
-    url: "audio/12.m4a"
-  },
-  {
-    id: "013",
-    title: "013 สังขยา",
-    subtitle: "เรื่องของตัวเลขและการนับในภาษาบาลี",
-    duration: "02:46",
-    url: "audio/13.m4a"
-  },
-  {
-    id: "014",
-    title: "014 วิธีนับสังขยา",
-    subtitle: "วิธีการจัดกลุ่มและการนับจำนวนตัวเลข",
-    duration: "09:04",
-    url: "audio/14.m4a"
-  },
-  {
-    id: "015",
-    title: "015 ปกติสังขยาเป็นนาม-ลิงค์",
-    subtitle: "ลิงค์และพจน์ของปกติสังขยา (1-อสงไขย)",
-    duration: "02:18",
-    url: "audio/15.m4a"
-  },
-  {
-    id: "016",
-    title: "016 แจกปกติสังขยา",
-    subtitle: "การแจกวิภัตติของตัวเลขปกติสังขยา",
-    duration: "09:07",
-    url: "audio/16.m4a"
-  },
-  {
-    id: "017",
-    title: "017 แจกปูรณสังขยา",
-    subtitle: "การแจกวิภัตติของเลขลำดับที่",
-    duration: "06:15",
-    url: "audio/17.m4a"
-  },
-  {
-    id: "018",
-    title: "018 สัพพนาม",
-    subtitle: "คำที่ใช้แทนคำนาม (ปุริสสัพพนาม วิเสสนสัพพนาม)",
-    duration: "03:28",
-    url: "audio/18.m4a"
-  },
-  {
-    id: "019",
-    title: "019 แจกปุริสสัพพนาม",
-    subtitle: "การแจกวิภัตติของบุรุษสรรพนาม (ต ย ตุมฺห อมฺห)",
-    duration: "06:20",
-    url: "audio/19.m4a"
-  },
-  {
-    id: "020",
-    title: "020 แจกอนิยมวิเสสนสัพพนาม",
-    subtitle: "สรรพนามเชื่อมโยง/ชี้เฉพาะแบบไม่แน่นอน",
-    duration: "10:33",
-    url: "audio/20.m4a"
-  },
-  {
-    id: "021",
-    title: "021 แจกนิยมวิเสสนสัพพนาม",
-    subtitle: "สรรพนามชี้เฉพาะแบบแน่นอน (ต เอต อิม อมุ)",
-    duration: "12:44",
-    url: "audio/21.m4a"
-  },
-  {
-    id: "022",
-    title: "022 อัพพยยศัพท์",
-    subtitle: "ศัพท์ที่ไม่เปลี่ยนแปลงรูปตามวิภัตติ ลิงค์ วจนะ",
-    duration: "03:39",
-    url: "audio/22.m4a"
-  },
-  {
-    id: "023",
-    title: "023 นิบาต",
-    subtitle: "คำสำหรับลงในระหว่างคำอื่น แสดงกาล สถานที่ ปฏิเสธ",
-    duration: "13:50",
-    url: "audio/23.m4a"
-  },
-  {
-    id: "024",
-    title: "024 ปัจจัยในอัพยยศัพท์",
-    subtitle: "ปัจจัยที่ใช้ประกอบท้ายธาตุ/ศัพท์เพื่อเป็นอัพยยศัพท์",
-    duration: "11:15",
-    url: "audio/24.m4a"
-  },
-  {
-    id: "025",
-    title: "025 อาขยาต วิภัตติ",
-    subtitle: "วิภัตติของคำกริยาแสดงกาล บท วจนะ บุรุษ",
-    duration: "07:37",
-    url: "audio/25.m4a"
-  },
-  {
-    id: "026",
-    title: "026 อาขยาต กาล",
-    subtitle: "กาลเวลาในการกริยา (ปัจจุบัน อดีต อนาคต)",
-    duration: "12:17",
-    url: "audio/26.m4a"
-  },
-  {
-    id: "027",
-    title: "027 อาขยาต บท",
-    subtitle: "บทของกริยา (ปรัสสบท อัตตโนบท)",
-    duration: "03:15",
-    url: "audio/27.m4a"
-  },
-  {
-    id: "028",
-    title: "028 อาขยาต วจนะ บุรุษ",
-    subtitle: "พจน์และบุรุษในตารางกริยาอาขยาต",
-    duration: "03:40",
-    url: "audio/28.m4a"
-  },
-  {
-    id: "029",
-    title: "029 ธาตุ หมวด ภูธาตุ",
-    subtitle: "หมวดธาตุตัวแทนกลุ่มที่ 1 มีเครื่องปรุงเฉพาะตัว",
-    duration: "03:17",
-    url: "audio/29.m4a"
-  },
-  {
-    id: "030",
-    title: "030 หมวด รุธฺ ธาตุ",
-    subtitle: "หมวดธาตุที่มีการลงนิคคหิตอาคมที่พยัญชนะต้นธาตุ",
-    duration: "01:25",
-    url: "audio/30.m4a"
-  },
-  {
-    id: "031",
-    title: "031 หมวด ทิวฺ ธาตุ",
-    subtitle: "หมวดธาตุที่มี ย ปัจจัย เป็นเครื่องปรุง",
-    duration: "02:17",
-    url: "audio/31.m4a"
-  },
-  {
-    id: "032",
-    title: "032 หมวด สุ ธาตุ",
-    subtitle: "หมวดธาตุที่มี นุ ณุ ณ ปัจจัย เป็นเครื่องปรุง",
-    duration: "00:46",
-    url: "audio/32.m4a"
-  },
-  {
-    id: "033",
-    title: "033 หมวด กี ธาตุ",
-    subtitle: "หมวดธาตุที่มี นา ปัจจัย เป็นเครื่องปรุง",
-    duration: "01:49",
-    url: "audio/33.m4a"
-  },
-  {
-    id: "034",
-    title: "034 หมวด คหฺ และ ตนฺ ธาตุ",
-    subtitle: "หมวดธาตุที่มี ปปฺป ณฺหา หรือ โอ ปัจจัย",
-    duration: "01:31",
-    url: "audio/34.m4a"
-  },
-  {
-    id: "035",
-    title: "035 หมวด จุรฺ ธาตุ",
-    subtitle: "หมวดธาตุที่มี เณ ณย ปัจจัย เป็นเครื่องปรุง",
-    duration: "01:39",
-    url: "audio/35.m4a"
-  },
-  {
-    id: "036",
-    title: "036 สกัมม+อกัมมธาตุ",
-    subtitle: "ธาตุที่เรียกหาบทกรรมและไม่เรียกหาบทกรรม",
-    duration: "01:18",
-    url: "audio/36.m4a"
-  },
-  {
-    id: "037",
-    title: "037 วาจก",
-    subtitle: "โครงสร้างประโยค 5 วาจก ในภาษาบาลี",
-    duration: "06:40",
-    url: "audio/37.m4a"
-  },
-  {
-    id: "038",
-    title: "038 ปัจจัย",
-    subtitle: "ตัวปรุงแต่งธาตุเพื่อบอกวาจก",
-    duration: "05:38",
-    url: "audio/38.m4a"
-  },
-  {
-    id: "039",
-    title: "039 ปัจจัยพิเศษ 5  ตัว",
-    subtitle: "ปัจจัยพิเศษสำหรับสร้างกริยาเฉพาะกลุ่ม (ข ส ห ร ณ)",
-    duration: "02:44",
-    url: "audio/39.m4a"
-  },
-  {
-    id: "040",
-    title: "040 คำอธิบายในในกัตตุวาจก",
-    subtitle: "โครงสร้างและหลักการของกัตตุวาจก (ประธานทำเอง)",
-    duration: "09:42",
-    url: "audio/40.m4a"
-  },
-  {
-    id: "041",
-    title: "041 คำอธิบายในกัมมวาจก",
-    subtitle: "โครงสร้างและหลักการของกัมมวาจก (ประธานถูกทำ)",
-    duration: "06:24",
-    url: "audio/41.m4a"
-  },
-  {
-    id: "042",
-    title: "042 กิตก์  นามกิตก์",
-    subtitle: "การแปลงคำกริยา (ธาตุ) ให้เป็นคำนาม",
-    duration: "02:04",
-    url: "audio/42.m4a"
-  },
-  {
-    id: "043",
-    title: "043 สาธนะ",
-    subtitle: "รูปวิเคราะห์เพื่อบอกความหมายนามกิตก์ 7 สาธนะ",
-    duration: "13:15",
-    url: "audio/43.m4a"
-  },
-  {
-    id: "044",
-    title: "044 ปัจจัยแห่งนามกิตก์",
-    subtitle: "ปัจจัย 3 กลุ่ม (กิต กิจจ กิตกิจจ) สำหรับทำนามกิตก์",
-    duration: "01:58",
-    url: "audio/44.m4a"
-  },
-  {
-    id: "045",
-    title: "045 วิเคราะห์ ในกิตปัจจัย",
-    subtitle: "การวิเคราะห์และตัวอย่างคำที่ลงกิตปัจจัย",
-    duration: "19:58",
-    url: "audio/45.m4a"
-  },
-  {
-    id: "046",
-    title: "046 วิเคราะห์ ในกิจจปัจจัย",
-    subtitle: "การวิเคราะห์และตัวอย่างคำที่ลงกิจจปัจจัย",
-    duration: "09:43",
-    url: "audio/46.m4a"
-  },
-  {
-    id: "047",
-    title: "047 วิเคราะห์ ในกิตกิจจปัจจัย",
-    subtitle: "การวิเคราะห์และตัวอย่างคำที่ลงกิตกิจจปัจจัย",
-    duration: "29:32",
-    url: "audio/47.m4a"
-  },
-  {
-    id: "048",
-    title: "048 กิริยากิตก์ วิภัตติและวาจก",
-    subtitle: "คำกริยาระหว่างประโยคที่แจกวิภัตติเหมือนนาม",
-    duration: "03:42",
-    url: "audio/48.m4a"
-  },
-  {
-    id: "049",
-    title: "049 กิริยากิตก์ กาล",
-    subtitle: "กาลเวลาในกิริยากิตก์ (ปัจจุบัน อดีต อนาคต)",
-    duration: "05:43",
-    url: "audio/49.m4a"
-  },
-  {
-    id: "050",
-    title: "050 กิริยากิตก์ วาจก",
-    subtitle: "วาจกที่ใช้ในกิริยากิตก์และปัจจัยเครื่องปรุง",
-    duration: "02:53",
-    url: "audio/50.m4a"
-  },
-  {
-    id: "051",
-    title: "051 ปัจจัยแห่งกิริยากิตก์",
-    subtitle: "ปัจจัยสำหรับสร้างคำกริยากิตก์",
-    duration: "02:58",
-    url: "audio/51.m4a"
-  },
-  {
-    id: "052",
-    title: "052 กิตปัจจัย",
-    subtitle: "ปัจจัยกิริยากิตก์กลุ่มกิต (อนฺต ตวนฺตุ ตาวี)",
-    duration: "04:01",
-    url: "audio/52.m4a"
-  },
-  {
-    id: "053",
-    title: "053 กิจจปัจจัย",
-    subtitle: "ปัจจัยกิริยากิตก์กลุ่มกิจจ (อนีย ตพฺพ)",
-    duration: "02:43",
-    url: "audio/53.m4a"
-  },
-  {
-    id: "054",
-    title: "054 กิตกิจจปัจจัย",
-    subtitle: "ปัจจัยกิริยากิตก์กลุ่มกิตกิจจ (มาน ต)",
-    duration: "13:58",
-    url: "audio/54.m4a"
-  },
-  {
-    id: "055",
-    title: "055 ตูนาทิ ปัจจัย",
-    subtitle: "ปัจจัยพิเศษในกิริยากิตก์ (ตูนาทิ ตฺวา ตฺวาน)",
-    duration: "07:28",
-    url: "audio/55.m4a"
-  },
-  {
-    id: "056",
-    title: "056 สมาส",
-    subtitle: "การย่อคำนามตั้งแต่ 2 ศัพท์ขึ้นไปเข้าเป็นศัพท์เดียวกัน",
-    duration: "04:16",
-    url: "audio/56.m4a"
-  },
-  {
-    id: "057",
-    title: "057 กัมมธารยสมาส",
-    subtitle: "สมาสที่มีบทหนึ่งเป็นคุณนามหรือวิเศษณ์ของอีกบท",
-    duration: "16:20",
-    url: "audio/57.m4a"
-  },
-  {
-    id: "058",
-    title: "058 ทิคุสมาส",
-    subtitle: "กัมมธารยสมาสที่มีตัวเลข (สังขยา) อยู่ข้างหน้า",
-    duration: "03:20",
-    url: "audio/58.m4a"
-  },
-  {
-    id: "059",
-    title: "059 ตัปปุริสสมาส",
-    subtitle: "สมาสที่เชื่อมด้วยวิภัตตินาม (ทุติยา ถึง สัตตมี)",
-    duration: "10:57",
-    url: "audio/59.m4a"
-  },
-  {
-    id: "060",
-    title: "060 ทวันทวสมาส",
-    subtitle: "สมาสที่รวมคำนามที่มีความสำคัญเท่ากันเข้าด้วยกัน",
-    duration: "06:40",
-    url: "audio/60.m4a"
-  },
-  {
-    id: "061",
-    title: "061 อัพยยีภาวสมาส",
-    subtitle: "สมาสที่มีอุปสัคหรือนิบาตอยู่ข้างหน้า",
-    duration: "07:17",
-    url: "audio/61.m4a"
-  },
-  {
-    id: "062",
-    title: "062 พหุพพิหิสมาส 6 ตามวิภัตติ",
-    subtitle: "สมาสที่บทอื่นเป็นประธาน จำแนกตามวิภัตติ 6",
-    duration: "19:20",
-    url: "audio/62.m4a"
-  },
-  {
-    id: "063",
-    title: "063 พหุพพิหิสมาส 5 ตามลักษณะ",
-    subtitle: "พหุพพิหิสมาสจำแนกตามลักษณะโครงสร้างทางบาลี",
-    duration: "14:48",
-    url: "audio/63.m4a"
-  },
-  {
-    id: "064",
-    title: "064 สมาสท้อง",
-    subtitle: "สมาสซ้อนสมาส หรือมีสมาสย่อยอยู่ภายในสมาสใหญ่",
-    duration: "08:11",
-    url: "audio/64.m4a"
-  },
-  {
-    id: "065",
-    title: "065 ตัทธิต",
-    subtitle: "การใช้ปัจจัยแทนศัพท์นามเพื่อย่อคำให้สั้นลง",
-    duration: "03:15",
-    url: "audio/65.m4a"
-  },
-  {
-    id: "066",
-    title: "066 โคตตตัทธิต",
-    subtitle: "ตัทธิตที่ใช้ย่อคำว่า 'ลูกหลาน' หรือ 'ตระกูล'",
-    duration: "11:17",
-    url: "audio/66.m4a"
-  },
-  {
-    id: "067",
-    title: "067 ตรัตยาทิตัทธิต",
-    subtitle: "ตัทธิตที่มีความหมายหลากหลาย เช่น ข้าม ย้อม ยึดถือ",
-    duration: "06:59",
-    url: "audio/67.m4a"
-  },
-  {
-    id: "068",
-    title: "068 ราคาทิตัทธิต",
-    subtitle: "ตัทธิตที่เกี่ยวกับสีหรือความย้อม",
-    duration: "04:19",
-    url: "audio/68.m4a"
-  },
-  {
-    id: "069",
-    title: "069 ชาตาทิตัทธิต",
-    subtitle: "ตัทธิตที่บอกการเกิด ที่อยู่ หรือความเกี่ยวข้อง",
-    duration: "05:47",
-    url: "audio/69.m4a"
-  },
-  {
-    id: "070",
-    title: "070 สมุหตัทธิต",
-    subtitle: "ตัทธิตที่รวมกลุ่มหรือส่วนรวม (เช่น ประชุม, หมู่)",
-    duration: "04:20",
-    url: "audio/70.m4a"
-  },
-  {
-    id: "071",
-    title: "071 ฐานตัทธิต",
-    subtitle: "ตัทธิตที่บอกสถานที่ หรือตำแหน่งที่ตั้ง",
-    duration: "05:00",
-    url: "audio/71.m4a"
-  },
-  {
-    id: "072",
-    title: "072 พหุลตัทธิต",
-    subtitle: "ตัทธิตที่แสดงความมีอยู่มาก หรือความอุดมสมบูรณ์",
-    duration: "03:15",
-    url: "audio/72.m4a"
-  },
-  {
-    id: "073",
-    title: "073 เสฏฐตัทธิต",
-    subtitle: "ตัทธิตที่แสดงการเปรียบเทียบ (ขั้นกว่า ขั้นสุด)",
-    duration: "05:03",
-    url: "audio/73.m4a"
-  },
-  {
-    id: "074",
-    title: "074 ตทัสสัตถิตัทธิต",
-    subtitle: "ตัทธิตที่ย่อคำว่า 'มีความมีอยู่' (เช่น ผู้มีปัญญา)",
-    duration: "11:56",
-    url: "audio/74.m4a"
-  },
-  {
-    id: "075",
-    title: "075 ปกติตัทธิต",
-    subtitle: "ตัทธิตที่บอกถึงวัตถุที่ทำขึ้น (เช่น ทำด้วยทอง)",
-    duration: "03:43",
-    url: "audio/75.m4a"
-  },
-  {
-    id: "076",
-    title: "076 ปูรณตัทธิต",
-    subtitle: "ตัทธิตที่เกี่ยวกับตัวเลขลำดับที่",
-    duration: "05:54",
-    url: "audio/76.m4a"
-  },
-  {
-    id: "077",
-    title: "077 สังขยาตัทธิต",
-    subtitle: "ตัทธิตที่เกี่ยวกับจำนวนนับหรือมาตราวัด",
-    duration: "01:40",
-    url: "audio/77.m4a"
-  },
-  {
-    id: "078",
-    title: "078 วิภาคตัทธิต",
-    subtitle: "ตัทธิตที่แสดงการจำแนก แจกจ่าย หรือส่วนแบ่ง",
-    duration: "02:03",
-    url: "audio/78.m4a"
-  },
-  {
-    id: "079",
-    title: "079 ภาวตัทธิต",
-    subtitle: "ตัทธิตที่บอกความมี ความเป็น หรือคุณลักษณะ (ตา ตฺต ณฺย)",
-    duration: "12:33",
-    url: "audio/79.m4a"
-  },
-  {
-    id: "080",
-    title: "080 อัพยยตัทธิต",
-    subtitle: "ตัทธิตที่ย่อคำแล้วกลายเป็นศัพท์ที่ไม่เปลี่ยนรูป (อัพยยศัพท์)",
-    duration: "02:11",
-    url: "audio/80.m4a"
-  },
-  {
-    id: "081",
-    title: "081 ตัทธิตนอกแบบ",
-    subtitle: "ตัทธิตพิเศษที่ไม่จัดอยู่ในหมวดหมู่ปกติ",
-    duration: "05:10",
-    url: "audio/81.m4a"
-  },
-  {
-    id: "082",
-    title: "082 สมัญญาภิธาน",
-    subtitle: "อักขรวิธีและชื่อเรียกอักขระในภาษาบาลี",
-    duration: "03:36",
-    url: "audio/82.m4a"
-  },
-  {
-    id: "083",
-    title: "083 สระ",
-    subtitle: "สระ 8 ตัวในภาษาบาลีและการแบ่งเสียงสั้น-ยาว",
-    duration: "06:02",
-    url: "audio/83.m4a"
-  },
-  {
-    id: "084",
-    title: "084 พยัญชนะ",
-    subtitle: "พยัญชนะ 33 ตัวและการแบ่งกลุ่มตามวรรค",
-    duration: "05:04",
-    url: "audio/84.m4a"
-  },
-  {
-    id: "085",
-    title: "085 ฐานกรณ์ของอักขระ",
-    subtitle: "ฐานเกิดและอวัยวะที่ใช้ในการออกเสียงอักขระ",
-    duration: "08:08",
-    url: "audio/85.m4a"
-  },
-  {
-    id: "086",
-    title: "086 เสียงของอักขระ",
-    subtitle: "ลักษณะเสียงอักขระ (สิถิล ธนิต โฆสะ อโฆสะ)",
-    duration: "06:47",
-    url: "audio/86.m4a"
-  },
-  {
-    id: "087",
-    title: "087 พยัญชนะสังโยค",
-    subtitle: "หลักการซ้อนพยัญชนะในคำภาษาบาลี",
-    duration: "04:27",
-    url: "audio/87.m4a"
-  },
-  {
-    id: "088",
-    title: "088 อัฑฒสระ",
-    subtitle: "กึ่งสระกึ่งพยัญชนะ (ย ร ล ว)",
-    duration: "02:23",
-    url: "audio/88.m4a"
-  },
-  {
-    id: "089",
-    title: "089 ลำดับสระ",
-    subtitle: "การจัดลำดับตามเสียงสระในอักขรวิธี",
-    duration: "03:26",
-    url: "audio/89.m4a"
-  },
-  {
-    id: "090",
-    title: "090 ลำดับการเรียงอักขระ",
-    subtitle: "การเรียงพยัญชนะตามพจนานุกรมบาลี",
-    duration: "02:08",
-    url: "audio/90.m4a"
-  },
-  {
-    id: "091",
-    title: "091 สนธิ",
-    subtitle: "การเชื่อมต่อคำศัพท์ทางเสียงและตัวอักษร",
-    duration: "04:01",
-    url: "audio/91.m4a"
-  },
-  {
-    id: "092",
-    title: "092 สระสนธิ",
-    subtitle: "วิธีต่อศัพท์ด้วยการเปลี่ยนแปลงรูปสระ",
-    duration: "15:43",
-    url: "audio/92.m4a"
-  },
-  {
-    id: "093",
-    title: "093 พยัญชนะสนธิ",
-    subtitle: "วิธีต่อศัพท์ด้วยการเปลี่ยนแปลงพยัญชนะ",
-    duration: "11:22",
-    url: "audio/93.m4a"
-  },
-  {
-    id: "094",
-    title: "094 นิคคหิตสนธิ",
-    subtitle: "วิธีต่อศัพท์ด้วยการจัดการกับตัวนิคคหิต (อัง)",
-    duration: "06:50",
-    url: "audio/94.m4a"
-  },
-  {
-    id: "095",
-    title: "095 กลอนสังขยา",
-    subtitle: "บทกลอนสำหรับช่วยท่องจำตัวเลขบาลี",
-    duration: "02:44",
-    url: "audio/95.m4a"
-  },
-  {
-    id: "096",
-    title: "096 กลอนวิภัตติอาขยาต",
-    subtitle: "บทกลอนสำหรับช่วยท่องจำวิภัตติคำกริยา",
-    duration: "08:47",
-    url: "audio/96.m4a"
-  },
-  {
-    id: "097",
-    title: "097 หลักการแปลมคธเป็นไทย",
-    subtitle: "หลักเกณฑ์และลำดับการแปลประโยคบาลีเป็นไทย",
-    duration: "01:52",
-    url: "audio/97.m4a"
-  }
+  { id: "001", title: "001 บทนำ", subtitle: "เกริ่นนำเบื้องต้นเกี่ยวกับบาลีไวยากรณ์", duration: "03:06", url: "audio/1.m4a" },
+  { id: "002", title: "002 นาม", subtitle: "ความหมายและการจำแนกคำนามในภาษาบาลี", duration: "07:22", url: "audio/2.m4a" },
+  { id: "003", title: "003 ลิงค์", subtitle: "เพศของคำนาม (ปุลิงค์ อิตถีลิงค์ นปุสกลิงค์)", duration: "16:08", url: "audio/3.m4a" },
+  { id: "004", title: "004 วจนะ", subtitle: "พจน์หรือจำนวน (เอกวจนะ พหุวจนะ)", duration: "01:38", url: "audio/4.m4a" },
+  { id: "005", title: "005 วิภัตติ", subtitle: "การจำแนกคำนามเพื่อแสดงหน้าที่ในประโยค", duration: "03:14", url: "audio/5.m4a" },
+  { id: "006", title: "006 อายตนิบาต", subtitle: "คำแปลอรรถวิภัตติหรือหน้าที่ของนามวิภัตติ", duration: "01:59", url: "audio/6.m4a" },
+  { id: "007", title: "007 การันต์", subtitle: "สระที่สุดแห่งสัญลักษณ์นาม", duration: "01:25", url: "audio/7.m4a" },
+  { id: "008", title: "008 แจกปุลิงค์", subtitle: "การแจกวิภัตตินามสำหรับเพศชาย", duration: "12:10", url: "audio/8.m4a" },
+  { id: "009", title: "009 แจกอิตถีลิงค์", subtitle: "การแจกวิภัตตินามสำหรับเพศหญิง", duration: "12:35", url: "audio/9.m4a" },
+  { id: "010", title: "010 แจกนปุสกลิงค์", subtitle: "การแจกวิภัตตินามสำหรับเพศกลาง", duration: "07:09", url: "audio/10.m4a" },
+  { id: "011", title: "011 กติปยศัพท์", subtitle: "ศัพท์พิเศษที่มีการแจกวิภัตติเฉพาะตัว", duration: "24:24", url: "audio/11.m4a" },
+  { id: "012", title: "012 มโนคณศัพท์", subtitle: "กลุ่มศัพท์ 12 ตัวที่แจกวิภัตติเหมือน มนัส", duration: "17:03", url: "audio/12.m4a" },
+  { id: "013", title: "013 สังขยา", subtitle: "เรื่องของตัวเลขและการนับในภาษาบาลี", duration: "02:46", url: "audio/13.m4a" },
+  { id: "014", title: "014 วิธีนับสังขยา", subtitle: "วิธีการจัดกลุ่มและการนับจำนวนตัวเลข", duration: "09:04", url: "audio/14.m4a" },
+  { id: "015", title: "015 ปกติสังขยาเป็นนาม-ลิงค์", subtitle: "ลิงค์และพจน์ของปกติสังขยา (1-อสงไขย)", duration: "02:18", url: "audio/15.m4a" },
+  { id: "016", title: "016 แจกปกติสังขยา", subtitle: "การแจกวิภัตติของตัวเลขปกติสังขยา", duration: "09:07", url: "audio/16.m4a" },
+  { id: "017", title: "017 แจกปูรณสังขยา", subtitle: "การแจกวิภัตติของเลขลำดับที่", duration: "06:15", url: "audio/17.m4a" },
+  { id: "018", title: "018 สัพพนาม", subtitle: "คำที่ใช้แทนคำนาม", duration: "03:28", url: "audio/18.m4a" },
+  { id: "019", title: "019 แจกปุริสสัพพนาม", subtitle: "การแจกวิภัตติของบุรุษสรรพนาม", duration: "06:20", url: "audio/19.m4a" },
+  { id: "020", title: "020 แจกอนิยมวิเสสนสัพพนาม", subtitle: "สรรพนามชี้เฉพาะแบบไม่แน่นอน", duration: "10:33", url: "audio/20.m4a" },
+  { id: "021", title: "021 แจกนิยมวิเสสนสัพพนาม", subtitle: "สรรพนามชี้เฉพาะแบบแน่นอน", duration: "12:44", url: "audio/21.m4a" },
+  { id: "022", title: "022 อัพพยยศัพท์", subtitle: "ศัพท์ที่ไม่เปลี่ยนแปลงรูปตามวิภัตติ", duration: "03:39", url: "audio/22.m4a" },
+  { id: "023", title: "023 นิบาต", subtitle: "คำสำหรับลงในระหว่างคำอื่น", duration: "13:50", url: "audio/23.m4a" },
+  { id: "024", title: "024 ปัจจัยในอัพยยศัพท์", subtitle: "ปัจจัยลงท้ายเพื่อเป็นอัพยยศัพท์", duration: "11:15", url: "audio/24.m4a" },
+  { id: "025", title: "025 อาขยาต วิภัตติ", subtitle: "วิภัตติของคำกริยาแสดงกาล", duration: "07:37", url: "audio/25.m4a" },
+  { id: "026", title: "026 อาขยาต กาล", subtitle: "กาลเวลาในการกริยา", duration: "12:17", url: "audio/26.m4a" },
+  { id: "027", title: "027 อาขยาต บท", subtitle: "บทของกริยา", duration: "03:15", url: "audio/27.m4a" },
+  { id: "028", title: "028 อาขยาต วจนะ บุรุษ", subtitle: "พจน์และบุรุษในตารางกริยา", duration: "03:40", url: "audio/28.m4a" },
+  { id: "029", title: "029 ธาตุ หมวด ภูธาตุ", subtitle: "หมวดธาตุตัวแทนกลุ่มที่ 1", duration: "03:17", url: "audio/29.m4a" },
+  { id: "030", title: "030 หมวด รุธฺ ธาตุ", subtitle: "หมวดธาตุลงนิคคหิตอาคม", duration: "01:25", url: "audio/30.m4a" },
+  { id: "031", title: "031 หมวด ทิวฺ ธาตุ", subtitle: "หมวดธาตุ ย ปัจจัย", duration: "02:17", url: "audio/31.m4a" },
+  { id: "032", title: "032 หมวด สุ ธาตุ", subtitle: "หมวดธาตุ นุ ณุ ณ ปัจจัย", duration: "00:46", url: "audio/32.m4a" },
+  { id: "033", title: "033 หมวด กี ธาตุ", subtitle: "หมวดธาตุ นา ปัจจัย", duration: "01:49", url: "audio/33.m4a" },
+  { id: "034", title: "034 หมวด คหฺ และ ตนฺ ธาตุ", subtitle: "หมวดธาตุพิเศษ", duration: "01:31", url: "audio/34.m4a" },
+  { id: "035", title: "035 หมวด จุรฺ ธาตุ", subtitle: "หมวดธาตุ เณ ณย ปัจจัย", duration: "01:39", url: "audio/35.m4a" },
+  { id: "036", title: "036 สกัมม+อกัมมธาตุ", subtitle: "ธาตุเรียกหาบทกรรม", duration: "01:18", url: "audio/36.m4a" },
+  { id: "037", title: "037 วาจก", subtitle: "โครงสร้างประโยค 5 วาจก", duration: "06:40", url: "audio/37.m4a" },
+  { id: "038", title: "038 ปัจจัย", subtitle: "ตัวปรุงแต่งธาตุเพื่อบอกวาจก", duration: "05:38", url: "audio/38.m4a" },
+  { id: "039", title: "039 ปัจจัยพิเศษ 5 ตัว", subtitle: "ปัจจัยพิเศษเฉพาะกลุ่ม", duration: "02:44", url: "audio/39.m4a" },
+  { id: "040", title: "040 คำอธิบายในกัตตุวาจก", subtitle: "โครงสร้างกัตตุวาจก", duration: "09:42", url: "audio/40.m4a" },
+  { id: "041", title: "041 คำอธิบายในกัมมวาจก", subtitle: "โครงสร้างกัมมวาจก", duration: "06:24", url: "audio/41.m4a" },
+  { id: "042", title: "042 กิตก์ นามกิตก์", subtitle: "แปลงคำกริยาเป็นคำนาม", duration: "02:04", url: "audio/42.m4a" },
+  { id: "043", title: "043 สาธนะ", subtitle: "รูปวิเคราะห์บอกความหมายนามกิตก์", duration: "13:15", url: "audio/43.m4a" },
+  { id: "044", title: "044 ปัจจัยแห่งนามกิตก์", subtitle: "ปัจจัย 3 กลุ่มนามกิตก์", duration: "01:58", url: "audio/44.m4a" },
+  { id: "045", title: "045 วิเคราะห์ ในกิตปัจจัย", subtitle: "วิเคราะห์กิตปัจจัย", duration: "19:58", url: "audio/45.m4a" },
+  { id: "046", title: "046 วิเคราะห์ ในกิจจปัจจัย", subtitle: "วิเคราะห์กิจจปัจจัย", duration: "09:43", url: "audio/46.m4a" },
+  { id: "047", title: "047 วิเคราะห์ ในกิตกิจจปัจจัย", subtitle: "วิเคราะห์กิตกิจจปัจจัย", duration: "29:32", url: "audio/47.m4a" },
+  { id: "048", title: "048 กิริยากิตก์ วิภัตติและวาจก", subtitle: "กริยาระหว่างประโยค", duration: "03:42", url: "audio/48.m4a" },
+  { id: "049", title: "049 กิริยากิตก์ กาล", subtitle: "กาลเวลาในกิริยากิตก์", duration: "05:43", url: "audio/49.m4a" },
+  { id: "050", title: "050 กิริยากิตก์ วาจก", subtitle: "วาจกในกิริยากิตก์", duration: "02:53", url: "audio/50.m4a" },
+  { id: "051", title: "051 ปัจจัยแห่งกิริยากิตก์", subtitle: "ปัจจัยกิริยากิตก์", duration: "02:58", url: "audio/51.m4a" },
+  { id: "052", title: "052 กิตปัจจัย", subtitle: "ปัจจัยกลุ่มกิต", duration: "04:01", url: "audio/52.m4a" },
+  { id: "053", title: "053 กิจจปัจจัย", subtitle: "ปัจจัยกลุ่มกิจจ", duration: "02:43", url: "audio/53.m4a" },
+  { id: "054", title: "054 กิตกิจจปัจจัย", subtitle: "ปัจจัยกลุ่มกิตกิจจ", duration: "13:58", url: "audio/54.m4a" },
+  { id: "055", title: "055 ตูนาทิ ปัจจัย", subtitle: "ปัจจัยพิเศษ ตูนาทิ ตฺวา", duration: "07:28", url: "audio/55.m4a" },
+  { id: "056", title: "056 สมาส", subtitle: "การย่อคำนามเข้าด้วยกัน", duration: "04:16", url: "audio/56.m4a" },
+  { id: "057", title: "057 กัมมธารยสมาส", subtitle: "สมาสวิเศษณ์", duration: "16:20", url: "audio/57.m4a" },
+  { id: "058", title: "058 ทิคุสมาส", subtitle: "สมาสตัวเลข", duration: "03:20", url: "audio/58.m4a" },
+  { id: "059", title: "059 ตัปปุริสสมาส", subtitle: "สมาสเชื่อมวิภัตติ", duration: "10:57", url: "audio/59.m4a" },
+  { id: "060", title: "060 ทวันทวสมาส", subtitle: "สมาสรวมคำนาม", duration: "06:40", url: "audio/60.m4a" },
+  { id: "061", title: "061 อัพยยีภาวสมาส", subtitle: "สมาสอุปสัค/นิบาต", duration: "07:17", url: "audio/61.m4a" },
+  { id: "062", title: "062 พหุพพิหิสมาส 6 ตามวิภัตติ", subtitle: "สมาสบทอื่นเป็นประธาน", duration: "19:20", url: "audio/62.m4a" },
+  { id: "063", title: "063 พหุพพิหิสมาส 5 ตามลักษณะ", subtitle: "สมาสตามลักษณะโครงสร้าง", duration: "14:48", url: "audio/63.m4a" },
+  { id: "064", title: "064 สมาสท้อง", subtitle: "สมาสซ้อนสมาส", duration: "08:11", url: "audio/64.m4a" },
+  { id: "065", title: "065 ตัทธิต", subtitle: "ปัจจัยย่อคำนาม", duration: "03:15", url: "audio/65.m4a" },
+  { id: "066", title: "066 โคตตตัทธิต", subtitle: "ตัทธิตลูกหลานตระกูล", duration: "11:17", url: "audio/66.m4a" },
+  { id: "067", title: "067 ตรัตยาทิตัทธิต", subtitle: "ตัทธิตความหมายหลากหลาย", duration: "06:59", url: "audio/67.m4a" },
+  { id: "068", title: "068 ราคาทิตัทธิต", subtitle: "ตัทธิตเกี่ยวกับสี", duration: "04:19", url: "audio/68.m4a" },
+  { id: "069", title: "069 ชาตาทิตัทธิต", subtitle: "ตัทธิตบอกการเกิดที่อยู่", duration: "05:47", url: "audio/69.m4a" },
+  { id: "070", title: "070 สมุหตัทธิต", subtitle: "ตัทธิตรวมกลุ่ม", duration: "04:20", url: "audio/70.m4a" },
+  { id: "071", title: "071 ฐานตัทธิต", subtitle: "ตัทธิตบอกสถานที่", duration: "05:00", url: "audio/71.m4a" },
+  { id: "072", title: "072 พหุลตัทธิต", subtitle: "ตัทธิตบอกความมีมาก", duration: "03:15", url: "audio/72.m4a" },
+  { id: "073", title: "073 เสฏฐตัทธิต", subtitle: "ตัทธิตแสดงการเปรียบเทียบ", duration: "05:03", url: "audio/73.m4a" },
+  { id: "074", title: "074 ตทัสสัตถิตัทธิต", subtitle: "ตัทธิตย่อคำว่า มีมีความมีอยู่", duration: "11:56", url: "audio/74.m4a" },
+  { id: "075", title: "075 ปกติตัทธิต", subtitle: "ตัทธิตบอกวัตถุที่ทำขึ้น", duration: "03:43", url: "audio/75.m4a" },
+  { id: "076", title: "076 ปูรณตัทธิต", subtitle: "ตัทธิตตัวเลขลำดับที่", duration: "05:54", url: "audio/76.m4a" },
+  { id: "077", title: "077 สังขยาตัทธิต", subtitle: "ตัทธิตจำนวนนับ", duration: "01:40", url: "audio/77.m4a" },
+  { id: "078", title: "078 วิภาคตัทธิต", subtitle: "ตัทธิตแจกจ่ายส่วนแบ่ง", duration: "02:03", url: "audio/78.m4a" },
+  { id: "079", title: "079 ภาวตัทธิต", subtitle: "ตัทธิตบอกความมี ความเป็น", duration: "12:33", url: "audio/79.m4a" },
+  { id: "080", title: "080 อัพยยตัทธิต", subtitle: "ตัทธิตย่อคำเป็นอัพยยศัพท์", duration: "02:11", url: "audio/80.m4a" },
+  { id: "081", title: "081 ตัทธิตนอกแบบ", subtitle: "ตัทธิตพิเศษนอกหมวด", duration: "05:10", url: "audio/81.m4a" },
+  { id: "082", title: "082 สมัญญาภิธาน", subtitle: "อักขรวิธีและชื่ออักขระ", duration: "03:36", url: "audio/82.m4a" },
+  { id: "083", title: "083 สระ", subtitle: "สระ 8 ตัวและการแบ่งเสียง", duration: "06:02", url: "audio/83.m4a" },
+  { id: "084", title: "084 พยัญชนะ", subtitle: "พยัญชนะ 33 ตัวและการแบ่งวรรค", duration: "05:04", url: "audio/84.m4a" },
+  { id: "085", title: "085 ฐานกรณ์ของอักขระ", subtitle: "ฐานเกิดและอวัยวะออกเสียง", duration: "08:08", url: "audio/85.m4a" },
+  { id: "086", title: "086 เสียงของอักขระ", subtitle: "ลักษณะเสียงอักขระ", duration: "06:47", url: "audio/86.m4a" },
+  { id: "087", title: "087 พยัญชนะสังโยค", subtitle: "หลักซ้อนพยัญชนะ", duration: "04:27", url: "audio/87.m4a" },
+  { id: "088", title: "088 อัฑฒสระ", subtitle: "กึ่งสระกึ่งพยัญชนะ", duration: "02:23", url: "audio/88.m4a" },
+  { id: "089", title: "089 ลำดับสระ", subtitle: "การจัดลำดับเสียงสระ", duration: "03:26", url: "audio/89.m4a" },
+  { id: "090", title: "090 ลำดับการเรียงอักขระ", subtitle: "การเรียงตามพจนานุกรม", duration: "02:08", url: "audio/90.m4a" },
+  { id: "091", title: "091 สนธิ", subtitle: "การเชื่อมต่อคำศัพท์", duration: "04:01", url: "audio/91.m4a" },
+  { id: "092", title: "092 สระสนธิ", subtitle: "วิธีต่อศัพท์รูปสระ", duration: "15:43", url: "audio/92.m4a" },
+  { id: "093", title: "093 พยัญชนะสนธิ", subtitle: "วิธีต่อศัพท์รูปพยัญชนะ", duration: "11:22", url: "audio/93.m4a" },
+  { id: "094", title: "094 นิคคหิตสนธิ", subtitle: "วิธีต่อศัพท์รูปนิคคหิต", duration: "06:50", url: "audio/94.m4a" },
+  { id: "095", title: "095 กลอนสังขยา", subtitle: "กลอนช่วยท่องจำตัวเลข", duration: "02:44", url: "audio/95.m4a" },
+  { id: "096", title: "096 กลอนวิภัตติอาขยาต", subtitle: "กลอนท่องจำวิภัตติ", duration: "08:47", url: "audio/96.m4a" },
+  { id: "097", title: "097 หลักการแปลมคธเป็นไทย", subtitle: "หลักเกณฑ์และลำดับการแปลประโยค", duration: "01:52", url: "audio/97.m4a" }
 ];
 
 let currentAudioIndex = -1;
@@ -1219,42 +2094,287 @@ let isLooping = false;
 let playbackSpeeds = [1.0, 1.25, 1.5, 0.75];
 let speedIndex = 0;
 
-// Global Audio Instance
 const audioPlayer = new Audio();
 
-// --- 2. Tab Navigation Logic ---
+document.addEventListener("DOMContentLoaded", function(){
+    slider = document.getElementById("slider");
+    cropCanvas = document.getElementById("cropCanvas");
+    modal = document.getElementById("cropModal");
+
+    if(cropCanvas){
+        ctx = cropCanvas.getContext("2d");
+
+        function getCanvasCoords(e) {
+            const r = cropCanvas.getBoundingClientRect();
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            return { x: clientX - r.left, y: clientY - r.top };
+        }
+
+        function handleStart(e) {
+            const pos = getCanvasCoords(e);
+            startX = pos.x; startY = pos.y;
+            isDragging = true;
+            rect = { x: startX, y: startY, w: 0, h: 0 };
+        }
+
+        function handleMove(e) {
+            if(!isDragging) return;
+            const pos = getCanvasCoords(e);
+            rect.w = pos.x - startX; rect.h = pos.y - startY;
+            drawOverlay();
+        }
+
+        function handleEnd() { isDragging = false; }
+
+        cropCanvas.addEventListener("mousedown", handleStart);
+        cropCanvas.addEventListener("mousemove", handleMove);
+        cropCanvas.addEventListener("mouseup", handleEnd);
+
+        cropCanvas.addEventListener("touchstart", (e) => { handleStart(e); e.preventDefault(); }, {passive: false});
+        cropCanvas.addEventListener("touchmove", (e) => { handleMove(e); e.preventDefault(); }, {passive: false});
+        cropCanvas.addEventListener("touchend", handleEnd);
+    }
+
+    if(slider){
+        slider.addEventListener("scroll", function(){
+            let index = Math.round(slider.scrollLeft / window.innerWidth);
+            updatePageUI(index);
+        });
+    }
+
+    /* SoundCloud audio trigger */
+    document.addEventListener("click", function(e){
+        if(e.target.classList.contains("sc-play")){
+            const btn = e.target;
+            const bar = document.getElementById("floating-audio-bar");
+            const container = document.getElementById("audioIframeContainer");
+            if(!bar || !container) return;
+
+            container.innerHTML = `
+              <iframe width="100%" height="65" frameborder="0" allow="autoplay"
+                src="${btn.dataset.src}&hide_related=true&show_user=false&visual=false">
+              </iframe>
+            `;
+            bar.style.display = "flex";
+        }
+    });
+
+    buildTOC();
+    initPlaylist();
+    updateCheckinBadge();
+});
+
+/* === NAVIGATION & SWITCH TAB === */
 function switchTab(tab) {
-  const bookPage = document.getElementById('page-book');
+  const indexPage = document.getElementById('page-index');
+  const readerPage = document.getElementById('page-reader');
   const audioPage = document.getElementById('page-audio');
-  const navBook = document.getElementById('nav-book');
+
+  const navIndex = document.getElementById('nav-index');
+  const navReader = document.getElementById('nav-reader');
   const navAudio = document.getElementById('nav-audio');
 
-  if (tab === 'book') {
-    bookPage.classList.remove('hidden');
-    audioPage.classList.add('hidden');
-    navBook.classList.add('active');
-    navAudio.classList.remove('active');
+  [indexPage, readerPage, audioPage].forEach(p => p.classList.add('hidden'));
+  [navIndex, navReader, navAudio].forEach(n => n.classList.remove('active'));
 
-    // Clean URL hash as requested to return to clean main index view
-    if (window.location.hash) {
-      history.pushState("", document.title, window.location.pathname + window.location.search);
-    }
+  closeTOC();
 
-    // Check if background audio is allowed
-    if (!isBgPlayEnabled && !audioPlayer.paused) {
-      audioPlayer.pause();
-      updatePlayIcons(false);
-    }
+  if (tab === 'index') {
+    indexPage.classList.remove('hidden');
+    navIndex.classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  } else if (tab === 'reader') {
+    readerPage.classList.remove('hidden');
+    navReader.classList.add('active');
   } else if (tab === 'audio') {
-    bookPage.classList.add('hidden');
     audioPage.classList.remove('hidden');
-    navBook.classList.remove('active');
     navAudio.classList.add('active');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 }
 
-// --- 3. Audio Playlist & Controller Logic ---
+function openReaderAtSlide(index) {
+  switchTab('reader');
+  setTimeout(() => {
+    goSlide(index);
+  }, 100);
+}
+
+function closeFloatingAudio(){
+  const bar = document.getElementById("floating-audio-bar");
+  const container = document.getElementById("audioIframeContainer");
+  if(bar) bar.style.display = "none";
+  if(container) container.innerHTML = "";
+}
+
+/* === TOC SYSTEM (CLOSED BY DEFAULT) === */
+function buildTOC(){
+    const toc = document.getElementById("tocContent");
+    if(!toc) return;
+
+    toc.innerHTML = "";
+    document.querySelectorAll('.slide').forEach((slide, index) => {
+        const slideName = slide.getAttribute("data-name") || `หน้า ${index + 1}`;
+        addTocItem(index, slideName);
+    });
+    updateCounters();
+}
+
+function addTocItem(index, name){
+    const toc = document.getElementById("tocContent");
+    if(!toc) return;
+
+    const wrap = document.createElement("div");
+    wrap.className = "toc-item-wrapper";
+    wrap.id = `toc-wrap-${index}`;
+
+    const text = document.createElement("div");
+    text.className = "toc-text";
+    text.innerText = `${index + 1}. ${name}`;
+
+    wrap.addEventListener("click", function(){
+        closeTOC();
+        goSlide(index);
+    });
+
+    wrap.appendChild(text);
+    toc.appendChild(wrap);
+}
+
+function updateCounters(){
+    totalSlides = document.querySelectorAll('.slide').length;
+    const select = document.getElementById("pageSelect");
+    if(select){
+        select.innerHTML = "";
+        for(let i = 0; i < totalSlides; i++){
+            const opt = document.createElement("option");
+            opt.value = i;
+            opt.innerText = `${i + 1}. ${document.querySelectorAll('.slide')[i].getAttribute('data-name') || ''}`;
+            select.appendChild(opt);
+        }
+    }
+}
+
+function toggleTOC(){
+    const toc = document.getElementById("tocDrawer");
+    const backdrop = document.getElementById("tocBackdrop");
+    if(toc) toc.classList.toggle("show");
+    if(backdrop) backdrop.classList.toggle("show");
+}
+
+function closeTOC(){
+    const toc = document.getElementById("tocDrawer");
+    const backdrop = document.getElementById("tocBackdrop");
+    if(toc) toc.classList.remove("show");
+    if(backdrop) backdrop.classList.remove("show");
+}
+
+/* === EBOOK READER CONTROLS === */
+function nextSlide(){
+    if(!slider) return;
+    closeTOC();
+    slider.scrollBy({left: window.innerWidth, behavior: "smooth"});
+}
+
+function prevSlide(){
+    if(!slider) return;
+    closeTOC();
+    slider.scrollBy({left: -window.innerWidth, behavior: "smooth"});
+}
+
+function goSlide(index){
+    if(!slider) return;
+    closeTOC();
+    slider.scrollTo({left: index * window.innerWidth, behavior: "smooth"});
+    updatePageUI(index);
+}
+
+function updatePageUI(index){
+    index = Math.round(index);
+    document.querySelectorAll('.toc-item-wrapper').forEach(d => d.classList.remove("active"));
+    const active = document.getElementById(`toc-wrap-${index}`);
+    if(active) active.classList.add("active");
+
+    const pageSelect = document.getElementById("pageSelect");
+    if(pageSelect) pageSelect.value = index;
+}
+
+function fontSize(change) {
+    currentZoom += change * 0.1;
+    if (currentZoom < 0.6) currentZoom = 0.6;
+    if (currentZoom > 2.0) currentZoom = 2.0;
+
+    document.querySelectorAll(".slide-content").forEach(el => {
+        el.style.transform = `scale(${currentZoom})`;
+    });
+}
+
+/* === CROP TOOL LOGIC === */
+function initCrop(imgElement) {
+    if(!cropCanvas || !modal) return;
+    currentCropImg = imgElement;
+    imgObj.src = imgElement.src;
+
+    imgObj.onload = function() {
+        const maxWidth = window.innerWidth * 0.9;
+        const maxHeight = window.innerHeight * 0.7;
+        let w = imgObj.naturalWidth;
+        let h = imgObj.naturalHeight;
+
+        if (w > maxWidth || h > maxHeight) {
+            const ratio = Math.min(maxWidth/w, maxHeight/h);
+            w *= ratio; h *= ratio;
+        }
+
+        cropCanvas.width = w; cropCanvas.height = h;
+        rect = {x:0, y:0, w:0, h:0};
+        drawOverlay();
+        modal.style.display = 'flex';
+    }
+}
+
+function drawOverlay() {
+    if(!ctx || !cropCanvas) return;
+    ctx.clearRect(0,0,cropCanvas.width,cropCanvas.height);
+    ctx.drawImage(imgObj, 0, 0, cropCanvas.width, cropCanvas.height);
+
+    if(rect.w !== 0 && rect.h !== 0){
+        ctx.strokeStyle = "#00bfff";
+        ctx.lineWidth = 2;
+        ctx.fillStyle = "rgba(0, 191, 255, 0.15)";
+        ctx.fillRect(rect.x, rect.y, rect.w, rect.h);
+        ctx.strokeRect(rect.x, rect.y, rect.w, rect.h);
+    }
+}
+
+function closeCrop(){ if(modal) modal.style.display = "none"; }
+
+function applyCrop(){
+    if(!ctx || !cropCanvas || rect.w === 0 || rect.h === 0){ closeCrop(); return; }
+
+    let fx = rect.w < 0 ? rect.x + rect.w : rect.x;
+    let fy = rect.h < 0 ? rect.y + rect.h : rect.y;
+    let fw = Math.abs(rect.w);
+    let fh = Math.abs(rect.h);
+
+    const scaleX = imgObj.naturalWidth / cropCanvas.width;
+    const scaleY = imgObj.naturalHeight / cropCanvas.height;
+
+    const temp = document.createElement("canvas");
+    temp.width = fw * scaleX; temp.height = fh * scaleY;
+    const tctx = temp.getContext("2d");
+
+    tctx.drawImage(imgObj,
+        fx * scaleX, fy * scaleY, fw * scaleX, fh * scaleY,
+        0, 0, temp.width, temp.height
+    );
+
+    if(currentCropImg){ currentCropImg.src = temp.toDataURL(); }
+    closeCrop();
+}
+
+/* === AUDIO PLAYER LOGIC === */
 function initPlaylist() {
   const container = document.getElementById('playlist-container');
   if (!container) return;
@@ -1263,23 +2383,23 @@ function initPlaylist() {
   chantingPlaylist.forEach((item, index) => {
     const card = document.createElement('div');
     card.id = `track-${index}`;
-    card.className = `audio-item-card bg-white p-3.5 rounded-2xl flex items-center justify-between cursor-pointer shadow-sm hover:shadow-md`;
+    card.className = `audio-item-card bg-white p-3 rounded-2xl flex items-center justify-between cursor-pointer shadow-sm hover:shadow-md`;
     card.onclick = () => selectAndPlayAudio(index);
 
     card.innerHTML = `
-      <div class="flex items-center gap-3 min-w-0 flex-1">
-        <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center font-bold text-sm shrink-0 border border-amber-200">
+      <div class="flex items-center gap-2.5 min-w-0 flex-1">
+        <div class="w-9 h-9 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center font-bold text-xs shrink-0 border border-amber-200">
           ${index + 1}
         </div>
         <div class="min-w-0 flex-1">
-          <h4 class="font-bold text-sm text-gray-800 truncate">${item.title}</h4>
-          <p class="text-xs text-gray-500 truncate">${item.subtitle}</p>
+          <h4 class="font-bold text-xs md:text-sm text-gray-800 truncate">${item.title}</h4>
+          <p class="text-[11px] text-gray-500 truncate">${item.subtitle}</p>
         </div>
       </div>
-      <div class="flex items-center gap-3 ml-2 shrink-0">
-        <span class="text-xs text-gray-400 font-mono">${item.duration}</span>
-        <button class="w-8 h-8 rounded-full bg-amber-50 text-amber-800 flex items-center justify-center hover:bg-amber-600 hover:text-white transition">
-          <svg class="w-4 h-4 fill-current ml-0.5" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+      <div class="flex items-center gap-2 ml-2 shrink-0">
+        <span class="text-[11px] text-gray-400 font-mono">${item.duration}</span>
+        <button class="w-7 h-7 rounded-full bg-amber-50 text-amber-800 flex items-center justify-center hover:bg-amber-600 hover:text-white transition">
+          <svg class="w-3.5 h-3.5 fill-current ml-0.5" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
         </button>
       </div>
     `;
@@ -1299,16 +2419,13 @@ function selectAndPlayAudio(index) {
   audioPlayer.playbackRate = playbackSpeeds[speedIndex];
   audioPlayer.loop = isLooping;
 
-  // Update UI Details
   document.getElementById('player-title').innerText = track.title;
   document.getElementById('player-subtitle').innerText = track.subtitle;
   document.getElementById('mini-title').innerText = track.title;
   document.getElementById('mini-subtitle').innerText = track.subtitle;
 
-  // Show Mini player bar
   document.getElementById('mini-player').classList.remove('hidden');
 
-  // Highlight active playlist item
   chantingPlaylist.forEach((_, i) => {
     const el = document.getElementById(`track-${i}`);
     if (el) {
@@ -1320,7 +2437,6 @@ function selectAndPlayAudio(index) {
   audioPlayer.play().then(() => {
     updatePlayIcons(true);
   }).catch((err) => {
-    console.log("Autoplay issue or file load error:", err);
     showToast(`⚠️ ไม่สามารถเล่นไฟล์ได้ (${track.title})`, 'warning');
     updatePlayIcons(false);
   });
@@ -1331,7 +2447,6 @@ function togglePlayPause() {
     selectAndPlayAudio(0);
     return;
   }
-
   if (audioPlayer.paused) {
     audioPlayer.play();
     updatePlayIcons(true);
@@ -1404,7 +2519,6 @@ function formatTime(seconds) {
   return `${mins < 10 ? '0' : ''}${mins}:${secs < 10 ? '0' : ''}${secs}`;
 }
 
-// Audio Player Event Listeners
 audioPlayer.addEventListener('timeupdate', () => {
   if (audioPlayer.duration) {
     const pct = (audioPlayer.currentTime / audioPlayer.duration) * 100;
@@ -1415,66 +2529,10 @@ audioPlayer.addEventListener('timeupdate', () => {
 });
 
 audioPlayer.addEventListener('ended', () => {
-  if (!isLooping) {
-    playNextAudio();
-  }
+  if (!isLooping) { playNextAudio(); }
 });
 
-// --- 4. Daily Check-in Logic ---
-function handleDailyCheckIn() {
-    const STORAGE_KEY_DATE = 'pali_last_checkin';
-    const STORAGE_KEY_COUNT = 'pali_checkin_count';
-    
-    const today = new Date().toISOString().split('T')[0];
-    const lastCheckIn = localStorage.getItem(STORAGE_KEY_DATE);
-    let count = parseInt(localStorage.getItem(STORAGE_KEY_COUNT) || '0');
-
-    if (lastCheckIn === today) {
-        showToast(`⚠️ วันนี้เช็คชื่อไปแล้ว สะสม 100 รับโค้ดลับ ลบ โฆษณาฟรีถาวร (สะสม ${count} วัน)`, 'warning');
-    } else {
-        count++;
-        localStorage.setItem(STORAGE_KEY_DATE, today);
-        localStorage.setItem(STORAGE_KEY_COUNT, count);
-        
-        updateCheckinBadge();
-
-        if (count === 100) {
-            document.getElementById('reward-modal').classList.add('open');
-        } else {
-            showToast(`✅ เช็คชื่อสำเร็จ! (วันที่ ${count})`, 'success');
-        }
-    }
-}
-
-function updateCheckinBadge() {
-    const STORAGE_KEY_COUNT = 'pali_checkin_count';
-    let count = parseInt(localStorage.getItem(STORAGE_KEY_COUNT) || '0');
-    const badge = document.getElementById('checkin-badge');
-    
-    if (badge) {
-        badge.innerText = count;
-        if (count > 0) {
-            badge.classList.remove('hidden');
-        } else {
-            badge.classList.add('hidden');
-        }
-    }
-}
-
-function showToast(message, type) {
-    const toast = document.getElementById("toast");
-    toast.textContent = message;
-    toast.className = type;
-    toast.classList.add("show");
-    
-    setTimeout(function(){ toast.classList.remove("show"); }, 3000);
-}
-
-function closeRewardModal() {
-    document.getElementById('reward-modal').classList.remove('open');
-}
-
-// --- 5. Search Logic ---
+/* === SEARCH LOGIC === */
 function filterContent() {
   let filter = document.getElementById('searchInput').value.toUpperCase();
   let buttons = document.getElementsByClassName('dbtn');
@@ -1493,7 +2551,52 @@ function filterContent() {
   }
 }
 
-// --- 6. Chatbot Logic ---
+/* === DAILY CHECK-IN LOGIC === */
+function handleDailyCheckIn() {
+    const STORAGE_KEY_DATE = 'pali_last_checkin';
+    const STORAGE_KEY_COUNT = 'pali_checkin_count';
+    const today = new Date().toISOString().split('T')[0];
+    const lastCheckIn = localStorage.getItem(STORAGE_KEY_DATE);
+    let count = parseInt(localStorage.getItem(STORAGE_KEY_COUNT) || '0');
+
+    if (lastCheckIn === today) {
+        showToast(`⚠️ วันนี้เช็คชื่อไปแล้ว (สะสม ${count} วัน)`, 'warning');
+    } else {
+        count++;
+        localStorage.setItem(STORAGE_KEY_DATE, today);
+        localStorage.setItem(STORAGE_KEY_COUNT, count);
+        updateCheckinBadge();
+
+        if (count === 100) {
+            document.getElementById('reward-modal').classList.add('open');
+        } else {
+            showToast(`✅ เช็คชื่อสำเร็จ! (วันที่ ${count})`, 'success');
+        }
+    }
+}
+
+function updateCheckinBadge() {
+    const count = parseInt(localStorage.getItem('pali_checkin_count') || '0');
+    const badge = document.getElementById('checkin-badge');
+    if (badge) {
+        badge.innerText = count;
+        badge.classList.toggle('hidden', count === 0);
+    }
+}
+
+function showToast(message, type) {
+    const toast = document.getElementById("toast");
+    toast.textContent = message;
+    toast.className = type;
+    toast.classList.add("show");
+    setTimeout(function(){ toast.classList.remove("show"); }, 3000);
+}
+
+function closeRewardModal() {
+    document.getElementById('reward-modal').classList.remove('open');
+}
+
+/* === AI CHATBOT LOGIC === */
 const BACKEND_URL = 'https://solitary-leaf-3661.tontakankeawpang321.workers.dev'; 
 
 const SYSTEM_PROMPT = {
@@ -1513,21 +2616,18 @@ const sendBtn = document.getElementById('send-btn');
 const thinkingIndicator = document.getElementById('thinking-indicator');
 
 function formatMessage(text) {
-    return text
-        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-        .replace(/\n/g, '<br>');
+    return text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
 }
 
 function addChatBubble(message, isUser = true) {
     const wrap = document.createElement('div');
     wrap.className = `flex items-start space-x-2 ${isUser ? 'flex-row-reverse space-x-reverse' : ''}`;
-    
     const bubbleClass = isUser ? 'bg-amber-800 text-white chat-bubble-user' : 'bg-white text-gray-800 border chat-bubble-model';
     const icon = isUser ? '👤' : '🤖';
 
     wrap.innerHTML = `
         <span class="text-2xl">${icon}</span>
-        <div class="chat-bubble ${bubbleClass} p-3 rounded-lg max-w-[85%] relative shadow-sm text-sm">
+        <div class="chat-bubble ${bubbleClass} p-3 rounded-lg max-w-[85%] relative shadow-sm text-xs md:text-sm">
             <p>${formatMessage(message)}</p>
         </div>`;
     
@@ -1571,21 +2671,18 @@ async function handleSend() {
     }
 }
 
-// Modal Control Elements
 const fab = document.getElementById('fab-chat-toggle');
 const fabCheckin = document.getElementById('fab-checkin');
-const modal = document.getElementById('chatbot-modal');
+const chatbotModal = document.getElementById('chatbot-modal');
 
 fab.onclick = () => {
-    modal.classList.remove('chatbot-hidden');
-    fab.style.opacity = '0';
-    fabCheckin.style.opacity = '0';
+    chatbotModal.classList.remove('chatbot-hidden');
+    fab.style.opacity = '0'; fabCheckin.style.opacity = '0';
 };
 
 document.getElementById('chatbot-close-btn').onclick = () => {
-    modal.classList.add('chatbot-hidden');
-    fab.style.opacity = '1';
-    fabCheckin.style.opacity = '1';
+    chatbotModal.classList.add('chatbot-hidden');
+    fab.style.opacity = '1'; fabCheckin.style.opacity = '1';
 };
 
 document.getElementById('new-chat-btn').onclick = () => {
@@ -1596,12 +2693,6 @@ document.getElementById('new-chat-btn').onclick = () => {
 
 sendBtn.onclick = handleSend;
 userInput.onkeydown = (e) => { if(e.key === 'Enter') handleSend(); };
-
-// --- On Window Load Initializers ---
-window.addEventListener('load', () => {
-    updateCheckinBadge();
-    initPlaylist();
-});
 </script>
 </body>
 </html>
