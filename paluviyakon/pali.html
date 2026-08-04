@@ -140,6 +140,7 @@ body.light .control-btn{background:#ddd;color:#111; border-color:#ccc;}
   padding:60px 0px 0px 0px; 
   overflow-y:auto;
   overflow-x:auto;
+  overscroll-behavior-x:contain; /* ป้องกันการส่งต่อการเลื่อนแนวขวางไปยัง slider หลัก */
   scroll-snap-align:start;
   position: relative;
   display: flex;
@@ -2094,16 +2095,21 @@ function closeTOC(){
 
 /* ================= FONT ================= */
 function fontSize(change){
-    currentZoom+=change*0.1;
-    if(currentZoom<0.5) currentZoom=0.5;
-    if(currentZoom>3) currentZoom=3;
+    currentZoom += change * 0.1;
+    if(currentZoom < 0.5) currentZoom = 0.5;
+    if(currentZoom > 3) currentZoom = 3;
 
     document.querySelectorAll(".slide-content")
-        .forEach(el=> el.style.zoom=currentZoom);
-}
+        .forEach(el => el.style.zoom = currentZoom);
 
-function changeTheme(t){
-    document.body.className=t;
+    // หากมีการซูมขยาย ให้ปิดการล็อกสไลด์หน้าเพื่อไม่ให้ปัดแล้วเปลี่ยนหน้า
+    if (slider) {
+        if (currentZoom > 1.0) {
+            slider.style.scrollSnapType = "none";
+        } else {
+            slider.style.scrollSnapType = "x mandatory";
+        }
+    }
 }
 
 /* ================= EXPORT ================= */
