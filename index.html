@@ -107,35 +107,36 @@ h2.category-title .dot { width: 8px; height: 8px; border-radius: 50%; background
   width: 100vw;
   height: calc(100vh - 60px);
   overflow: hidden;
-  background: #0f0f0f;
+  background: #ffffff;
 }
 
 .reader-topbar {
   position: absolute;
   top: 0; left: 0; width: 100%; height: 50px;
-  background: rgba(20, 20, 20, 0.92);
+  background: rgba(255, 255, 255, 0.92);
   backdrop-filter: blur(8px);
   padding: 6px 12px;
   display: flex; justify-content: space-between; align-items: center;
-  z-index: 80; border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  z-index: 80; border-bottom: 1px solid #e5e7eb;
 }
 
 .reader-brand {
-  font-size: 14px; font-weight: 600; color: #00bfff;
+  font-size: 14px; font-weight: 600; color: #b45309;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 140px;
 }
 
 button.control-btn {
-  padding: 6px 10px; border: 1px solid #444; border-radius: 8px;
-  background: #2a2a2a; color: #fff; font-size: 13px; font-weight: 500;
-  cursor: pointer; transition: transform 0.1s;
+  padding: 6px 10px; border: 1px solid #d1d5db; border-radius: 8px;
+  background: #ffffff; color: #1f2937; font-size: 13px; font-weight: 500;
+  cursor: pointer; transition: transform 0.1s, background-color 0.2s;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
 }
 button.control-btn:active { transform: scale(0.95); }
 
 .toc-btn-trigger {
-  background: linear-gradient(135deg, #00bfff, #0066ff);
-  color: white; border: none; font-weight: 600; padding: 6px 12px;
-  box-shadow: 0 2px 8px rgba(0, 191, 255, 0.3);
+  background: linear-gradient(135deg, #b45309, #d97706) !important;
+  color: #ffffff !important; border: none !important; font-weight: 600; padding: 6px 12px;
+  box-shadow: 0 2px 8px rgba(180, 83, 9, 0.3);
 }
 
 .slider {
@@ -173,7 +174,7 @@ button.control-btn:active { transform: scale(0.95); }
 .img-wrapper {
   position: relative; width: 100%; margin: 0 auto;
   border-radius: 8px; overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3); background: #1a1a1a;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08); background: #ffffff;
 }
 
 .slide img {
@@ -219,53 +220,54 @@ button.control-btn:active { transform: scale(0.95); }
 /* TOC Drawer (CLOSED BY DEFAULT) */
 .toc-backdrop {
   position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-  background: rgba(0,0,0,0.65); backdrop-filter: blur(3px);
+  background: rgba(0,0,0,0.4); backdrop-filter: blur(3px);
   z-index: 940; opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
 }
 .toc-backdrop.show { opacity: 1; pointer-events: auto; }
 
 .toc-drawer {
   position: fixed; top: 0; left: 0; width: 82%; max-width: 320px; height: 100%;
-  background: #181818; overflow-y: auto;
+  background: #ffffff; overflow-y: auto;
   transform: translateX(-100%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   padding: 56px 12px 20px 12px; z-index: 950;
-  box-shadow: 5px 0 25px rgba(0,0,0,0.6); color: #eee;
+  box-shadow: 5px 0 25px rgba(0,0,0,0.15); color: #1f2937;
 }
 .toc-drawer.show { transform: translateX(0); }
 
 .toc-header {
-  font-weight: 600; font-size: 15px; color: #00bfff;
-  margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid #333;
-  display: flex; justify-content: space-between; align-items: center;
+  font-weight: 600; font-size: 15px; color: #b45309;
+  margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid #e5e7eb;
+  display: flex; justify-between; align-items: center;
 }
 
 .toc-item-wrapper {
   display: flex; align-items: center; margin-bottom: 4px;
   padding: 10px 12px; border-radius: 8px; font-size: 13.5px;
-  transition: background 0.2s; cursor: pointer;
+  transition: background 0.2s; cursor: pointer; color: #374151;
 }
-.toc-item-wrapper:active { background: rgba(255,255,255,0.1); }
-.toc-item-wrapper.active { background: #00bfff; color: #ffffff; font-weight: 600; }
+.toc-item-wrapper:active { background: #f3f4f6; }
+.toc-item-wrapper.active { background: #fef3c7; color: #b45309; font-weight: 600; }
 .toc-text { flex-grow: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 /* Bottom Dock in Reader */
 .bottom-dock {
   position: absolute; bottom: 0; left: 0; width: 100%; height: 52px;
-  background: rgba(20, 20, 20, 0.95); backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px);
   display: flex; align-items: center; justify-content: space-between;
-  padding: 4px 12px; z-index: 80; border-top: 1px solid rgba(255,255,255,0.1);
+  padding: 4px 12px; z-index: 80; border-top: 1px solid #e5e7eb;
 }
 
 .dock-nav-btn {
   width: 38px; height: 38px; border-radius: 50%;
-  background: rgba(255, 255, 255, 0.12); color: #fff; font-size: 16px; border: none;
+  background: #f3f4f6; color: #1f2937; font-size: 16px; border: 1px solid #d1d5db;
   display: flex; align-items: center; justify-content: center; cursor: pointer;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
 }
 
 .page-select-wrapper { flex: 1; margin: 0 10px; }
 .page-select-wrapper select {
-  width: 100%; height: 36px; background: #282828; color: #fff;
-  border: 1px solid #444; border-radius: 8px; padding: 0 8px; font-size: 12.5px; text-align: center;
+  width: 100%; height: 36px; background: #ffffff; color: #1f2937;
+  border: 1px solid #d1d5db; border-radius: 8px; padding: 0 8px; font-size: 12.5px; text-align: center;
 }
 
 /* Crop Modal */
@@ -289,7 +291,7 @@ canvas#cropCanvas { display: block; touch-action: none; }
   width: 52px; height: 52px; background-color: var(--amber-main); color: white;
   border: none; border-radius: 50%; font-size: 18px; font-weight: bold;
   box-shadow: 0 6px 18px rgba(180, 83, 9, 0.4); cursor: pointer; z-index: 850;
-  display: flex; align-items: center; justify-content: center; transition: transform 0.2s;
+  display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;
 }
 #fab-chat-toggle:active { transform: scale(0.92); }
 
@@ -300,11 +302,28 @@ canvas#cropCanvas { display: block; touch-action: none; }
   color: #92400e; border: 2px solid #fff; border-radius: 50%;
   font-size: 18px; box-shadow: 0 4px 14px rgba(245, 158, 11, 0.4);
   cursor: pointer; z-index: 850; display: flex; align-items: center; justify-content: center;
+  transition: all 0.3s ease;
 }
 #checkin-badge {
   position: absolute; top: -4px; right: -4px;
   background-color: #ef4444; color: white; font-size: 10px; font-weight: bold;
   padding: 2px 5px; border-radius: 10px; border: 2px solid white; min-width: 18px; text-align: center;
+}
+
+/* FAB Hide/Show Toggle */
+#fab-toggle-visibility {
+  position: fixed; bottom: 75px; right: 20px;
+  width: 38px; height: 38px; background: #4b5563; color: white;
+  border: 2px solid white; border-radius: 50%; font-size: 15px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2); cursor: pointer; z-index: 850;
+  display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;
+}
+#fab-toggle-visibility:active { transform: scale(0.9); }
+
+.fabs-hidden {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transform: scale(0.7) translateY(20px) !important;
 }
 
 #chatbot-modal {
@@ -1913,6 +1932,9 @@ input[type=range]::-webkit-slider-thumb { height: 15px; width: 15px; border-radi
 <!-- AI FAB -->
 <button id="fab-chat-toggle" title="ถาม AI">AI</button>
 
+<!-- FAB Visibility Toggle -->
+<button id="fab-toggle-visibility" title="ซ่อน/แสดงปุ่มลอย" onclick="toggleFabVisibility()">👁️</button>
+
 <!-- Toast Notification -->
 <div id="toast"></div>
 
@@ -2093,6 +2115,7 @@ let isBgPlayEnabled = true;
 let isLooping = false;
 let playbackSpeeds = [1.0, 1.25, 1.5, 0.75];
 let speedIndex = 0;
+let fabsUserHidden = false;
 
 const audioPlayer = new Audio();
 
@@ -2184,13 +2207,41 @@ function switchTab(tab) {
     indexPage.classList.remove('hidden');
     navIndex.classList.add('active');
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    updateFabVisibility(false);
   } else if (tab === 'reader') {
     readerPage.classList.remove('hidden');
     navReader.classList.add('active');
+    updateFabVisibility(true); // Automatically hide FABs in Reader mode
   } else if (tab === 'audio') {
     audioPage.classList.remove('hidden');
     navAudio.classList.add('active');
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    updateFabVisibility(false);
+  }
+}
+
+function toggleFabVisibility() {
+  fabsUserHidden = !fabsUserHidden;
+  updateFabVisibility(false);
+  showToast(fabsUserHidden ? 'ซ่อนปุ่มลอยแล้ว' : 'แสดงปุ่มลอยแล้ว', 'success');
+}
+
+function updateFabVisibility(isReaderTab = false) {
+  const checkin = document.getElementById('fab-checkin');
+  const chat = document.getElementById('fab-chat-toggle');
+  const toggleBtn = document.getElementById('fab-toggle-visibility');
+
+  if (isReaderTab || fabsUserHidden) {
+    if (checkin) checkin.classList.add('fabs-hidden');
+    if (chat) chat.classList.add('fabs-hidden');
+    if (toggleBtn) {
+      if (isReaderTab) toggleBtn.classList.add('fabs-hidden');
+      else toggleBtn.classList.remove('fabs-hidden');
+    }
+  } else {
+    if (checkin) checkin.classList.remove('fabs-hidden');
+    if (chat) chat.classList.remove('fabs-hidden');
+    if (toggleBtn) toggleBtn.classList.remove('fabs-hidden');
   }
 }
 
